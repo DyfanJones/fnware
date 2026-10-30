@@ -2,13 +2,47 @@
 
 export("%@%")
 export(":=")
+export(after_sleep_log)
+export(after_sleep_none)
+export(before_sleep_log)
+export(before_sleep_none)
 export(lru_cache)
 export(retry)
+export(retry_all)
+export(retry_if_error)
+export(retry_if_error_message)
+export(retry_if_result)
+export(retry_never)
+export(stop_after_attempt)
+export(stop_after_delay)
+export(stop_all)
+export(stop_any)
+export(stop_before_delay)
+export(stop_never)
+export(wait_chain)
+export(wait_combine)
+export(wait_exp)
+export(wait_exp_jitter)
+export(wait_fixed)
+export(wait_none)
+export(wait_rand)
 importFrom(S7,
   ":=",
+  "method<-",
+  S7_dispatch,
+  S7_inherits,
   S7_on_build,
   S7_on_load,
-  S7_on_unload
+  S7_on_unload,
+  class_any,
+  class_character,
+  class_function,
+  class_list,
+  class_numeric,
+  new_class,
+  new_generic,
+  new_object,
+  new_property
 )
 importFrom(adorn,
   "%@%",
@@ -17,3 +51,4 @@ importFrom(adorn,
 )
 importFrom(cachem,cache_mem)
 importFrom(rlang,hash)
+importFrom(stats,runif)

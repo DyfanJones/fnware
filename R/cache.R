@@ -1,7 +1,27 @@
 #' @importFrom adorn := decorator
 #' @importFrom rlang hash
 #' @importFrom cachem cache_mem
+NULL
 
+#' Cache function results
+#'
+#' Decorator that remembers a function's results, keyed on the matched arguments
+#' (including defaults), and evicts the least recently used entries when full.
+#'
+#' Call `lru_cache(maxsize)` to build a decorator, then apply it with `%@%` or by
+#' calling it on a function.
+#'
+#' @param maxsize Maximum cache size in bytes. Defaults to 1 GiB.
+#' @return A decorator.
+#' @examples
+#' slow_square <- lru_cache() %@% function(x) {
+#'   Sys.sleep(0.1)
+#'   x^2
+#' }
+#' slow_square(4) # slow
+#' slow_square(4) # cached
+#' @rdname lru_cache
+#' @usage NULL
 #' @export
 lru_cache := decorator(
   function(f, maxsize = 1024 * 1024^2) {

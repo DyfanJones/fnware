@@ -1,15 +1,18 @@
-Package: stuff
-Title: Useful decorator functions
+Package: garnish
+Title: Python-Style Decorators for R
 Version: 0.1.0
 Authors@R: 
     person("Dyfan", "Jones", , "dyfan.r.jones@gmail.com", role = c("aut", "cre"))
-Description: Useful decorator functions
+Description: A collection of popular Python decorators ported to R with the 'adorn'
+    framework. Includes retrying failing calls with configurable stop, wait and
+    retry strategies (after 'tenacity'), and least recently used caching of
+    function results.
 License: MIT + file LICENSE
-URL: https://dyfanjones.github.io/stuff/, https://github.com/DyfanJones/stuff
-BugReports: https://github.com/DyfanJones/stuff/issues
+URL: https://dyfanjones.github.io/garnish/, https://github.com/DyfanJones/garnish
+BugReports: https://github.com/DyfanJones/garnish/issues
 Depends:
     R (>= 4.4.0)
-Imports: methods, adorn, S7 (>= 0.2.2.9000), rlang, cachem
+Imports: adorn, S7 (>= 0.2.2.9000), rlang, cachem, stats
 Remotes: 
     DyfanJones/adorn,
     RConsortium/S7
@@ -22,9 +25,14 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Collate: 
     'cache.R'
-    'retry.R'
-    'wait.R'
-    'reexport-adorn.R'
     'reexport-S7.R'
+    'reexport-adorn.R'
+    'retry_utils.R'
+    'retry_after.R'
+    'retry_before.R'
+    'retry_retry.R'
+    'retry_wait.R'
+    'retry_stop.R'
+    'retry.R'
     'zzz.R'
 VignetteBuilder: litedown
