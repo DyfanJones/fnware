@@ -1,0 +1,30 @@
+Package: stuff
+Title: Useful decorator functions
+Version: 0.1.0
+Authors@R: 
+    person("Dyfan", "Jones", , "dyfan.r.jones@gmail.com", role = c("aut", "cre"))
+Description: Useful decorator functions
+License: MIT + file LICENSE
+URL: https://dyfanjones.github.io/stuff/, https://github.com/DyfanJones/stuff
+BugReports: https://github.com/DyfanJones/stuff/issues
+Depends:
+    R (>= 4.4.0)
+Imports: methods, adorn, S7 (>= 0.2.2.9000), rlang, cachem
+Remotes: 
+    DyfanJones/adorn,
+    RConsortium/S7
+Suggests: 
+    litedown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.1
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Collate: 
+    'cache.R'
+    'retry.R'
+    'wait.R'
+    'reexport-adorn.R'
+    'reexport-S7.R'
+    'zzz.R'
+VignetteBuilder: litedown
