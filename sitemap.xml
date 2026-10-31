@@ -1,0 +1,23 @@
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://dyfanjones.github.io/garnish/404.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/LICENSE-text.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/articles/caching.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/articles/contextmanager.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/articles/index.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/articles/retry.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/authors.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/index.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/after_sleep.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/as_decorator.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/before_sleep.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/contextmanager.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/index.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/lru_cache.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/reexports.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/retry.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/retry_conditions.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/stop_conditions.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/wait_strategies.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/with_context.html</loc></url>
+</urlset>
+

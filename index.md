@@ -1,0 +1,203 @@
+# garnish
+
+Popular Python decorators ported to R with the
+[adorn](https://dyfanjones.github.io/adorn/) framework.
+
+| Decorator | What it does | Python equivalent |
+|----|----|----|
+| [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) | Calls a function again when it fails | [tenacity](https://github.com/jd/tenacity) |
+| [`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md) | Caches results, evicting the least recently used | [`functools.lru_cache`](https://docs.python.org/3/library/functools.html#functools.lru_cache) |
+| `cache` | Caches results, never evicting | [`functools.cache`](https://docs.python.org/3/library/functools.html#functools.cache) |
+| [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md) | Caches results as files, so they outlive the session | [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/stable/memory.html) |
+| `contextmanager` | Writes setup and teardown once, as `local_`, `with_` and decorator forms | [`contextlib.contextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager) |
+
+## Installation
+
+``` r
+
+# install.packages("pak")
+pak::pak("DyfanJones/garnish")
+```
+
+## Usage
+
+[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) and
+[`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+build a decorator, which you apply to a function with `%@%` or by
+calling it on the function.
+
+### Retry
+
+``` r
+
+library(garnish)
+
+n <- 0
+flaky <- function() {
+  n <<- n + 1
+  if (n < 3) stop("not yet")
+  n
+}
+
+retry(stop = stop_after_attempt(5))(flaky)()
+#> [1] 3
+```
+
+Choose when to give up, how long to wait, and what to retry:
+
+``` r
+
+fetch := retry(
+  stop = stop_after_attempt(4),
+  wait = wait_exp(multiplier = 0.1) + wait_rand(0, 0.1),
+  retry = retry_if_error_message(match = "timeout"),
+  before_sleep = before_sleep_log()
+) %@% function(url) {
+  # ...
+}
+```
+
+When `stop` fires, a `retry_error` condition is signalled. Set
+`reraise = TRUE` to re-throw the last error instead, or give
+`retry_error_callback` a function to return a fallback value:
+
+``` r
+
+poll := retry(
+  stop = stop_after_attempt(3),
+  retry = retry_if_result(is.null),
+  retry_error_callback = function(state) "gave up"
+) %@% function() NULL
+
+poll()
+#> [1] "gave up"
+```
+
+| Strategy | Functions |
+|----|----|
+| Stop (`stop`) | [`stop_never()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md), [`stop_after_attempt()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md), [`stop_after_delay()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md), [`stop_before_delay()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md), [`stop_any()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md), [`stop_all()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md) |
+| Wait (`wait`) | [`wait_none()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md), [`wait_fixed()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md), [`wait_rand()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md), [`wait_exp()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md), [`wait_exp_jitter()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md), [`wait_chain()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md), [`wait_combine()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md) or `a + b` |
+| Retry (`retry`) | [`retry_all()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md), [`retry_never()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md), [`retry_if_error()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md), [`retry_if_error_message()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md), [`retry_if_result()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md) |
+| Hooks | [`before_sleep_none()`](https://dyfanjones.github.io/garnish/reference/before_sleep.md), [`before_sleep_log()`](https://dyfanjones.github.io/garnish/reference/before_sleep.md), [`after_sleep_none()`](https://dyfanjones.github.io/garnish/reference/after_sleep.md), [`after_sleep_log()`](https://dyfanjones.github.io/garnish/reference/after_sleep.md) |
+
+### LRU cache
+
+``` r
+
+slow_square := lru_cache() %@% function(x) {
+  Sys.sleep(0.2)
+  x^2
+}
+
+slow_square(4) # slow
+slow_square(4) # cached
+```
+
+`cache` is the same without a size limit. It takes no parameters, so
+apply it directly:
+
+``` r
+
+slow_cube := cache %@% function(x) {
+  Sys.sleep(0.2)
+  x^3
+}
+```
+
+[`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+keeps results in files under `dir`, so they survive the session and can
+be shared between sessions. `dir` has no default, because a temporary
+directory would defeat the point:
+
+``` r
+
+slow_cube := disk_cache("~/.cache/my-analysis") %@% function(x) {
+  Sys.sleep(0.2)
+  x^3
+}
+```
+
+Set `format = "qs2"` to use the [qs2](https://github.com/qsbase/qs2)
+package instead of [`saveRDS()`](https://rdrr.io/r/base/readRDS.html).
+On a 1,000,000-row data frame it was about 7x faster to write and 3.5x
+faster to read back, and slightly smaller on disk (one machine, so
+measure your own). qs2 is optional and must be installed.
+
+Editing a function’s body invalidates its entries, but changing
+something it calls does not. Results are saved with
+[`saveRDS()`](https://rdrr.io/r/base/readRDS.html), so environments and
+external pointers do not round-trip.
+
+### Context manager
+
+R has no `yield`, so a context manager calls
+[`teardown()`](https://dyfanjones.github.io/garnish/reference/contextmanager.md)
+right after acquiring each resource and returns the resource. Unlike
+[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) and
+[`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md),
+`contextmanager` takes no parameters, so it is applied without calling
+it first.
+
+``` r
+
+local_tempdir := contextmanager %@% function(pattern = "tmp") {
+  path <- tempfile(pattern)
+  dir.create(path)
+  teardown(unlink(path, recursive = TRUE))
+  path
+}
+```
+
+That one definition gives three forms. Called inside a function, cleanup
+runs when that function exits, like `withr::local_*()`:
+
+``` r
+
+f <- function() {
+  d <- local_tempdir()
+  writeLines("hi", file.path(d, "x.txt"))
+  d
+}
+
+d <- f()
+dir.exists(d)
+#> [1] FALSE
+```
+
+[`with_context()`](https://dyfanjones.github.io/garnish/reference/with_context.md)
+scopes it to a block, passing the value to a function:
+
+``` r
+
+with_context(local_tempdir(), function(d) list.files(d))
+#> character(0)
+```
+
+[`as_decorator()`](https://dyfanjones.github.io/garnish/reference/as_decorator.md)
+runs a function inside the context:
+
+``` r
+
+g := as_decorator(local_tempdir) %@% function() "ran inside context"
+g()
+#> [1] "ran inside context"
+```
+
+Cleanups run last in, first out, and the ones registered before a
+failing setup step still run. A context manager called from another’s
+setup is cleaned up with the outer one.
+
+## Learn more
+
+Vignettes:
+[`vignette("retry")`](https://dyfanjones.github.io/garnish/articles/retry.md),
+[`vignette("caching")`](https://dyfanjones.github.io/garnish/articles/caching.md)
+and
+[`vignette("contextmanager")`](https://dyfanjones.github.io/garnish/articles/contextmanager.md).
+The help pages are
+[`?retry`](https://dyfanjones.github.io/garnish/reference/retry.md),
+[`?lru_cache`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+(which also covers `cache` and `disk_cache`) and
+[`?contextmanager`](https://dyfanjones.github.io/garnish/reference/contextmanager.md).
+See the adorn [documentation](https://dyfanjones.github.io/adorn/) for
+how decorators are applied, stacked and removed.
