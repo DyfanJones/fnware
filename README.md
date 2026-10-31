@@ -1,6 +1,7 @@
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/DyfanJones/garnish/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DyfanJones/garnish/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/DyfanJones/garnish/graph/badge.svg)](https://app.codecov.io/gh/DyfanJones/garnish)
+[![R-universe version](https://DyfanJones.r-universe.dev/garnish/badges/version)](https://DyfanJones.r-universe.dev/garnish)
 <!-- badges: end -->
 
 # garnish
