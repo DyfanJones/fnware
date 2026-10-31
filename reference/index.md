@@ -68,6 +68,14 @@ Remember a function’s results.
   [`disk_cache`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
   : Cache function results
 
+## Validation
+
+Check arguments and return values.
+
+- [`validate_args()`](https://dyfanjones.github.io/garnish/reference/validate_args.md)
+  [`validate_return()`](https://dyfanjones.github.io/garnish/reference/validate_args.md)
+  : Validate arguments and return values
+
 ## Context managers
 
 Write setup and teardown once.

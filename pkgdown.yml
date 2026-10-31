@@ -5,7 +5,8 @@ articles:
   caching: caching.html
   contextmanager: contextmanager.html
   retry: retry.html
-last_built: 2026-10-31T15:38Z
+  validation: validation.html
+last_built: 2026-10-31T16:11Z
 urls:
   reference: https://dyfanjones.github.io/garnish/reference
   article: https://dyfanjones.github.io/garnish/articles

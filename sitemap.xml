@@ -5,6 +5,7 @@
 <url><loc>https://dyfanjones.github.io/garnish/articles/contextmanager.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/articles/index.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/articles/retry.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/articles/validation.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/authors.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/index.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/after_sleep.html</loc></url>
@@ -18,6 +19,7 @@
 <url><loc>https://dyfanjones.github.io/garnish/reference/retry.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/retry_conditions.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/stop_conditions.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/validate_args.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/wait_strategies.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/with_context.html</loc></url>
 </urlset>

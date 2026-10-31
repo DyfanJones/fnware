@@ -9,6 +9,7 @@ Popular Python decorators ported to R with the
 | [`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md) | Caches results, evicting the least recently used | [`functools.lru_cache`](https://docs.python.org/3/library/functools.html#functools.lru_cache) |
 | `cache` | Caches results, never evicting | [`functools.cache`](https://docs.python.org/3/library/functools.html#functools.cache) |
 | [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md) | Caches results as files, so they outlive the session | [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/stable/memory.html) |
+| [`validate_args()`](https://dyfanjones.github.io/garnish/reference/validate_args.md), [`validate_return()`](https://dyfanjones.github.io/garnish/reference/validate_args.md) | Checks arguments and return values with any validator function | [pydantic `validate_call`](https://docs.pydantic.dev/latest/concepts/validation_decorator/) |
 | `contextmanager` | Writes setup and teardown once, as `local_`, `with_` and decorator forms | [`contextlib.contextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager) |
 
 ## Installation
@@ -187,18 +188,50 @@ Cleanups run last in, first out, and the ones registered before a
 failing setup step still run. A context manager called from another’s
 setup is cleaned up with the outer one.
 
+### Validation
+
+[`validate_args()`](https://dyfanjones.github.io/garnish/reference/validate_args.md)
+takes one validator per argument and
+[`validate_return()`](https://dyfanjones.github.io/garnish/reference/validate_args.md)
+takes one for the result. A validator is any function (or formula) that
+returns `TRUE` to pass. Returning a string fails with that string as the
+message, which is how checkmate’s `check_*()` functions behave, so they
+work without garnish depending on them:
+
+``` r
+
+scale_by := validate_args(x = is.numeric, n = ~ .x > 0) %@% function(x, n = 1) {
+  x * n
+}
+
+scale_by(2, 3)
+#> [1] 6
+
+scale_by("a", -1)
+#> Error: Invalid arguments.
+#> ✖ `x`: failed validation.
+#> ✖ `n`: failed validation.
+```
+
+All failures are reported together as a `garnish_validation_error`.
+Defaults are validated too.
+
 ## Learn more
 
 Vignettes:
 [`vignette("retry")`](https://dyfanjones.github.io/garnish/articles/retry.md),
 [`vignette("caching")`](https://dyfanjones.github.io/garnish/articles/caching.md)
 and
-[`vignette("contextmanager")`](https://dyfanjones.github.io/garnish/articles/contextmanager.md).
+[`vignette("contextmanager")`](https://dyfanjones.github.io/garnish/articles/contextmanager.md)
+and
+[`vignette("validation")`](https://dyfanjones.github.io/garnish/articles/validation.md).
 The help pages are
 [`?retry`](https://dyfanjones.github.io/garnish/reference/retry.md),
 [`?lru_cache`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
-(which also covers `cache` and `disk_cache`) and
-[`?contextmanager`](https://dyfanjones.github.io/garnish/reference/contextmanager.md).
+(which also covers `cache` and `disk_cache`),
+[`?contextmanager`](https://dyfanjones.github.io/garnish/reference/contextmanager.md)
+and
+[`?validate_args`](https://dyfanjones.github.io/garnish/reference/validate_args.md).
 See the adorn [documentation](https://dyfanjones.github.io/adorn/) for
 how decorators are applied, stacked and removed.
 
@@ -272,6 +305,14 @@ Remember a function’s results.
   [`disk_cache`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
   : Cache function results
 
+## Validation
+
+Check arguments and return values.
+
+- [`validate_args()`](https://dyfanjones.github.io/garnish/reference/validate_args.md)
+  [`validate_return()`](https://dyfanjones.github.io/garnish/reference/validate_args.md)
+  : Validate arguments and return values
+
 ## Context managers
 
 Write setup and teardown once.
@@ -300,3 +341,5 @@ Write setup and teardown once.
   results](https://dyfanjones.github.io/garnish/articles/caching.md):
 - [Context
   managers](https://dyfanjones.github.io/garnish/articles/contextmanager.md):
+- [Validating arguments and
+  results](https://dyfanjones.github.io/garnish/articles/validation.md):

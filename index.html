@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Python-Style Decorators for R">
-<meta name="description" content="A collection of popular Python decorators ported to R with the adorn framework. Includes retrying failing calls with configurable stop, wait and retry strategies (after tenacity), and least recently used caching of function results.">
-<meta property="og:description" content="A collection of popular Python decorators ported to R with the adorn framework. Includes retrying failing calls with configurable stop, wait and retry strategies (after tenacity), and least recently used caching of function results.">
+<meta name="description" content="Popular Python decorators ported to R with the adorn framework: retrying, caching, context managers and argument validation.">
+<meta property="og:description" content="Popular Python decorators ported to R with the adorn framework: retrying, caching, context managers and argument validation.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -38,6 +38,7 @@
 <li><a class="dropdown-item" href="articles/retry.html">Retrying failing calls</a></li>
     <li><a class="dropdown-item" href="articles/caching.html">Caching results</a></li>
     <li><a class="dropdown-item" href="articles/contextmanager.html">Context managers</a></li>
+    <li><a class="dropdown-item" href="articles/validation.html">Validating arguments and results</a></li>
   </ul>
 </li>
       </ul>
@@ -97,6 +98,13 @@
 <td><code><a href="reference/lru_cache.html">disk_cache()</a></code></td>
 <td>Caches results as files, so they outlive the session</td>
 <td><a href="https://joblib.readthedocs.io/en/stable/memory.html" class="external-link"><code>joblib.Memory.cache</code></a></td>
+</tr>
+<tr>
+<td>
+<code><a href="reference/validate_args.html">validate_args()</a></code>, <code><a href="reference/validate_args.html">validate_return()</a></code>
+</td>
+<td>Checks arguments and return values with any validator function</td>
+<td><a href="https://docs.pydantic.dev/latest/concepts/validation_decorator/" class="external-link">pydantic <code>validate_call</code></a></td>
 </tr>
 <tr>
 <td><code>contextmanager</code></td>
@@ -247,11 +255,29 @@
 <span><span class="co">#&gt; [1] "ran inside context"</span></span></code></pre></div>
 <p>Cleanups run last in, first out, and the ones registered before a failing setup step still run. A context manager called from another’s setup is cleaned up with the outer one.</p>
 </div>
+<div class="section level3">
+<h3 id="validation">Validation<a class="anchor" aria-label="anchor" href="#validation"></a>
+</h3>
+<p><code><a href="reference/validate_args.html">validate_args()</a></code> takes one validator per argument and <code><a href="reference/validate_args.html">validate_return()</a></code> takes one for the result. A validator is any function (or formula) that returns <code>TRUE</code> to pass. Returning a string fails with that string as the message, which is how checkmate’s <code>check_*()</code> functions behave, so they work without garnish depending on them:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">scale_by</span> <span class="op">:=</span> <span class="fu"><a href="reference/validate_args.html">validate_args</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">is.numeric</span>, n <span class="op">=</span> <span class="op">~</span> <span class="va">.x</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">n</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">x</span> <span class="op">*</span> <span class="va">n</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">scale_by</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 6</span></span>
+<span></span>
+<span><span class="fu">scale_by</span><span class="op">(</span><span class="st">"a"</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: Invalid arguments.</span></span>
+<span><span class="co">#&gt; ✖ `x`: failed validation.</span></span>
+<span><span class="co">#&gt; ✖ `n`: failed validation.</span></span></code></pre></div>
+<p>All failures are reported together as a <code>garnish_validation_error</code>. Defaults are validated too.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="learn-more">Learn more<a class="anchor" aria-label="anchor" href="#learn-more"></a>
 </h2>
-<p>Vignettes: <code><a href="articles/retry.html">vignette("retry")</a></code>, <code><a href="articles/caching.html">vignette("caching")</a></code> and <code><a href="articles/contextmanager.html">vignette("contextmanager")</a></code>. The help pages are <code><a href="reference/retry.html">?retry</a></code>, <code><a href="reference/lru_cache.html">?lru_cache</a></code> (which also covers <code>cache</code> and <code>disk_cache</code>) and <code><a href="reference/contextmanager.html">?contextmanager</a></code>. See the adorn <a href="https://dyfanjones.github.io/adorn/" class="external-link">documentation</a> for how decorators are applied, stacked and removed.</p>
+<p>Vignettes: <code><a href="articles/retry.html">vignette("retry")</a></code>, <code><a href="articles/caching.html">vignette("caching")</a></code> and <code><a href="articles/contextmanager.html">vignette("contextmanager")</a></code> and <code><a href="articles/validation.html">vignette("validation")</a></code>. The help pages are <code><a href="reference/retry.html">?retry</a></code>, <code><a href="reference/lru_cache.html">?lru_cache</a></code> (which also covers <code>cache</code> and <code>disk_cache</code>), <code><a href="reference/contextmanager.html">?contextmanager</a></code> and <code><a href="reference/validate_args.html">?validate_args</a></code>. See the adorn <a href="https://dyfanjones.github.io/adorn/" class="external-link">documentation</a> for how decorators are applied, stacked and removed.</p>
 </div>
 </div>
 
