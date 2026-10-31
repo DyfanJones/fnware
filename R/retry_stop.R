@@ -1,12 +1,17 @@
 #' @include retry_utils.R
 
+#' @rdname extending_retry
+#' @export
 stop_base := new_class(abstract = TRUE)
 
-# `state` is a list(attempt, wait, elapsed, error) built by `retry()`:
+# `state` is a list(attempt, wait, elapsed, error, value) built by `retry()`:
 #   attempt: 1-based number of the attempt that just failed
 #   wait:    seconds `retry()` is about to sleep
 #   elapsed: seconds since the first attempt started
-#   error:   the condition that was caught
+#   error:   the condition that was caught, or NULL if the result was rejected
+#   value:   the value returned, or NULL if the call errored
+#' @rdname extending_retry
+#' @export
 stop_fn := new_generic("class", function(class, state, ...) {
   S7_dispatch()
 })

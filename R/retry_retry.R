@@ -1,9 +1,13 @@
 #' @include retry_utils.R
 
+#' @rdname extending_retry
+#' @export
 retry_base := new_class(abstract = TRUE)
 
 # `outcome` is list(value, error) for the attempt that just finished: `error`
 # is NULL when the call succeeded, otherwise `value` is NULL.
+#' @rdname extending_retry
+#' @export
 retry_fn := new_generic("class", function(class, outcome, ...) {
   S7_dispatch()
 })

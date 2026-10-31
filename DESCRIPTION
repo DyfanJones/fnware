@@ -36,5 +36,6 @@ Collate:
     'retry_wait.R'
     'retry_stop.R'
     'retry.R'
+    'retry_extend.R'
     'zzz.R'
 VignetteBuilder: litedown

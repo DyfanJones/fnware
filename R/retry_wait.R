@@ -1,9 +1,13 @@
 #' @include retry_utils.R
 
+#' @rdname extending_retry
+#' @export
 wait_base := new_class(abstract = TRUE)
 
 # `prev_wait` is the previous sleep time (NULL on the first retry) and is only
 # used by strategies that depend on it, e.g. decorrelated jitter.
+#' @rdname extending_retry
+#' @export
 wait_fn := new_generic("class", function(class, attempt, prev_wait = NULL, ...) {
   S7_dispatch()
 })

@@ -1,7 +1,11 @@
 #' @include retry_utils.R
 
+#' @rdname extending_retry
+#' @export
 after_sleep_base := new_class(abstract = TRUE)
 
+#' @rdname extending_retry
+#' @export
 after_sleep_fn := new_generic("class", function(class, state, ...) {
   S7_dispatch()
 })
