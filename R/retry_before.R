@@ -27,10 +27,9 @@ before_sleep_none := new_class(parent = before_sleep_base)
 #' @export
 before_sleep_log := new_class(
   parent = before_sleep_base,
-  properties = list(logger = class_function),
-  constructor = function(logger = message) {
-    new_object(before_sleep_base(), logger = logger)
-  }
+  properties = list(
+    logger = new_property(class_function, default = quote(message))
+  )
 )
 
 method(before_sleep_fn, before_sleep_none) <- function(class, state, ...) {

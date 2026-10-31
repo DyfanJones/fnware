@@ -27,10 +27,9 @@ after_sleep_none := new_class(parent = after_sleep_base)
 #' @export
 after_sleep_log := new_class(
   parent = after_sleep_base,
-  properties = list(logger = class_function),
-  constructor = function(logger = message) {
-    new_object(after_sleep_base(), logger = logger)
-  }
+  properties = list(
+    logger = new_property(class_function, default = quote(message))
+  )
 )
 
 method(after_sleep_fn, after_sleep_none) <- function(class, state, ...) {

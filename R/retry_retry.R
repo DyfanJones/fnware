@@ -44,10 +44,7 @@ retry_never := new_class(parent = retry_base)
 #' @export
 retry_if_error := new_class(
   parent = retry_base,
-  properties = list(classes = class_character),
-  constructor = function(classes = "error") {
-    new_object(retry_base(), classes = classes)
-  }
+  properties = list(classes = new_property(class_character, default = "error"))
 )
 
 #' @rdname retry_conditions
@@ -55,25 +52,16 @@ retry_if_error := new_class(
 retry_if_error_message := new_class(
   parent = retry_base,
   properties = list(
-    message = NULL | class_character,
-    match = NULL | class_character
-  ),
-  constructor = function(message = NULL, match = NULL) {
-    if (is.null(message) == is.null(match)) {
-      base::stop("Exactly one of `message` or `match` must be supplied.")
-    }
-    new_object(retry_base(), message = message, match = match)
-  }
+    message = new_property(NULL | class_character, default = NULL),
+    match = new_property(NULL | class_character, default = NULL)
+  )
 )
 
 #' @rdname retry_conditions
 #' @export
 retry_if_result := new_class(
   parent = retry_base,
-  properties = list(predicate = class_function),
-  constructor = function(predicate) {
-    new_object(retry_base(), predicate = predicate)
-  }
+  properties = list(predicate = class_function)
 )
 
 method(retry_fn, retry_all) <- function(class, outcome, ...) {

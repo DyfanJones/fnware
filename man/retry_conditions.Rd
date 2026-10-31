@@ -16,7 +16,7 @@ retry_if_error(classes = "error")
 
 retry_if_error_message(message = NULL, match = NULL)
 
-retry_if_result(predicate)
+retry_if_result(predicate = function() NULL)
 }
 \arguments{
 \item{classes}{Condition classes to retry on.}
