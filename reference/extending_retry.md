@@ -111,8 +111,7 @@ library(S7)
 wait_linear <- new_class(
   "wait_linear",
   parent = wait_base,
-  properties = list(step = class_numeric),
-  constructor = function(step = 1) new_object(wait_base(), step = step)
+  properties = list(step = new_property(class_numeric, default = 1))
 )
 
 method(wait_fn, wait_linear) <- function(class, attempt, prev_wait = NULL, ...) {
