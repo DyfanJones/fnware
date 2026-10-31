@@ -68,6 +68,13 @@ Remember a function’s results.
   [`disk_cache`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
   : Cache function results
 
+## Rate limiting
+
+Limit how often a function can be called.
+
+- [`rate_limit()`](https://dyfanjones.github.io/garnish/reference/rate_limit.md)
+  : Limit how often a function can be called
+
 ## Validation
 
 Check arguments and return values.
