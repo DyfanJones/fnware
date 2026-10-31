@@ -4,8 +4,12 @@ export("%@%")
 export(":=")
 export(after_sleep_log)
 export(after_sleep_none)
+export(as_decorator)
 export(before_sleep_log)
 export(before_sleep_none)
+export(cache)
+export(contextmanager)
+export(disk_cache)
 export(lru_cache)
 export(retry)
 export(retry_all)
@@ -19,6 +23,7 @@ export(stop_all)
 export(stop_any)
 export(stop_before_delay)
 export(stop_never)
+export(teardown)
 export(wait_chain)
 export(wait_combine)
 export(wait_exp)
@@ -26,6 +31,7 @@ export(wait_exp_jitter)
 export(wait_fixed)
 export(wait_none)
 export(wait_rand)
+export(with_context)
 importFrom(S7,
   ":=",
   "method<-",
@@ -47,8 +53,13 @@ importFrom(S7,
 importFrom(adorn,
   "%@%",
   ":=",
-  decorator
+  decorator,
+  decorator_context
 )
-importFrom(cachem,cache_mem)
+importFrom(cachem,
+  cache_disk,
+  cache_mem
+)
 importFrom(rlang,hash)
 importFrom(stats,runif)
+importFrom(withr,defer)

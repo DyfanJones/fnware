@@ -2,20 +2,45 @@
 % Please edit documentation in R/cache.R
 \name{lru_cache}
 \alias{lru_cache}
+\alias{cache}
+\alias{disk_cache}
 \title{Cache function results}
 \arguments{
 \item{maxsize}{Maximum cache size in bytes. Defaults to 1 GiB.}
+
+\item{format}{File format for \code{disk_cache()}: \code{"rds"} (the default) or \code{"qs2"},
+which needs the qs2 package.}
+
+\item{dir}{Directory for \code{disk_cache()} to keep its files in. It is created if
+needed. There is no default, so persistence is always a choice.}
 }
 \value{
 A decorator.
 }
 \description{
-Decorator that remembers a function's results, keyed on the matched arguments
-(including defaults), and evicts the least recently used entries when full.
+Decorators that remember a function's results, keyed on the matched arguments
+(including defaults).
 }
 \details{
+\itemize{
+\item \code{lru_cache()} evicts the least recently used entries when the cache is full.
+Port of Python's \code{functools.lru_cache}.
+\item \code{cache()} never evicts. Port of Python's \code{functools.cache}.
+\item \code{disk_cache()} stores results as files in \code{dir}, so they survive the R
+session and can be shared between sessions. Like \code{joblib.Memory.cache}.
+}
+
+Entries are keyed on the function's formals and body as well as its arguments,
+so editing the function invalidates them. Changes to anything it calls do not.
+\code{disk_cache()} saves results with \code{\link[=saveRDS]{saveRDS()}}, or with the qs2 package when
+\code{format = "qs2"}, which is usually faster and smaller for large objects.
+Neither round-trips environments or external pointers. Files from the two
+formats are not shared, so changing \code{format} for an existing \code{dir} starts with
+an empty cache.
+
 Call \code{lru_cache(maxsize)} to build a decorator, then apply it with \verb{\%@\%} or by
-calling it on a function.
+calling it on a function. \code{cache} takes no parameters, so it is applied
+directly.
 }
 \examples{
 slow_square <- lru_cache() \%@\% function(x) {
@@ -24,4 +49,19 @@ slow_square <- lru_cache() \%@\% function(x) {
 }
 slow_square(4) # slow
 slow_square(4) # cached
+
+slow_cube <- cache \%@\% function(x) {
+  Sys.sleep(0.1)
+  x^3
+}
+slow_cube(2) # slow
+slow_cube(2) # cached
+
+dir <- tempfile("cache")
+slow_cube <- disk_cache(dir) \%@\% function(x) {
+  Sys.sleep(0.1)
+  x^3
+}
+slow_cube(2) # slow, and saved to `dir`
+slow_cube(2) # cached
 }

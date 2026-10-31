@@ -1,4 +1,6 @@
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/DyfanJones/garnish/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DyfanJones/garnish/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/DyfanJones/garnish/graph/badge.svg)](https://app.codecov.io/gh/DyfanJones/garnish)
 <!-- badges: end -->
 
 # garnish
@@ -10,6 +12,9 @@ Popular Python decorators ported to R with the
 |-------------|-------------------------------------------------------|--------------------------------------------------------|
 | `retry()`   | Calls a function again when it fails                  | [tenacity](https://github.com/jd/tenacity)             |
 | `lru_cache()` | Caches results, evicting the least recently used    | [`functools.lru_cache`](https://docs.python.org/3/library/functools.html#functools.lru_cache) |
+| `cache` | Caches results, never evicting | [`functools.cache`](https://docs.python.org/3/library/functools.html#functools.cache) |
+| `disk_cache()` | Caches results as files, so they outlive the session | [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/stable/memory.html) |
+| `contextmanager` | Writes setup and teardown once, as `local_`, `with_` and decorator forms | [`contextlib.contextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager) |
 
 ## Installation
 
@@ -86,8 +91,89 @@ slow_square(4) # slow
 slow_square(4) # cached
 ```
 
+`cache` is the same without a size limit. It takes no parameters, so apply it
+directly:
+
+``` r
+slow_cube := cache %@% function(x) {
+  Sys.sleep(0.2)
+  x^3
+}
+```
+
+`disk_cache()` keeps results in files under `dir`, so they survive the session
+and can be shared between sessions. `dir` has no default, because a temporary
+directory would defeat the point:
+
+``` r
+slow_cube := disk_cache("~/.cache/my-analysis") %@% function(x) {
+  Sys.sleep(0.2)
+  x^3
+}
+```
+
+Set `format = "qs2"` to use the [qs2](https://github.com/qsbase/qs2) package
+instead of `saveRDS()`. On a 1,000,000-row data frame it was about 7x faster to
+write and 3.5x faster to read back, and slightly smaller on disk (one machine, so
+measure your own). qs2 is optional and must be installed.
+
+Editing a function's body invalidates its entries, but changing something it
+calls does not. Results are saved with `saveRDS()`, so environments and external
+pointers do not round-trip.
+
+### Context manager
+
+R has no `yield`, so a context manager calls `teardown()` right after acquiring
+each resource and returns the resource. Unlike `retry()` and `lru_cache()`,
+`contextmanager` takes no parameters, so it is applied without calling it first.
+
+``` r
+local_tempdir := contextmanager %@% function(pattern = "tmp") {
+  path <- tempfile(pattern)
+  dir.create(path)
+  teardown(unlink(path, recursive = TRUE))
+  path
+}
+```
+
+That one definition gives three forms. Called inside a function, cleanup runs
+when that function exits, like `withr::local_*()`:
+
+``` r
+f <- function() {
+  d <- local_tempdir()
+  writeLines("hi", file.path(d, "x.txt"))
+  d
+}
+
+d <- f()
+dir.exists(d)
+#> [1] FALSE
+```
+
+`with_context()` scopes it to a block, passing the value to a function:
+
+``` r
+with_context(local_tempdir(), function(d) list.files(d))
+#> character(0)
+```
+
+`as_decorator()` runs a function inside the context:
+
+``` r
+g := as_decorator(local_tempdir) %@% function() "ran inside context"
+g()
+#> [1] "ran inside context"
+```
+
+Cleanups run last in, first out, and the ones registered before a failing setup
+step still run. A context manager called from another's setup is cleaned up with
+the outer one.
+
 ## Learn more
 
-See `?retry` and `?lru_cache`, or the adorn
+Vignettes: `vignette("retry")`, `vignette("caching")` and
+`vignette("contextmanager")`. The help pages are `?retry`, `?lru_cache` (which
+also covers `cache` and `disk_cache`) and `?contextmanager`. See the adorn
 [documentation](https://dyfanjones.github.io/adorn/) for how decorators are
 applied, stacked and removed.

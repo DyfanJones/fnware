@@ -1,0 +1,40 @@
+url: https://dyfanjones.github.io/garnish/
+
+template:
+  bootstrap: 5
+  light-switch: true
+
+articles:
+  - title: Guides
+    navbar: ~
+    contents:
+      - retry
+      - caching
+      - contextmanager
+
+reference:
+  - title: Retrying
+    desc: Call a function again when it fails.
+    contents:
+      - retry
+      - stop_never
+      - wait_fixed
+      - retry_all
+      - before_sleep_none
+      - after_sleep_none
+
+  - title: Caching
+    desc: Remember a function's results.
+    contents:
+      - lru_cache
+
+  - title: Context managers
+    desc: Write setup and teardown once.
+    contents:
+      - contextmanager
+      - with_context
+      - as_decorator
+
+  - title: Re-exports
+    contents:
+      - reexports
