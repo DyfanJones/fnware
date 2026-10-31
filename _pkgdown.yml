@@ -11,6 +11,7 @@ articles:
       - retry
       - caching
       - contextmanager
+      - validation
 
 reference:
   - title: Retrying
@@ -28,6 +29,11 @@ reference:
     desc: Remember a function's results.
     contents:
       - lru_cache
+
+  - title: Validation
+    desc: Check arguments and return values.
+    contents:
+      - validate_args
 
   - title: Context managers
     desc: Write setup and teardown once.

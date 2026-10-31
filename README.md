@@ -14,6 +14,7 @@ Popular Python decorators ported to R with the
 | `lru_cache()` | Caches results, evicting the least recently used    | [`functools.lru_cache`](https://docs.python.org/3/library/functools.html#functools.lru_cache) |
 | `cache` | Caches results, never evicting | [`functools.cache`](https://docs.python.org/3/library/functools.html#functools.cache) |
 | `disk_cache()` | Caches results as files, so they outlive the session | [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/stable/memory.html) |
+| `validate_args()`, `validate_return()` | Checks arguments and return values with any validator function | [pydantic `validate_call`](https://docs.pydantic.dev/latest/concepts/validation_decorator/) |
 | `contextmanager` | Writes setup and teardown once, as `local_`, `with_` and decorator forms | [`contextlib.contextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager) |
 
 ## Installation
@@ -170,10 +171,36 @@ Cleanups run last in, first out, and the ones registered before a failing setup
 step still run. A context manager called from another's setup is cleaned up with
 the outer one.
 
+### Validation
+
+`validate_args()` takes one validator per argument and `validate_return()` takes
+one for the result. A validator is any function (or formula) that returns `TRUE`
+to pass. Returning a string fails with that string as the message, which is how
+checkmate's `check_*()` functions behave, so they work without garnish depending
+on them:
+
+``` r
+scale_by := validate_args(x = is.numeric, n = ~ .x > 0) %@% function(x, n = 1) {
+  x * n
+}
+
+scale_by(2, 3)
+#> [1] 6
+
+scale_by("a", -1)
+#> Error: Invalid arguments.
+#> ✖ `x`: failed validation.
+#> ✖ `n`: failed validation.
+```
+
+All failures are reported together as a `garnish_validation_error`. Defaults are
+validated too.
+
 ## Learn more
 
 Vignettes: `vignette("retry")`, `vignette("caching")` and
-`vignette("contextmanager")`. The help pages are `?retry`, `?lru_cache` (which
-also covers `cache` and `disk_cache`) and `?contextmanager`. See the adorn
+`vignette("contextmanager")` and `vignette("validation")`. The help pages are
+`?retry`, `?lru_cache` (which also covers `cache` and `disk_cache`),
+`?contextmanager` and `?validate_args`. See the adorn
 [documentation](https://dyfanjones.github.io/adorn/) for how decorators are
 applied, stacked and removed.

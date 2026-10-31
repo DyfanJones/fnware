@@ -3,10 +3,8 @@ Title: Python-Style Decorators for R
 Version: 0.1.0
 Authors@R: 
     person("Dyfan", "Jones", , "dyfan.r.jones@gmail.com", role = c("aut", "cre"))
-Description: A collection of popular Python decorators ported to R with the 'adorn'
-    framework. Includes retrying failing calls with configurable stop, wait and
-    retry strategies (after 'tenacity'), and least recently used caching of
-    function results.
+Description: Popular Python decorators ported to R with the 'adorn' framework:
+    retrying, caching, context managers and argument validation.
 License: MIT + file LICENSE
 URL: https://dyfanjones.github.io/garnish/, https://github.com/DyfanJones/garnish
 BugReports: https://github.com/DyfanJones/garnish/issues
@@ -37,5 +35,6 @@ Collate:
     'retry_stop.R'
     'retry.R'
     'retry_extend.R'
+    'validate.R'
     'zzz.R'
 VignetteBuilder: litedown

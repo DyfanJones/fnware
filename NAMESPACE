@@ -32,6 +32,8 @@ export(stop_before_delay)
 export(stop_fn)
 export(stop_never)
 export(teardown)
+export(validate_args)
+export(validate_return)
 export(wait_base)
 export(wait_chain)
 export(wait_combine)
@@ -70,6 +72,10 @@ importFrom(cachem,
   cache_disk,
   cache_mem
 )
-importFrom(rlang,hash)
+importFrom(rlang,
+  abort,
+  as_function,
+  hash
+)
 importFrom(stats,runif)
 importFrom(withr,defer)
