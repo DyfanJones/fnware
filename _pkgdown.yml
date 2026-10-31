@@ -9,6 +9,7 @@ articles:
     navbar: ~
     contents:
       - retry
+      - circuitbreaker
       - caching
       - contextmanager
       - validation
@@ -18,6 +19,7 @@ reference:
     desc: Call a function again when it fails.
     contents:
       - retry
+      - circuitbreaker
       - stop_never
       - wait_fixed
       - retry_all

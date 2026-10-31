@@ -310,3 +310,6 @@ fetch := retry(
 - **Decorators stack.** In `a %@% b %@% f`, `a` is outermost. Put `retry()`
   outside a timing decorator to time all attempts, or inside it to time each
   one.
+- **Retrying a service that is down is wasteful.** For a failure that lasts
+  minutes rather than seconds, stack [`circuit_breaker()`](circuitbreaker.html)
+  outside `retry()` so callers fail fast once the service is clearly down.

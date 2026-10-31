@@ -48,7 +48,7 @@ NULL
 #' @usage circuit_breaker(f, failures = 5, reset_after = 30)
 #' @export
 circuit_breaker := decorator(
-  function(failures = 5, reset_after = 30) {
+  function(f, failures = 5, reset_after = 30) {
     stopifnot(
       "`failures` must be a single whole number of at least 1" = is.numeric(
         failures
