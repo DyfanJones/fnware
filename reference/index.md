@@ -68,6 +68,13 @@ Remember a function’s results.
   [`disk_cache`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
   : Cache function results
 
+## Circuit breaking
+
+Stop calling a function that keeps failing.
+
+- [`circuit_breaker`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md)
+  : Stop calling a function that keeps failing
+
 ## Rate limiting
 
 Limit how often a function can be called.

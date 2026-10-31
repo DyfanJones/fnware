@@ -10,6 +10,7 @@ Popular Python decorators ported to R with the
 | `cache` | Caches results, never evicting | [`functools.cache`](https://docs.python.org/3/library/functools.html#functools.cache) |
 | [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md) | Caches results as files, so they outlive the session | [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/stable/memory.html) |
 | [`validate_args()`](https://dyfanjones.github.io/garnish/reference/validate_args.md), [`validate_return()`](https://dyfanjones.github.io/garnish/reference/validate_args.md) | Checks arguments and return values with any validator function | [pydantic `validate_call`](https://docs.pydantic.dev/latest/concepts/validation_decorator/) |
+| [`circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md) | Stops calling a function after repeated failures, then retries after a cooldown | [pybreaker](https://github.com/danielfm/pybreaker) |
 | [`rate_limit()`](https://dyfanjones.github.io/garnish/reference/rate_limit.md) | Limits how often a function can be called in a time window | [`ratelimit`](https://pypi.org/project/ratelimit/) |
 | `contextmanager` | Writes setup and teardown once, as `local_`, `with_` and decorator forms | [`contextlib.contextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager) |
 
@@ -305,6 +306,13 @@ Remember a function’s results.
   [`cache`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
   [`disk_cache`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
   : Cache function results
+
+## Circuit breaking
+
+Stop calling a function that keeps failing.
+
+- [`circuit_breaker`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md)
+  : Stop calling a function that keeps failing
 
 ## Rate limiting
 
