@@ -54,7 +54,12 @@ retry_if_error_message := new_class(
   properties = list(
     message = new_property(NULL | class_character, default = NULL),
     match = new_property(NULL | class_character, default = NULL)
-  )
+  ),
+  validator = function(self) {
+    if (is.null(self@message) == is.null(self@match)) {
+      "Exactly one of `message` or `match` must be supplied."
+    }
+  }
 )
 
 #' @rdname retry_conditions
