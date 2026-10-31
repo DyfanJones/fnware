@@ -34,6 +34,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
+    <li><a class="dropdown-item" href="../articles/circuitbreaker.html">Failing fast with a circuit breaker</a></li>
     <li><a class="dropdown-item" href="../articles/caching.html">Caching results</a></li>
     <li><a class="dropdown-item" href="../articles/contextmanager.html">Context managers</a></li>
     <li><a class="dropdown-item" href="../articles/validation.html">Validating arguments and results</a></li>
@@ -511,6 +512,11 @@ like a slow one.</li>
 <strong>Decorators stack.</strong> In <code>a %@% b %@% f</code>,
 <code>a</code> is outermost. Put <code><a href="../reference/retry.html">retry()</a></code> outside a timing
 decorator to time all attempts, or inside it to time each one.</li>
+<li>
+<strong>Retrying a service that is down is wasteful.</strong> For a
+failure that lasts minutes rather than seconds, stack <a href="circuitbreaker.html"><code>circuit_breaker()</code></a> outside
+<code><a href="../reference/retry.html">retry()</a></code> so callers fail fast once the service is clearly
+down.</li>
 </ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

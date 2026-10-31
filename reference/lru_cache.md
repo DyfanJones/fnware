@@ -3,7 +3,22 @@
 Decorators that remember a function's results, keyed on the matched
 arguments (including defaults).
 
+## Usage
+
+``` r
+lru_cache(f, maxsize = 1024 * 1024^2)
+
+cache(f)
+
+disk_cache(f, dir, maxsize = 1024 * 1024^2, format = c("rds", "qs2"))
+```
+
 ## Arguments
+
+- f:
+
+  The function to decorate. Usually supplied by `%@%` rather than
+  directly.
 
 - maxsize:
 

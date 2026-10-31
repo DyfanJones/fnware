@@ -4,7 +4,18 @@ Decorator that stops calling a function after it fails repeatedly, so
 callers fail fast instead of waiting on something that is down. It has
 three states:
 
+## Usage
+
+``` r
+circuit_breaker(f, failures = 5, reset_after = 30)
+```
+
 ## Arguments
+
+- f:
+
+  The function to decorate. Usually supplied by `%@%` rather than
+  directly.
 
 - failures:
 

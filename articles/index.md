@@ -4,6 +4,8 @@
 
 - [Retrying failing
   calls](https://dyfanjones.github.io/garnish/articles/retry.md):
+- [Failing fast with a circuit
+  breaker](https://dyfanjones.github.io/garnish/articles/circuitbreaker.md):
 - [Caching
   results](https://dyfanjones.github.io/garnish/articles/caching.md):
 - [Context

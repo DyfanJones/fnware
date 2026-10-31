@@ -8,10 +8,15 @@ that errors still uses up its slot, as it does for an API.
 ## Usage
 
 ``` r
-rate_limit(...)
+rate_limit(f, calls, period = 1)
 ```
 
 ## Arguments
+
+- f:
+
+  The function to decorate. Usually supplied by `%@%` rather than
+  directly.
 
 - calls:
 
@@ -46,7 +51,7 @@ vapply(1:3, f, numeric(1)) # immediate
 #> [1] 1 2 3
 system.time(f(4)) # waits for the window to clear
 #>    user  system elapsed 
-#>   0.001   0.000   0.883 
+#>   0.001   0.000   0.897 
 
 # Throttle every attempt, retries included
 fetch <- retry(stop = stop_after_attempt(3)) %@%

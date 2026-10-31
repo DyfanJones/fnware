@@ -4,7 +4,27 @@ Decorator that calls a function again until it succeeds or a [stop
 condition](https://dyfanjones.github.io/garnish/reference/stop_conditions.md)
 condition is met, sleeping between attempts. Port of Python's tenacity.
 
+## Usage
+
+``` r
+retry(
+  f,
+  stop = stop_never(),
+  wait = wait_none(),
+  retry = retry_all(),
+  before_sleep = before_sleep_none(),
+  after_sleep = after_sleep_none(),
+  reraise = FALSE,
+  retry_error_callback = NULL
+)
+```
+
 ## Arguments
+
+- f:
+
+  The function to decorate. Usually supplied by `%@%` rather than
+  directly.
 
 - stop:
 

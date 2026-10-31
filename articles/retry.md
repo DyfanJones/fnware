@@ -421,3 +421,9 @@ fetch := retry(
   [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
   outside a timing decorator to time all attempts, or inside it to time
   each one.
+- **Retrying a service that is down is wasteful.** For a failure that
+  lasts minutes rather than seconds, stack
+  [`circuit_breaker()`](https://dyfanjones.github.io/garnish/articles/circuitbreaker.md)
+  outside
+  [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+  so callers fail fast once the service is clearly down.

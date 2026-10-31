@@ -4,7 +4,7 @@
 
 Call a function again when it fails.
 
-- [`retry`](https://dyfanjones.github.io/garnish/reference/retry.md) :
+- [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) :
   Retry a function when it fails
 
 - [`stop_never()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md)
@@ -63,16 +63,16 @@ Call a function again when it fails.
 
 Remember a function’s results.
 
-- [`lru_cache`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
-  [`cache`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
-  [`disk_cache`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+- [`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+  [`cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+  [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
   : Cache function results
 
 ## Circuit breaking
 
 Stop calling a function that keeps failing.
 
-- [`circuit_breaker`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md)
+- [`circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md)
   : Stop calling a function that keeps failing
 
 ## Rate limiting
@@ -94,7 +94,8 @@ Check arguments and return values.
 
 Write setup and teardown once.
 
-- [`teardown()`](https://dyfanjones.github.io/garnish/reference/contextmanager.md)
+- [`contextmanager()`](https://dyfanjones.github.io/garnish/reference/contextmanager.md)
+  [`teardown()`](https://dyfanjones.github.io/garnish/reference/contextmanager.md)
   : Write setup and teardown once
 - [`with_context()`](https://dyfanjones.github.io/garnish/reference/with_context.md)
   : Run code inside a context

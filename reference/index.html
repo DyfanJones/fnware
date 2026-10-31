@@ -19,6 +19,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
+    <li><a class="dropdown-item" href="../articles/circuitbreaker.html">Failing fast with a circuit breaker</a></li>
     <li><a class="dropdown-item" href="../articles/caching.html">Caching results</a></li>
     <li><a class="dropdown-item" href="../articles/contextmanager.html">Context managers</a></li>
     <li><a class="dropdown-item" href="../articles/validation.html">Validating arguments and results</a></li>
@@ -55,7 +56,7 @@
 
       <dl><dt>
 
-          <code><a href="retry.html">retry</a></code>
+          <code><a href="retry.html">retry()</a></code>
 
         </dt>
         <dd>Retry a function when it fails</dd>
@@ -113,7 +114,7 @@
 
       <dl><dt>
 
-          <code><a href="lru_cache.html">lru_cache</a></code> <code><a href="lru_cache.html">cache</a></code> <code><a href="lru_cache.html">disk_cache</a></code>
+          <code><a href="lru_cache.html">lru_cache()</a></code> <code><a href="lru_cache.html">cache()</a></code> <code><a href="lru_cache.html">disk_cache()</a></code>
 
         </dt>
         <dd>Cache function results</dd>
@@ -129,7 +130,7 @@
 
       <dl><dt>
 
-          <code><a href="circuit_breaker.html">circuit_breaker</a></code>
+          <code><a href="circuit_breaker.html">circuit_breaker()</a></code>
 
         </dt>
         <dd>Stop calling a function that keeps failing</dd>
@@ -177,7 +178,7 @@
 
       <dl><dt>
 
-          <code><a href="contextmanager.html">teardown()</a></code>
+          <code><a href="contextmanager.html">contextmanager()</a></code> <code><a href="contextmanager.html">teardown()</a></code>
 
         </dt>
         <dd>Write setup and teardown once</dd>
