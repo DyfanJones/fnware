@@ -24,6 +24,7 @@ NULL
 #' of the setup fails. `teardown()` finds the frame by searching the call stack
 #' for the nearest running context manager and reading its `.local_envir`.
 #'
+#' @param f The function to decorate. Usually supplied by `%@%` rather than directly.
 #' @param expr Code that releases the resource. Evaluated in the setup function's
 #'   environment when the context ends, so it can use the setup's local variables.
 #' @return `contextmanager` is a decorator. `teardown()` is called for its side
@@ -45,7 +46,7 @@ NULL
 #' d <- f()
 #' dir.exists(d) # cleaned up when f() exited
 #' @rdname contextmanager
-#' @usage NULL
+#' @usage contextmanager(f)
 #' @export
 contextmanager := decorator(
   function(f) {

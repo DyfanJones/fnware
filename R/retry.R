@@ -12,6 +12,7 @@ NULL
 #' retry_error_callback)` to build a decorator, then apply it with `%@%` or by
 #' calling it on a function.
 #'
+#' @param f The function to decorate. Usually supplied by `%@%` rather than directly.
 #' @param stop A stop condition, e.g. [stop_after_attempt()]. Defaults to never stopping.
 #' @param wait A [wait strategy][wait_fixed]. Defaults to no waiting.
 #' @param retry A [retry condition][retry_all]. Defaults to retrying every error.
@@ -38,7 +39,16 @@ NULL
 #' f <- retry(stop = stop_after_attempt(3), wait = wait_exp(min = 0.1)) %@% function() 1
 #' f()
 #' @rdname retry
-#' @usage NULL
+#' @usage retry(
+#'   f,
+#'   stop = stop_never(),
+#'   wait = wait_none(),
+#'   retry = retry_all(),
+#'   before_sleep = before_sleep_none(),
+#'   after_sleep = after_sleep_none(),
+#'   reraise = FALSE,
+#'   retry_error_callback = NULL
+#' )
 #' @export
 retry := decorator(
   function(

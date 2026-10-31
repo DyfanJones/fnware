@@ -16,6 +16,7 @@ NULL
 #' retries. Stacking it outside would only throttle whole calls, and retries
 #' could still exceed the limit.
 #'
+#' @param f The function to decorate. Usually supplied by `%@%` rather than directly.
 #' @param calls Maximum number of calls in one window. A whole number of at least 1.
 #' @param period Length of the window in seconds. Defaults to 1.
 #' @return A decorator.
@@ -28,6 +29,8 @@ NULL
 #' fetch <- retry(stop = stop_after_attempt(3)) %@%
 #'   rate_limit(calls = 5, period = 1) %@%
 #'   function(url) url
+#' @rdname rate_limit
+#' @usage rate_limit(f, calls, period = 1)
 #' @export
 rate_limit := decorator(
   function(f, calls, period = 1) {

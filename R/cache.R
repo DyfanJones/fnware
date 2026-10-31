@@ -49,6 +49,7 @@ memoised <- function(f, fn, cache) {
 #' calling it on a function. `cache` takes no parameters, so it is applied
 #' directly.
 #'
+#' @param f The function to decorate. Usually supplied by `%@%` rather than directly.
 #' @param maxsize Maximum cache size in bytes. Defaults to 1 GiB.
 #' @param format File format for `disk_cache()`: `"rds"` (the default) or `"qs2"`,
 #'   which needs the qs2 package.
@@ -78,7 +79,7 @@ memoised <- function(f, fn, cache) {
 #' slow_cube(2) # slow, and saved to `dir`
 #' slow_cube(2) # cached
 #' @rdname lru_cache
-#' @usage NULL
+#' @usage lru_cache(f, maxsize = 1024 * 1024^2)
 #' @export
 lru_cache := decorator(
   function(f, maxsize = 1024 * 1024^2) {
@@ -88,7 +89,7 @@ lru_cache := decorator(
 )
 
 #' @rdname lru_cache
-#' @usage NULL
+#' @usage cache(f)
 #' @export
 cache := decorator(
   function(f) {
@@ -98,7 +99,7 @@ cache := decorator(
 )
 
 #' @rdname lru_cache
-#' @usage NULL
+#' @usage disk_cache(f, dir, maxsize = 1024 * 1024^2, format = c("rds", "qs2"))
 #' @export
 disk_cache := decorator(
   function(f, dir, maxsize = 1024 * 1024^2, format = c("rds", "qs2")) {

@@ -3,7 +3,21 @@
 \name{retry}
 \alias{retry}
 \title{Retry a function when it fails}
+\usage{
+retry(
+  f,
+  stop = stop_never(),
+  wait = wait_none(),
+  retry = retry_all(),
+  before_sleep = before_sleep_none(),
+  after_sleep = after_sleep_none(),
+  reraise = FALSE,
+  retry_error_callback = NULL
+)
+}
 \arguments{
+\item{f}{The function to decorate. Usually supplied by \verb{\%@\%} rather than directly.}
+
 \item{stop}{A stop condition, e.g. \code{\link[=stop_after_attempt]{stop_after_attempt()}}. Defaults to never stopping.}
 
 \item{wait}{A \link[=wait_fixed]{wait strategy}. Defaults to no waiting.}

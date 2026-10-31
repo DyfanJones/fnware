@@ -3,7 +3,12 @@
 \name{circuit_breaker}
 \alias{circuit_breaker}
 \title{Stop calling a function that keeps failing}
+\usage{
+circuit_breaker(f, failures = 5, reset_after = 30)
+}
 \arguments{
+\item{f}{The function to decorate. Usually supplied by \verb{\%@\%} rather than directly.}
+
 \item{failures}{Number of consecutive errors that open the circuit. A whole
 number of at least 1. Defaults to 5.}
 

@@ -27,6 +27,7 @@ NULL
 #'   function(url) { ... }
 #' ```
 #'
+#' @param f The function to decorate. Usually supplied by `%@%` rather than directly.
 #' @param failures Number of consecutive errors that open the circuit. A whole
 #'   number of at least 1. Defaults to 5.
 #' @param reset_after Seconds the circuit stays open before a trial call. A number
@@ -44,17 +45,24 @@ NULL
 #' try(f()) # rejected without calling flaky()
 #' n # still 2
 #' @rdname circuit_breaker
-#' @usage NULL
+#' @usage circuit_breaker(f, failures = 5, reset_after = 30)
 #' @export
 circuit_breaker := decorator(
-  function(f, failures = 5, reset_after = 30) {
+  function(failures = 5, reset_after = 30) {
     stopifnot(
-      "`failures` must be a single whole number of at least 1" =
-        is.numeric(failures) && length(failures) == 1L && !is.na(failures) &&
-          failures >= 1 && failures == round(failures),
-      "`reset_after` must be a single number greater than 0" =
-        is.numeric(reset_after) && length(reset_after) == 1L &&
-          !is.na(reset_after) && reset_after > 0
+      "`failures` must be a single whole number of at least 1" = is.numeric(
+        failures
+      ) &&
+        length(failures) == 1L &&
+        !is.na(failures) &&
+        failures >= 1 &&
+        failures == round(failures),
+      "`reset_after` must be a single number greater than 0" = is.numeric(
+        reset_after
+      ) &&
+        length(reset_after) == 1L &&
+        !is.na(reset_after) &&
+        reset_after > 0
     )
     status <- "closed"
     count <- 0L

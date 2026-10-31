@@ -4,9 +4,11 @@
 \alias{rate_limit}
 \title{Limit how often a function can be called}
 \usage{
-rate_limit(...)
+rate_limit(f, calls, period = 1)
 }
 \arguments{
+\item{f}{The function to decorate. Usually supplied by \verb{\%@\%} rather than directly.}
+
 \item{calls}{Maximum number of calls in one window. A whole number of at least 1.}
 
 \item{period}{Length of the window in seconds. Defaults to 1.}

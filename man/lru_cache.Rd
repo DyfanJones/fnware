@@ -5,7 +5,16 @@
 \alias{cache}
 \alias{disk_cache}
 \title{Cache function results}
+\usage{
+lru_cache(f, maxsize = 1024 * 1024^2)
+
+cache(f)
+
+disk_cache(f, dir, maxsize = 1024 * 1024^2, format = c("rds", "qs2"))
+}
 \arguments{
+\item{f}{The function to decorate. Usually supplied by \verb{\%@\%} rather than directly.}
+
 \item{maxsize}{Maximum cache size in bytes. Defaults to 1 GiB.}
 
 \item{format}{File format for \code{disk_cache()}: \code{"rds"} (the default) or \code{"qs2"},

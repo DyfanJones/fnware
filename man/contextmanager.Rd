@@ -5,11 +5,15 @@
 \alias{teardown}
 \title{Write setup and teardown once}
 \usage{
+contextmanager(f)
+
 teardown(expr)
 }
 \arguments{
 \item{expr}{Code that releases the resource. Evaluated in the setup function's
 environment when the context ends, so it can use the setup's local variables.}
+
+\item{f}{The function to decorate. Usually supplied by \verb{\%@\%} rather than directly.}
 }
 \value{
 \code{contextmanager} is a decorator. \code{teardown()} is called for its side
