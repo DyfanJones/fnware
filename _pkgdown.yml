@@ -30,6 +30,11 @@ reference:
     contents:
       - lru_cache
 
+  - title: Circuit breaking
+    desc: Stop calling a function that keeps failing.
+    contents:
+      - circuit_breaker
+
   - title: Rate limiting
     desc: Limit how often a function can be called.
     contents:

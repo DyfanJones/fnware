@@ -4,7 +4,7 @@
 \alias{rate_limit}
 \title{Limit how often a function can be called}
 \usage{
-rate_limit(calls, period = 1)
+rate_limit(...)
 }
 \arguments{
 \item{calls}{Maximum number of calls in one window. A whole number of at least 1.}

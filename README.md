@@ -15,6 +15,7 @@ Popular Python decorators ported to R with the
 | `cache` | Caches results, never evicting | [`functools.cache`](https://docs.python.org/3/library/functools.html#functools.cache) |
 | `disk_cache()` | Caches results as files, so they outlive the session | [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/stable/memory.html) |
 | `validate_args()`, `validate_return()` | Checks arguments and return values with any validator function | [pydantic `validate_call`](https://docs.pydantic.dev/latest/concepts/validation_decorator/) |
+| `circuit_breaker()` | Stops calling a function after repeated failures, then retries after a cooldown | [pybreaker](https://github.com/danielfm/pybreaker) |
 | `rate_limit()` | Limits how often a function can be called in a time window | [`ratelimit`](https://pypi.org/project/ratelimit/) |
 | `contextmanager` | Writes setup and teardown once, as `local_`, `with_` and decorator forms | [`contextlib.contextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager) |
 
