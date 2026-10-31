@@ -83,9 +83,14 @@ test_that("stop_*_delay use elapsed time", {
 })
 
 test_that("validators reject bad input", {
-  expect_error(stop_after_attempt(0))
+  expect_error(stop_after_attempt(-1), "greater than or equal to 0")
+  expect_error(stop_after_delay(-1), "greater than or equal to 0")
+  expect_error(wait_exp_jitter(base = -1), "greater than or equal to 0")
   expect_error(wait_rand(min = 2, max = 1))
-  expect_error(wait_exp_jitter(jitter = "bogus"))
+  expect_error(wait_exp_jitter(jitter = "bogus"), "must be one of")
+  expect_error(wait_chain(), "at least one wait strategy")
+  expect_error(wait_chain(1), "only contain wait strategies")
+  expect_error(stop_any(1), "only contain stop conditions")
   expect_no_error(wait_exp())
   expect_no_error(wait_rand())
 })
@@ -210,4 +215,40 @@ test_that("wait_combine and + sum strategies", {
   w3 <- wait_fixed(1) + wait_fixed(2) + wait_fixed(3)
   expect_equal(wait_fn(w3, 1), 6)
   expect_equal(wait_fn(wait_combine(wait_fixed(1), wait_chain(wait_fixed(2))), 1), 3)
+})
+
+test_that("zero is a valid wait_exp and wait_exp_jitter setting", {
+  expect_no_error(wait_exp(min = 0))
+  expect_equal(wait_fn(wait_exp(min = 0, max = 0), 3), 0)
+
+  for (jitter in c("full", "equal", "decorrelated", "none")) {
+    for (w in list(
+      wait_exp_jitter(base = 0, jitter = jitter),
+      wait_exp_jitter(max_delay = 0, jitter = jitter),
+      wait_exp_jitter(base = 0, max_delay = 0, jitter = jitter)
+    )) {
+      expect_equal(wait_fn(w, 1), 0)
+      expect_equal(wait_fn(w, 5, prev_wait = 0), 0)
+    }
+  }
+})
+
+test_that("decorrelated jitter handles a zero previous wait", {
+  w <- wait_exp_jitter(base = 0.1, max_delay = 20, jitter = "decorrelated")
+  waits <- vapply(
+    1:50,
+    function(i) wait_fn(w, 2, prev_wait = 0),
+    numeric(1)
+  )
+  expect_false(anyNA(waits))
+  expect_equal(waits, rep(0.1, 50))
+
+  # a larger previous wait still widens the range, capped at max_delay
+  waits <- vapply(
+    1:50,
+    function(i) wait_fn(w, 2, prev_wait = 1),
+    numeric(1)
+  )
+  expect_true(all(waits >= 0.1 & waits <= 3))
+  expect_equal(wait_fn(wait_exp_jitter(base = 5, max_delay = 1, jitter = "decorrelated"), 2, prev_wait = 10), 1)
 })

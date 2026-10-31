@@ -8,9 +8,12 @@ wait_base := new_class(abstract = TRUE)
 # used by strategies that depend on it, e.g. decorrelated jitter.
 #' @rdname extending_retry
 #' @export
-wait_fn := new_generic("class", function(class, attempt, prev_wait = NULL, ...) {
-  S7_dispatch()
-})
+wait_fn := new_generic(
+  "class",
+  function(class, attempt, prev_wait = NULL, ...) {
+    S7_dispatch()
+  }
+)
 
 #' Wait strategies
 #'
@@ -44,7 +47,7 @@ wait_fn := new_generic("class", function(class, attempt, prev_wait = NULL, ...) 
 wait_fixed := new_class(
   parent = wait_base,
   properties = list(
-    wait = new_property(class_numeric, validator = non_negative_validator)
+    wait = new_property(class_numeric, validator = validator_non_negative)
   )
 )
 
@@ -64,18 +67,12 @@ wait_exp := new_class(
     min = new_property(
       class_numeric,
       default = 0,
-      validator = non_negative_validator
+      validator = validator_non_negative
     ),
     max = new_property(class_numeric, default = MAX_TIME),
     exp_base = new_property(class_numeric, default = 2)
   )
 )
-
-jitter_validator <- function(value) {
-  if (length(value) != 1L || !value %in% c("full", "equal", "decorrelated", "none")) {
-    "must be one of 'full', 'equal', 'decorrelated' or 'none'"
-  }
-}
 
 #' @rdname wait_strategies
 #' @export
@@ -85,17 +82,17 @@ wait_exp_jitter := new_class(
     base = new_property(
       class_numeric,
       default = 0.1,
-      validator = above_zero_validator
+      validator = validator_non_negative
     ),
     max_delay = new_property(
       class_numeric,
       default = 20,
-      validator = above_zero_validator
+      validator = validator_non_negative
     ),
     jitter = new_property(
       class_character,
       default = "full",
-      validator = jitter_validator
+      validator = validator_jitter
     )
   )
 )
@@ -108,7 +105,7 @@ wait_rand := new_class(
     min = new_property(
       class_numeric,
       default = 0,
-      validator = non_negative_validator
+      validator = validator_non_negative
     ),
     max = new_property(class_numeric, default = 1)
   ),
@@ -140,7 +137,7 @@ method(wait_fn, wait_exp_jitter) <- function(
     equal = exp / 2 + runif(1, 0, exp / 2),
     decorrelated = min(
       class@max_delay,
-      runif(1, class@base, (prev_wait %||% class@base) * 3)
+      runif(1, class@base, max(class@base, (prev_wait %||% class@base) * 3))
     )
   )
 }
@@ -149,20 +146,13 @@ method(wait_fn, wait_rand) <- function(class, attempt, prev_wait = NULL, ...) {
   runif(1, class@min, class@max)
 }
 
-wait_strategies_validator <- function(value) {
-  if (length(value) == 0L) {
-    "must contain at least one wait strategy"
-  } else if (!all(vapply(value, S7_inherits, logical(1), class = wait_base))) {
-    "must only contain wait strategies"
-  }
-}
 
 #' @rdname wait_strategies
 #' @export
 wait_chain := new_class(
   parent = wait_base,
   properties = list(
-    waits = new_property(class_list, validator = wait_strategies_validator)
+    waits = new_property(class_list, validator = validator_wait_strategies)
   ),
   constructor = function(...) new_object(wait_base(), waits = list(...))
 )
@@ -172,7 +162,7 @@ wait_chain := new_class(
 wait_combine := new_class(
   parent = wait_base,
   properties = list(
-    waits = new_property(class_list, validator = wait_strategies_validator)
+    waits = new_property(class_list, validator = validator_wait_strategies)
   ),
   constructor = function(...) new_object(wait_base(), waits = list(...))
 )
@@ -182,8 +172,19 @@ method(wait_fn, wait_chain) <- function(class, attempt, prev_wait = NULL, ...) {
   wait_fn(class@waits[[idx]], attempt, prev_wait)
 }
 
-method(wait_fn, wait_combine) <- function(class, attempt, prev_wait = NULL, ...) {
-  sum(vapply(class@waits, wait_fn, numeric(1), attempt = attempt, prev_wait = prev_wait))
+method(wait_fn, wait_combine) <- function(
+  class,
+  attempt,
+  prev_wait = NULL,
+  ...
+) {
+  sum(vapply(
+    class@waits,
+    wait_fn,
+    numeric(1),
+    attempt = attempt,
+    prev_wait = prev_wait
+  ))
 }
 
 method(`+`, list(wait_base, wait_base)) <- function(e1, e2) {

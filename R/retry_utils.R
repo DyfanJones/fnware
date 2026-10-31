@@ -5,15 +5,34 @@
 
 MAX_TIME <- 2^63 / 2
 
-non_negative_validator <- function(value) {
+# validator functions
+validator_non_negative <- function(value) {
   if (length(value) != 1L || is.na(value) || value < 0) {
     "must be a single number greater than or equal to 0"
   }
 }
 
-above_zero_validator <- function(value) {
-  if (length(value) != 1L || is.na(value) || value <= 0) {
-    "must be a single number greater than 0"
+validator_jitter <- function(value) {
+  if (
+    length(value) != 1L ||
+      !value %in% c("full", "equal", "decorrelated", "none")
+  ) {
+    "must be one of 'full', 'equal', 'decorrelated' or 'none'"
+  }
+}
+
+
+validator_wait_strategies <- function(value) {
+  if (length(value) == 0L) {
+    "must contain at least one wait strategy"
+  } else if (!all(vapply(value, S7_inherits, logical(1), class = wait_base))) {
+    "must only contain wait strategies"
+  }
+}
+
+validator_stop_combinator <- function(value) {
+  if (!all(vapply(value, S7_inherits, logical(1), class = stop_base))) {
+    "must only contain stop conditions"
   }
 }
 
@@ -47,11 +66,4 @@ retry_error <- function(state) {
       value = state$value
     )
   )
-}
-
-
-stop_combinator_validator <- function(value) {
-  if (!all(vapply(value, S7_inherits, logical(1), class = stop_base))) {
-    "must only contain stop conditions"
-  }
 }

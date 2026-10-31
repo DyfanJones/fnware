@@ -46,7 +46,7 @@ stop_after_attempt := new_class(
     max_attempt_number = new_property(
       class_numeric,
       default = 1,
-      validator = above_zero_validator
+      validator = validator_non_negative
     )
   )
 )
@@ -59,7 +59,7 @@ stop_after_delay := new_class(
     max_delay = new_property(
       class_numeric,
       default = 1,
-      validator = above_zero_validator
+      validator = validator_non_negative
     )
   )
 )
@@ -72,7 +72,7 @@ stop_before_delay := new_class(
     max_delay = new_property(
       class_numeric,
       default = 1,
-      validator = above_zero_validator
+      validator = validator_non_negative
     )
   )
 )
@@ -82,7 +82,7 @@ stop_before_delay := new_class(
 stop_any := new_class(
   parent = stop_base,
   properties = list(
-    stops = new_property(class_list, validator = stop_combinator_validator)
+    stops = new_property(class_list, validator = validator_stop_combinator)
   ),
   constructor = function(...) new_object(stop_base(), stops = list(...))
 )
@@ -92,7 +92,7 @@ stop_any := new_class(
 stop_all := new_class(
   parent = stop_base,
   properties = list(
-    stops = new_property(class_list, validator = stop_combinator_validator)
+    stops = new_property(class_list, validator = validator_stop_combinator)
   ),
   constructor = function(...) new_object(stop_base(), stops = list(...))
 )
