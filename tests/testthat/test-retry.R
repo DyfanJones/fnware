@@ -113,7 +113,8 @@ test_that("waiting actually sleeps", {
   fl <- flaky(1)
   g <- retry(stop = stop_after_attempt(3), wait = wait_fixed(0.2))(fl$f)
   t <- system.time(g())[["elapsed"]]
-  expect_gte(t, 0.2)
+  # Sys.sleep() and system.time() have coarse timers on Windows, so allow slack.
+  expect_gte(t, 0.15)
 })
 
 test_that("retry_if_result retries until the predicate is satisfied", {
