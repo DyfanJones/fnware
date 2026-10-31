@@ -277,6 +277,123 @@ and
 The loggers take any function that accepts one string, so you can send
 the message to whatever logging package you use.
 
+## Writing your own strategies
+
+Everything above is built from five kinds of strategy, and you can add
+your own to any of them. They are S7 classes, so if you have not used
+S7, the idea is small: make a class that inherits from a base class,
+then say what it does by registering a method for a generic. The
+built-in strategies work the same way, and yours combine with them.
+
+| [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) argument | Inherit from | Method of | Return |
+|----|----|----|----|
+| `stop` | `stop_base` | `stop_fn(class, state)` | `TRUE` to give up |
+| `wait` | `wait_base` | `wait_fn(class, attempt, prev_wait)` | seconds to sleep |
+| `retry` | `retry_base` | `retry_fn(class, outcome)` | `TRUE` to try again |
+| `before_sleep` | `before_sleep_base` | `before_sleep_fn(class, state)` | nothing |
+| `after_sleep` | `after_sleep_base` | `after_sleep_fn(class, state)` | nothing |
+
+A wait that grows by a fixed step each attempt:
+
+``` r
+
+library(S7)
+
+wait_linear <- new_class(
+  "wait_linear",
+  parent = wait_base,
+  properties = list(step = class_numeric),
+  constructor = function(step = 1) new_object(wait_base(), step = step)
+)
+
+method(wait_fn, wait_linear) <- function(class, attempt, prev_wait = NULL, ...) {
+  class@step * attempt
+}
+
+wait_fn(wait_linear(2), attempt = 3)
+```
+
+    ## [1] 6
+
+It composes like the built-in waits, with `+` and in
+[`wait_chain()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md):
+
+``` r
+
+wait_fn(wait_linear(1) + wait_fixed(2), attempt = 3)
+```
+
+    ## [1] 5
+
+A stop condition gets the `state` list described in
+[`?extending_retry`](https://dyfanjones.github.io/garnish/reference/extending_retry.md),
+which has `attempt`, `wait`, `elapsed`, `error` and `value`. This one
+gives up once an attempt fails with a message matching a pattern:
+
+``` r
+
+stop_on_message <- new_class(
+  "stop_on_message",
+  parent = stop_base,
+  properties = list(pattern = class_character),
+  constructor = function(pattern) new_object(stop_base(), pattern = pattern)
+)
+
+method(stop_fn, stop_on_message) <- function(class, state, ...) {
+  !is.null(state$error) && grepl(class@pattern, conditionMessage(state$error))
+}
+
+attempts <- 0
+fatal <- retry(
+  stop = stop_any(stop_after_attempt(5), stop_on_message("permission denied"))
+) %@% function() {
+  attempts <<- attempts + 1
+  stop("permission denied")
+}
+try(fatal(), silent = TRUE)
+attempts
+```
+
+    ## [1] 1
+
+It stopped after one attempt, though `stop_after_attempt(5)` would have
+allowed five, because
+[`stop_any()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md)
+fires when either condition does.
+
+A retry condition gets `outcome`, a list with `value` and `error`, one
+of which is `NULL`:
+
+``` r
+
+retry_if_negative <- new_class("retry_if_negative", parent = retry_base)
+
+method(retry_fn, retry_if_negative) <- function(class, outcome, ...) {
+  is.null(outcome$error) && outcome$value < 0
+}
+
+vals <- c(-1, -1, 5)
+i <- 0
+next_value <- retry(retry = retry_if_negative()) %@% function() {
+  i <<- i + 1
+  vals[[i]]
+}
+next_value()
+```
+
+    ## [1] 5
+
+``` r
+
+i
+```
+
+    ## [1] 3
+
+If you write strategies in a package, call
+[`S7::methods_register()`](https://rconsortium.github.io/S7/reference/S7_on_load.html)
+in its `.onLoad()` so the methods are registered when it loads.
+
 ## Putting it together
 
 ``` r

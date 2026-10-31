@@ -251,6 +251,18 @@ Call a function again when it fails.
   [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
   sleeps
 
+- [`after_sleep_base()`](https://dyfanjones.github.io/garnish/reference/extending_retry.md)
+  [`after_sleep_fn()`](https://dyfanjones.github.io/garnish/reference/extending_retry.md)
+  [`before_sleep_base()`](https://dyfanjones.github.io/garnish/reference/extending_retry.md)
+  [`before_sleep_fn()`](https://dyfanjones.github.io/garnish/reference/extending_retry.md)
+  [`retry_base()`](https://dyfanjones.github.io/garnish/reference/extending_retry.md)
+  [`retry_fn()`](https://dyfanjones.github.io/garnish/reference/extending_retry.md)
+  [`wait_base()`](https://dyfanjones.github.io/garnish/reference/extending_retry.md)
+  [`wait_fn()`](https://dyfanjones.github.io/garnish/reference/extending_retry.md)
+  [`stop_base()`](https://dyfanjones.github.io/garnish/reference/extending_retry.md)
+  [`stop_fn()`](https://dyfanjones.github.io/garnish/reference/extending_retry.md)
+  : Write your own stop, wait, retry and hook strategies
+
 ## Caching
 
 Remember a function’s results.
