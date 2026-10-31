@@ -67,7 +67,7 @@ contextmanager := decorator(
 teardown <- function(expr) {
   envir <- enclosing_context(parent.frame())
   if (is.null(envir)) {
-    stop("`teardown()` must be called from a `contextmanager()` function.", call. = FALSE)
+    abort("`teardown()` must be called from a `contextmanager()` function.", call = NULL)
   }
   defer(expr, envir = envir)
 }

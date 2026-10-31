@@ -66,7 +66,7 @@ retry := decorator(
         )
         if (!retry_fn(retry, outcome)) {
           if (!is.null(outcome$error)) {
-            base::stop(outcome$error)
+            cnd_signal(outcome$error)
           }
           return(outcome$value)
         }
@@ -83,9 +83,9 @@ retry := decorator(
             return(retry_error_callback(state))
           }
           if (reraise && !is.null(state$error)) {
-            base::stop(state$error)
+            cnd_signal(state$error)
           }
-          base::stop(retry_error(state))
+          cnd_signal(retry_error(state))
         }
         before_sleep_fn(before_sleep, state)
         Sys.sleep(wait_time)

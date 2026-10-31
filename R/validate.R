@@ -1,5 +1,5 @@
 #' @importFrom adorn decorator
-#' @importFrom rlang abort as_function
+#' @importFrom rlang abort as_function cnd_signal
 NULL
 
 #' Validate arguments and return values

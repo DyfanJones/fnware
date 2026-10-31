@@ -30,6 +30,11 @@ reference:
     contents:
       - lru_cache
 
+  - title: Rate limiting
+    desc: Limit how often a function can be called.
+    contents:
+      - rate_limit
+
   - title: Validation
     desc: Check arguments and return values.
     contents:

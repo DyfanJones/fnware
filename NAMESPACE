@@ -15,6 +15,7 @@ export(cache)
 export(contextmanager)
 export(disk_cache)
 export(lru_cache)
+export(rate_limit)
 export(retry)
 export(retry_all)
 export(retry_base)
@@ -75,6 +76,7 @@ importFrom(cachem,
 importFrom(rlang,
   abort,
   as_function,
+  cnd_signal,
   hash
 )
 importFrom(stats,runif)

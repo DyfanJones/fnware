@@ -25,6 +25,7 @@ Roxygen: list(markdown = TRUE)
 Collate: 
     'cache.R'
     'contextmanager.R'
+    'rate_limit.R'
     'reexport-S7.R'
     'reexport-adorn.R'
     'retry_utils.R'
