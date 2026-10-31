@@ -70,22 +70,26 @@ circuit_breaker := decorator(
         }
         status <<- "half_open"
       }
-      res <- tryCatch(
-        withVisible(f(...)),
-        error = function(err) err
+      outcome <- tryCatch(
+        list(res = withVisible(f(...)), error = NULL),
+        error = function(err) list(res = NULL, error = err)
       )
-      if (inherits(res, "error")) {
+      if (!is.null(outcome$error)) {
         count <<- count + 1L
         if (status == "half_open" || count >= failures) {
           status <<- "open"
           opened_at <<- proc.time()[["elapsed"]]
           count <<- 0L
         }
-        stop(res)
+        stop(outcome$error)
       }
       status <<- "closed"
       count <<- 0L
-      if (res$visible) res$value else invisible(res$value)
+      if (outcome$res$visible) {
+        outcome$res$value
+      } else {
+        invisible(outcome$res$value)
+      }
     }
   }
 )
