@@ -9,11 +9,12 @@ tracker <- function() {
 
 test_that("local form cleans up when the calling function exits", {
   tr <- tracker()
-  local_res := contextmanager %@% function(name = "a") {
-    tr$add(paste("open", name))
-    teardown(tr$add(paste("close", name)))
-    name
-  }
+  local_res := contextmanager %@%
+    function(name = "a") {
+      tr$add(paste("open", name))
+      teardown(tr$add(paste("close", name)))
+      name
+    }
   f <- function() {
     x <- local_res("x")
     tr$add("body")
@@ -25,10 +26,11 @@ test_that("local form cleans up when the calling function exits", {
 
 test_that("local form cleans up when the caller errors", {
   tr <- tracker()
-  local_res := contextmanager %@% function() {
-    teardown(tr$add("close"))
-    1
-  }
+  local_res := contextmanager %@%
+    function() {
+      teardown(tr$add("close"))
+      1
+    }
   f <- function() {
     local_res()
     stop("boom")
@@ -45,11 +47,12 @@ test_that("arguments pass through, by position or name", {
 
 test_that("with_context passes the value and cleans up afterwards", {
   tr <- tracker()
-  local_res := contextmanager %@% function() {
-    tr$add("open")
-    teardown(tr$add("close"))
-    "val"
-  }
+  local_res := contextmanager %@%
+    function() {
+      tr$add("open")
+      teardown(tr$add("close"))
+      "val"
+    }
   out <- with_context(local_res(), function(v) {
     tr$add(paste("body", v))
     "result"
@@ -60,33 +63,37 @@ test_that("with_context passes the value and cleans up afterwards", {
 
 test_that("with_context cleans up when the code errors", {
   tr <- tracker()
-  local_res := contextmanager %@% function() {
-    teardown(tr$add("close"))
-    1
-  }
+  local_res := contextmanager %@%
+    function() {
+      teardown(tr$add("close"))
+      1
+    }
   expect_error(with_context(local_res(), function(v) stop("boom")), "boom")
   expect_equal(tr$get(), "close")
 })
 
 test_that("as_decorator runs the function inside the context", {
   tr <- tracker()
-  local_res := contextmanager %@% function() {
-    tr$add("open")
-    teardown(tr$add("close"))
-  }
-  g := as_decorator(local_res) %@% function(x) {
-    tr$add("body")
-    x * 2
-  }
+  local_res := contextmanager %@%
+    function() {
+      tr$add("open")
+      teardown(tr$add("close"))
+    }
+  g := as_decorator(local_res) %@%
+    function(x) {
+      tr$add("body")
+      x * 2
+    }
   expect_equal(g(4), 8)
   expect_equal(tr$get(), c("open", "body", "close"))
 })
 
 test_that("as_decorator cleans up on error and forwards context arguments", {
   tr <- tracker()
-  local_res := contextmanager %@% function(name) {
-    teardown(tr$add(paste("close", name)))
-  }
+  local_res := contextmanager %@%
+    function(name) {
+      teardown(tr$add(paste("close", name)))
+    }
   g := as_decorator(local_res, "r") %@% function() stop("boom")
   expect_error(g(), "boom")
   expect_equal(tr$get(), "close r")
@@ -94,11 +101,12 @@ test_that("as_decorator cleans up on error and forwards context arguments", {
 
 test_that("teardowns run last in, first out", {
   tr <- tracker()
-  local_two := contextmanager %@% function() {
-    teardown(tr$add("first"))
-    teardown(tr$add("second"))
-    teardown(tr$add("third"))
-  }
+  local_two := contextmanager %@%
+    function() {
+      teardown(tr$add("first"))
+      teardown(tr$add("second"))
+      teardown(tr$add("third"))
+    }
   f <- function() local_two()
   f()
   expect_equal(tr$get(), c("third", "second", "first"))
@@ -106,30 +114,33 @@ test_that("teardowns run last in, first out", {
 
 test_that("teardowns registered before a setup failure still run", {
   tr <- tracker()
-  local_partial := contextmanager %@% function() {
-    teardown(tr$add("close a"))
-    stop("setup failed")
-    teardown(tr$add("close b"))
-  }
+  local_partial := contextmanager %@%
+    function() {
+      teardown(tr$add("close a"))
+      stop("setup failed")
+      teardown(tr$add("close b"))
+    }
   f <- function() local_partial()
   expect_error(f(), "setup failed")
   expect_equal(tr$get(), "close a")
 
   tr2 <- tracker()
-  local_partial2 := contextmanager %@% function() {
-    teardown(tr2$add("close a"))
-    stop("setup failed")
-  }
+  local_partial2 := contextmanager %@%
+    function() {
+      teardown(tr2$add("close a"))
+      stop("setup failed")
+    }
   expect_error(with_context(local_partial2(), identity), "setup failed")
   expect_equal(tr2$get(), "close a")
 })
 
 test_that("teardown can use the setup function's local variables", {
   seen <- NULL
-  local_res := contextmanager %@% function() {
-    path <- "secret"
-    teardown(seen <<- path)
-  }
+  local_res := contextmanager %@%
+    function() {
+      path <- "secret"
+      teardown(seen <<- path)
+    }
   f <- function() local_res()
   f()
   expect_equal(seen, "secret")
@@ -137,16 +148,18 @@ test_that("teardown can use the setup function's local variables", {
 
 test_that("nested contexts register on the right frames", {
   tr <- tracker()
-  local_inner := contextmanager %@% function() {
-    tr$add("open inner")
-    teardown(tr$add("close inner"))
-  }
-  local_outer := contextmanager %@% function() {
-    tr$add("open outer")
-    teardown(tr$add("close outer"))
-    local_inner()
-    tr$add("outer setup done")
-  }
+  local_inner := contextmanager %@%
+    function() {
+      tr$add("open inner")
+      teardown(tr$add("close inner"))
+    }
+  local_outer := contextmanager %@%
+    function() {
+      tr$add("open outer")
+      teardown(tr$add("close outer"))
+      local_inner()
+      tr$add("outer setup done")
+    }
   f <- function() {
     local_outer()
     tr$add("body")
@@ -154,15 +167,23 @@ test_that("nested contexts register on the right frames", {
   f()
   expect_equal(
     tr$get(),
-    c("open outer", "open inner", "outer setup done", "body", "close inner", "close outer")
+    c(
+      "open outer",
+      "open inner",
+      "outer setup done",
+      "body",
+      "close inner",
+      "close outer"
+    )
   )
 })
 
 test_that("an inner context ends with its own caller, not the outer one", {
   tr <- tracker()
-  local_res := contextmanager %@% function(name) {
-    teardown(tr$add(paste("close", name)))
-  }
+  local_res := contextmanager %@%
+    function(name) {
+      teardown(tr$add(paste("close", name)))
+    }
   outer <- function() {
     local_res("outer")
     inner <- function() {
@@ -181,9 +202,10 @@ test_that("an inner context ends with its own caller, not the outer one", {
 
 test_that("local() blocks clean up at the end of the block", {
   tr <- tracker()
-  local_res := contextmanager %@% function() {
-    teardown(tr$add("close"))
-  }
+  local_res := contextmanager %@%
+    function() {
+      teardown(tr$add("close"))
+    }
   local({
     local_res()
     tr$add("in local")
@@ -203,5 +225,10 @@ test_that("a caller that is not on the call stack owns the context", {
 test_that("works when defined outside the package namespace", {
   env <- new.env(parent = globalenv())
   local_res <- eval(quote(contextmanager %@% function() 1), env)
-  expect_equal(local({ local_res() }), 1)
+  expect_equal(
+    local({
+      local_res()
+    }),
+    1
+  )
 })

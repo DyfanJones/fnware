@@ -3,7 +3,9 @@ flaky <- function(fail_times, value = "ok") {
   list(
     f = function() {
       calls <<- calls + 1L
-      if (calls <= fail_times) base::stop("boom ", calls)
+      if (calls <= fail_times) {
+        base::stop("boom ", calls)
+      }
       value
     },
     calls = function() calls
@@ -148,7 +150,7 @@ test_that("retry_if_error_message matches exactly or by regex", {
   }
   expect_equal(mk(retry_if_error_message(match = "^temporary"))(), "ok")
   expect_error(mk(retry_if_error_message(message = "temporary"))(), "failure 1")
-  expect_error(mk(retry_if_error_message(match = "nothing")) (), "failure 1")
+  expect_error(mk(retry_if_error_message(match = "nothing"))(), "failure 1")
   expect_error(retry_if_error_message(), "Exactly one")
   expect_error(retry_if_error_message("a", "b"), "Exactly one")
 })
@@ -215,7 +217,10 @@ test_that("wait_combine and + sum strategies", {
   expect_equal(wait_fn(w, 3), 1 + 4)
   w3 <- wait_fixed(1) + wait_fixed(2) + wait_fixed(3)
   expect_equal(wait_fn(w3, 1), 6)
-  expect_equal(wait_fn(wait_combine(wait_fixed(1), wait_chain(wait_fixed(2))), 1), 3)
+  expect_equal(
+    wait_fn(wait_combine(wait_fixed(1), wait_chain(wait_fixed(2))), 1),
+    3
+  )
 })
 
 test_that("zero is a valid wait_exp and wait_exp_jitter setting", {
@@ -251,5 +256,12 @@ test_that("decorrelated jitter handles a zero previous wait", {
     numeric(1)
   )
   expect_true(all(waits >= 0.1 & waits <= 3))
-  expect_equal(wait_fn(wait_exp_jitter(base = 5, max_delay = 1, jitter = "decorrelated"), 2, prev_wait = 10), 1)
+  expect_equal(
+    wait_fn(
+      wait_exp_jitter(base = 5, max_delay = 1, jitter = "decorrelated"),
+      2,
+      prev_wait = 10
+    ),
+    1
+  )
 })

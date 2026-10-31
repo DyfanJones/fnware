@@ -50,13 +50,13 @@ NULL
 contextmanager := decorator(
   function(f) {
     wrapper <- function(..., .local_envir) {
-      # The default is lazy: evaluate now, while parent.frame() is the caller.
       force(.local_envir)
       f(...)
     }
-    # adorn evaluates replaced formals in the decorated function's environment,
-    # which cannot see this package's internals, so embed the function itself.
-    formals(wrapper)$.local_envir <- substitute(fn(parent.frame()), list(fn = context_envir))
+    formals(wrapper)$.local_envir <- substitute(
+      fn(parent.frame()),
+      list(fn = context_envir)
+    )
     wrapper
   },
   formals = "replace"
@@ -67,7 +67,10 @@ contextmanager := decorator(
 teardown <- function(expr) {
   envir <- enclosing_context(parent.frame())
   if (is.null(envir)) {
-    abort("`teardown()` must be called from a `contextmanager()` function.", call = NULL)
+    abort(
+      "`teardown()` must be called from a `contextmanager()` function.",
+      call = NULL
+    )
   }
   defer(expr, envir = envir)
 }
@@ -84,9 +87,12 @@ context_envir <- function(caller) {
 # call stack is the context stack, so there is no global state to keep in sync.
 enclosing_context <- function(from) {
   frames <- sys.frames()
-  # `from` is not on the stack at top level, so nothing encloses it.
-  at <- Position(function(frame) identical(frame, from), frames, right = TRUE,
-                 nomatch = 0L)
+  at <- Position(
+    function(frame) identical(frame, from),
+    frames,
+    right = TRUE,
+    nomatch = 0L
+  )
   for (frame in rev(frames[seq_len(at)])) {
     if (exists(".local_envir", frame, inherits = FALSE)) {
       return(get(".local_envir", frame, inherits = FALSE))

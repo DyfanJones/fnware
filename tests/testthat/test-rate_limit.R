@@ -14,10 +14,11 @@ test_that("a call over the limit waits for the window to clear", {
 
 test_that("the window slides rather than resetting", {
   starts <- numeric()
-  f <- rate_limit(calls = 2, period = 0.3) %@% function() {
-    starts <<- c(starts, proc.time()[["elapsed"]])
-    NULL
-  }
+  f <- rate_limit(calls = 2, period = 0.3) %@%
+    function() {
+      starts <<- c(starts, proc.time()[["elapsed"]])
+      NULL
+    }
   f()
   Sys.sleep(0.2)
   f()

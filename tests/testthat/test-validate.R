@@ -7,7 +7,11 @@ test_that("validate_args passes valid arguments through", {
 
 test_that("validate_args fails on FALSE with a generic message", {
   f <- validate_args(x = is.numeric) %@% function(x) x
-  expect_error(f("a"), "`x`: failed validation", class = "garnish_validation_error")
+  expect_error(
+    f("a"),
+    "`x`: failed validation",
+    class = "garnish_validation_error"
+  )
 })
 
 test_that("string results are used as the message", {

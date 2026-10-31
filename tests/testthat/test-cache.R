@@ -21,10 +21,11 @@ test_that("lru_cache returns cached results without calling again", {
 
 test_that("positional, named and default arguments share a cache entry", {
   calls <- 0L
-  g <- lru_cache() %@% function(x, y = 2) {
-    calls <<- calls + 1L
-    x * y
-  }
+  g <- lru_cache() %@%
+    function(x, y = 2) {
+      calls <<- calls + 1L
+      x * y
+    }
   g(3)
   g(x = 3)
   g(3, 2)
@@ -52,11 +53,14 @@ test_that("invisible results stay invisible on hits and misses", {
 
 test_that("errors are not cached", {
   calls <- 0L
-  g <- lru_cache() %@% function() {
-    calls <<- calls + 1L
-    if (calls < 2L) stop("boom")
-    "ok"
-  }
+  g <- lru_cache() %@%
+    function() {
+      calls <<- calls + 1L
+      if (calls < 2L) {
+        stop("boom")
+      }
+      "ok"
+    }
   expect_error(g(), "boom")
   expect_equal(g(), "ok")
   expect_equal(g(), "ok")
@@ -65,10 +69,11 @@ test_that("errors are not cached", {
 
 test_that("NULL results are cached", {
   calls <- 0L
-  g <- lru_cache() %@% function() {
-    calls <<- calls + 1L
-    NULL
-  }
+  g <- lru_cache() %@%
+    function() {
+      calls <<- calls + 1L
+      NULL
+    }
   g()
   g()
   expect_equal(calls, 1L)
@@ -83,11 +88,14 @@ test_that("a default that depends on another argument is part of the key", {
 
 test_that("a small maxsize evicts the least recently used entry", {
   calls <- 0L
-  g <- lru_cache(maxsize = 7000) %@% function(i) {
-    calls <<- calls + 1L
-    numeric(200) + i # about 2 KB per entry, so three fit
-  }
-  g(1); g(2); g(3)
+  g <- lru_cache(maxsize = 7000) %@%
+    function(i) {
+      calls <<- calls + 1L
+      numeric(200) + i # about 2 KB per entry, so three fit
+    }
+  g(1)
+  g(2)
+  g(3)
   g(1) # refresh 1 so 2 is the least recently used
   g(4)
   before <- calls
@@ -99,21 +107,27 @@ test_that("a small maxsize evicts the least recently used entry", {
 
 test_that("cache never evicts", {
   calls <- 0L
-  g <- cache %@% function(i) {
-    calls <<- calls + 1L
-    numeric(200000) + i # 1.6 MB per entry
+  g <- cache %@%
+    function(i) {
+      calls <<- calls + 1L
+      numeric(200000) + i # 1.6 MB per entry
+    }
+  for (i in 1:20) {
+    g(i)
   }
-  for (i in 1:20) g(i)
-  for (i in 1:20) g(i)
+  for (i in 1:20) {
+    g(i)
+  }
   expect_equal(calls, 20L)
 })
 
 test_that("cache shares entries across argument spellings and keeps visibility", {
   calls <- 0L
-  g <- cache %@% function(x, y = 2) {
-    calls <<- calls + 1L
-    invisible(x * y)
-  }
+  g <- cache %@%
+    function(x, y = 2) {
+      calls <<- calls + 1L
+      invisible(x * y)
+    }
   expect_invisible(g(3))
   g(x = 3, y = 2)
   expect_equal(calls, 1L)
@@ -128,10 +142,11 @@ test_that("cache is applied bare and keeps separate caches per function", {
 test_that("disk_cache returns cached results and writes files to dir", {
   dir <- withr::local_tempdir()
   calls <- 0L
-  g <- disk_cache(dir) %@% function(x) {
-    calls <<- calls + 1L
-    x^2
-  }
+  g <- disk_cache(dir) %@%
+    function(x) {
+      calls <<- calls + 1L
+      x^2
+    }
   expect_equal(g(4), 16)
   expect_equal(g(4), 16)
   expect_equal(calls, 1L)
@@ -142,10 +157,11 @@ test_that("disk_cache entries are reused by a fresh decoration of the same funct
   dir <- withr::local_tempdir()
   calls <- 0L
   make <- function() {
-    disk_cache(dir) %@% function(x) {
-      calls <<- calls + 1L
-      x + 1
-    }
+    disk_cache(dir) %@%
+      function(x) {
+        calls <<- calls + 1L
+        x + 1
+      }
   }
   make()(1)
   make()(1) # new decorator, same dir: a hit, as from a new session
@@ -163,10 +179,11 @@ test_that("changing the function body invalidates disk_cache entries", {
 test_that("disk_cache keeps invisibility and defaults", {
   dir <- withr::local_tempdir()
   calls <- 0L
-  g <- disk_cache(dir) %@% function(x, y = 2) {
-    calls <<- calls + 1L
-    invisible(x * y)
-  }
+  g <- disk_cache(dir) %@%
+    function(x, y = 2) {
+      calls <<- calls + 1L
+      invisible(x * y)
+    }
   expect_invisible(g(3))
   expect_invisible(g(x = 3, y = 2))
   expect_equal(calls, 1L)
@@ -190,10 +207,11 @@ test_that("disk_cache can store results with qs2", {
   skip_if_not_installed("qs2")
   dir <- withr::local_tempdir()
   calls <- 0L
-  g <- disk_cache(dir, format = "qs2") %@% function(x) {
-    calls <<- calls + 1L
-    data.frame(x = x, y = x^2)
-  }
+  g <- disk_cache(dir, format = "qs2") %@%
+    function(x) {
+      calls <<- calls + 1L
+      data.frame(x = x, y = x^2)
+    }
   expect_equal(g(3), data.frame(x = 3, y = 9))
   expect_equal(g(3), data.frame(x = 3, y = 9))
   expect_equal(calls, 1L)
@@ -205,10 +223,11 @@ test_that("rds and qs2 caches in one directory do not collide", {
   dir <- withr::local_tempdir()
   calls <- 0L
   make <- function(format) {
-    disk_cache(dir, format = format) %@% function(x) {
-      calls <<- calls + 1L
-      x
-    }
+    disk_cache(dir, format = format) %@%
+      function(x) {
+        calls <<- calls + 1L
+        x
+      }
   }
   make("rds")(1)
   make("qs2")(1)

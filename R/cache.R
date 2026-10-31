@@ -103,8 +103,6 @@ cache := decorator(
 disk_cache := decorator(
   function(f, dir, maxsize = 1024 * 1024^2, format = c("rds", "qs2")) {
     stopifnot(is.character(dir), length(dir) == 1L)
-    # Not `match.arg()`: adorn writes configured values into the factory's
-    # formals, so it would take the user's value as the only valid choice.
     format <- rlang::arg_match(format, c("rds", "qs2"))
     fn <- decorator_context()$fn
     cache <- switch(

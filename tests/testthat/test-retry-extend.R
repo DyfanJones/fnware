@@ -6,7 +6,12 @@ wait_linear <- new_class(
   properties = list(step = class_numeric),
   constructor = function(step = 1) new_object(wait_base(), step = step)
 )
-method(wait_fn, wait_linear) <- function(class, attempt, prev_wait = NULL, ...) {
+method(wait_fn, wait_linear) <- function(
+  class,
+  attempt,
+  prev_wait = NULL,
+  ...
+) {
   class@step * attempt
 }
 
@@ -54,7 +59,8 @@ test_that("a custom wait strategy is used by retry()", {
   g <- retry(
     stop = stop_after_attempt(3),
     wait = wait_linear(0.02)
-  ) %@% function() stop("boom")
+  ) %@%
+    function() stop("boom")
   elapsed <- system.time(try(g(), silent = TRUE))[["elapsed"]]
   expect_gte(elapsed, 0.05) # 0.02 + 0.04 between three attempts
 })
@@ -73,10 +79,11 @@ test_that("a custom retry condition decides what is retried", {
   g <- retry(
     stop = stop_after_attempt(5),
     retry = retry_on_negative()
-  ) %@% function() {
-    i <<- i + 1L
-    vals[[i]]
-  }
+  ) %@%
+    function() {
+      i <<- i + 1L
+      vals[[i]]
+    }
   expect_equal(g(), 5)
   expect_equal(i, 3L)
 })
@@ -87,13 +94,19 @@ test_that("hook methods receive the documented state fields", {
   g <- retry(
     stop = stop_after_attempt(3),
     before_sleep = hook_recorder(seen)
-  ) %@% function() {
-    fl <<- fl + 1L
-    if (fl < 2L) stop("once")
-    "ok"
-  }
+  ) %@%
+    function() {
+      fl <<- fl + 1L
+      if (fl < 2L) {
+        stop("once")
+      }
+      "ok"
+    }
   expect_equal(g(), "ok")
-  expect_setequal(seen$fields, c("attempt", "wait", "elapsed", "error", "value"))
+  expect_setequal(
+    seen$fields,
+    c("attempt", "wait", "elapsed", "error", "value")
+  )
 })
 
 test_that("the abstract bases cannot be used directly", {

@@ -31,13 +31,16 @@ NULL
 #' @export
 rate_limit := decorator(
   function(f, calls, period = 1) {
-    # The validator comes first in each `&&` so the later checks never see a
-    # non-number.
     stopifnot(
-      "`calls` must be a single whole number of at least 1" =
-        validator_rate_limit(calls) && calls >= 1 && calls == round(calls),
-      "`period` must be a single number greater than 0" =
-        validator_rate_limit(period) && period > 0
+      "`calls` must be a single whole number of at least 1" = validator_rate_limit(
+        calls
+      ) &&
+        calls >= 1 &&
+        calls == round(calls),
+      "`period` must be a single number greater than 0" = validator_rate_limit(
+        period
+      ) &&
+        period > 0
     )
     # Start times of calls still inside the window, oldest first.
     starts <- numeric()

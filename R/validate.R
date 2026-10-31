@@ -62,7 +62,10 @@ validate_args <- function(...) {
       }
       function(...) {
         # Match on positions in `...` so only validated arguments are forced.
-        idx <- as.list(match.call(f, as.call(c(quote(f), as.list(seq_len(...length()))))))[-1L]
+        idx <- as.list(match.call(
+          f,
+          as.call(c(quote(f), as.list(seq_len(...length()))))
+        ))[-1L]
         failures <- character()
         for (nm in intersect(nms, names(idx))) {
           msg <- validation_failure(validators[[nm]], ...elt(idx[[nm]]))
@@ -72,7 +75,10 @@ validate_args <- function(...) {
         }
         if (length(failures)) {
           abort(
-            c("Invalid arguments.", stats::setNames(failures, rep("x", length(failures)))),
+            c(
+              "Invalid arguments.",
+              stats::setNames(failures, rep("x", length(failures)))
+            ),
             class = "garnish_validation_error",
             call = NULL
           )
