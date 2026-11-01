@@ -57,7 +57,11 @@ check_function <- function(
 ) {
   if (!(is.function(x) || (null && is.null(x)))) {
     abort(
-      sprintf("`%s` must be a function%s.", arg, if (null) " or `NULL`" else ""),
+      sprintf(
+        "`%s` must be a function%s.",
+        arg,
+        if (null) " or `NULL`" else ""
+      ),
       call = call
     )
   }

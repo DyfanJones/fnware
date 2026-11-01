@@ -26,10 +26,13 @@ test_that("a slow R loop times out with a garnish_timeout_error", {
 })
 
 test_that("a busy loop times out", {
-  f <- timeout(0.2) %@% function() {
-    x <- 0
-    while (TRUE) x <- x + 1
-  }
+  f <- timeout(0.2) %@%
+    function() {
+      x <- 0
+      while (TRUE) {
+        x <- x + 1
+      }
+    }
   expect_error(f(), class = "garnish_timeout_error")
 })
 
@@ -60,7 +63,9 @@ test_that("the time limit is cleared after success and after error", {
   run <- function(g) {
     try(g(), silent = TRUE)
     t0 <- proc.time()[["elapsed"]]
-    while (proc.time()[["elapsed"]] - t0 < 0.5) Sys.sleep(0.02)
+    while (proc.time()[["elapsed"]] - t0 < 0.5) {
+      Sys.sleep(0.02)
+    }
     "survived"
   }
   expect_equal(run(ok), "survived")
@@ -71,11 +76,12 @@ test_that("the time limit is cleared after success and after error", {
 
 test_that("timeout_remaining() is Inf outside and decreases inside", {
   expect_equal(timeout_remaining(), Inf)
-  f <- timeout(10) %@% function() {
-    a <- timeout_remaining()
-    Sys.sleep(0.1)
-    c(a, timeout_remaining())
-  }
+  f <- timeout(10) %@%
+    function() {
+      a <- timeout_remaining()
+      Sys.sleep(0.1)
+      c(a, timeout_remaining())
+    }
   r <- f()
   expect_lte(r[[1]], 10 + 1e-6)
   expect_gt(r[[1]], 9)
@@ -107,10 +113,11 @@ test_that("an inner timeout cannot outlast an outer one", {
 
 test_that("the outer limit is restored after an inner timeout finishes", {
   inner <- timeout(5) %@% function() "inner"
-  outer <- timeout(0.3) %@% function() {
-    inner()
-    slow_loop()
-  }
+  outer <- timeout(0.3) %@%
+    function() {
+      inner()
+      slow_loop()
+    }
   expect_error(outer(), class = "garnish_timeout_error")
 })
 
@@ -248,7 +255,10 @@ test_that("arguments are validated", {
   expect_error(timeout("a") %@% function() 1, "seconds")
   expect_error(timeout(c(1, 2)) %@% function() 1, "seconds")
   expect_error(timeout(1, method = "x") %@% function() 1, "method")
-  expect_error(timeout(1, method = function(call, seconds) call()) %@% function() 1, "method")
+  expect_error(
+    timeout(1, method = function(call, seconds) call()) %@% function() 1,
+    "method"
+  )
 })
 
 test_that("a callr-based method kills the process and passes the deadline on", {
@@ -259,20 +269,28 @@ test_that("a callr-based method kills the process and passes the deadline on", {
     deadline <- format(as.numeric(Sys.time()) + seconds, digits = 17)
     env <- c(callr::rcmd_safe_env(), GARNISH_TIMEOUT_DEADLINE = deadline)
     tryCatch(
-      callr::r(function(call) call(), args = list(call), timeout = seconds, env = env),
+      callr::r(
+        function(call) call(),
+        args = list(call),
+        timeout = seconds,
+        env = env
+      ),
       callr_timeout_error = function(e) {
         rlang::abort("Timed out.", class = "garnish_timeout_error")
       }
     )
   }
-  hang <- timeout(0.5, method = timeout_callr()) %@% function() {
-    Sys.sleep(10)
-    1
-  }
+  hang <- timeout(0.5, method = timeout_callr()) %@%
+    function() {
+      Sys.sleep(10)
+      1
+    }
   fast <- timeout(10, method = timeout_callr()) %@% function(x) x + 1
-  deadline <- timeout(10, method = timeout_callr()) %@% function() {
-    as.numeric(Sys.getenv("GARNISH_TIMEOUT_DEADLINE")) - as.numeric(Sys.time())
-  }
+  deadline <- timeout(10, method = timeout_callr()) %@%
+    function() {
+      as.numeric(Sys.getenv("GARNISH_TIMEOUT_DEADLINE")) -
+        as.numeric(Sys.time())
+    }
   expect_error(hang(), class = "garnish_timeout_error")
   expect_equal(fast(1), 2)
   expect_lte(deadline(), 10)

@@ -187,7 +187,10 @@ test_that("retry_error_callback supplies the fallback value", {
     retry_error_callback = function(state) paste("gave up after", state$attempt)
   )(f)
   expect_equal(g(), "gave up after 2")
-  expect_error(retry(retry_error_callback = "nope")(function() 1), "`retry_error_callback` must be a function or `NULL`")
+  expect_error(
+    retry(retry_error_callback = "nope")(function() 1),
+    "`retry_error_callback` must be a function or `NULL`"
+  )
 })
 
 test_that("log hooks cope with result based retries", {

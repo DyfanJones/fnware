@@ -67,7 +67,8 @@ test_that("return visibility is preserved", {
 })
 
 test_that("separately decorated functions have separate state", {
-  bad <- circuit_breaker(failures = 1, reset_after = 60) %@% function() stop("x")
+  bad <- circuit_breaker(failures = 1, reset_after = 60) %@%
+    function() stop("x")
   good <- circuit_breaker(failures = 1, reset_after = 60) %@% function() "ok"
   expect_error(bad(), "x")
   expect_error(bad(), class = "garnish_circuit_open")
