@@ -37,7 +37,7 @@ is_time_limit_error <- function(cnd) {
   grepl("reached elapsed time limit", conditionMessage(cnd), fixed = TRUE)
 }
 
-timeout_error <- function(name, limit, enclosing = FALSE, call = NULL) {
+timeout_message <- function(name, limit, enclosing = FALSE) {
   msg <- sprintf(
     "`%s` timed out: it did not finish within %s second%s.",
     name,
@@ -47,8 +47,12 @@ timeout_error <- function(name, limit, enclosing = FALSE, call = NULL) {
   if (enclosing) {
     msg <- paste(msg, "(cut short by an enclosing timeout)")
   }
+  msg
+}
+
+timeout_error <- function(name, limit, enclosing = FALSE, call = NULL) {
   abort(
-    msg,
+    timeout_message(name, limit, enclosing),
     class = "garnish_timeout_error",
     limit = limit,
     fn = name,
@@ -74,6 +78,8 @@ timeout_error <- function(name, limit, enclosing = FALSE, call = NULL) {
 #' left before that deadline, or `Inf` outside any `timeout()`, so you can pass
 #' the budget to a library with its own timeout. It does not see deadlines in
 #' other R processes unless a method passes one on, see [timeout_fn()].
+#'
+#' For functions that return a promise, use [async_timeout()].
 #'
 #' @section Limitations:
 #' `timeout_r()` uses [setTimeLimit()], which R only checks between R

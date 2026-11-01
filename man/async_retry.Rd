@@ -60,8 +60,7 @@ for you. In a script, run it with \code{later::run_now()}.
 Decorators that call a function synchronously do not wait for a promise.
 Stack \code{async_retry()} as the outermost decorator, and put only decorators
 that expect a promise inside it. \code{\link[=timeout]{timeout()}}, for instance, cannot bound a
-promise, so a \code{timeout()} beneath \code{async_retry()} would only bound the
-moment the call is started.
+promise, so use \code{\link[=async_timeout]{async_timeout()}} to cap each attempt.
 
 The \code{before_sleep} and \code{after_sleep} hooks and \code{retry_error_callback} run in
 the event loop, so keep them quick.

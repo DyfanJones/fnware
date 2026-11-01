@@ -42,6 +42,7 @@ reference:
     contents:
       - timeout
       - extending_timeout
+      - async_timeout
 
   - title: Rate limiting
     desc: Limit how often a function can be called.

@@ -335,6 +335,40 @@ retried the same way. When `stop` fires, the promise rejects with the same
 decorator inside it that calls the function synchronously, such as
 `timeout()`, cannot wait for or bound a promise.
 
+### Bounding a slow promise
+
+`async_timeout()` is the promise version of `timeout()`. If the promise has not
+settled after the limit, the promise it returns rejects with the same
+`garnish_timeout_error`, which `async_retry()` retries:
+
+```{r async-timeout, eval = requireNamespace("promises", quietly = TRUE) && requireNamespace("later", quietly = TRUE)}
+# A stand-in for a request: resolves with `value` after `delay` seconds
+request <- function(value, delay) {
+  promises::promise(function(resolve, reject) {
+    later::later(function() resolve(value), delay)
+  })
+}
+
+calls <- 0
+fetch := async_retry(stop = stop_after_attempt(3)) %@%
+  async_timeout(0.1) %@%
+  function() {
+    calls <<- calls + 1
+    if (calls < 3) request("too slow", 1) else request("in time", 0.01)
+  }
+
+promises::then(fetch(), function(value) cat("resolved:", value, "\n"))
+while (!later::loop_empty()) later::run_now(0.1)
+calls
+```
+
+It tells the caller to stop waiting but does not stop the work, so the first two
+requests above are still running when the third finishes. A method that also
+cancels the work, for example a `mirai` task, can be written with
+`async_timeout_base` and `async_timeout_fn()`, the same way as for `timeout()`.
+It cannot bound a function that blocks the session before it returns a
+promise. Use `timeout()` for that.
+
 ## Writing your own strategies
 
 Everything above is built from five kinds of strategy, and you can add your own

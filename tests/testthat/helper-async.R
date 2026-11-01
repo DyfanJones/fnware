@@ -23,3 +23,12 @@ settle_promise <- function(p, timeout = 5) {
   }
   as.list(out)
 }
+
+# Run the event loop until nothing is scheduled, or `timeout` seconds pass.
+drain_loop <- function(timeout = 5) {
+  t0 <- proc.time()[["elapsed"]]
+  while (!later::loop_empty() && proc.time()[["elapsed"]] - t0 < timeout) {
+    later::run_now(0.05)
+  }
+  later::loop_empty()
+}

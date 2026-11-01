@@ -90,7 +90,11 @@ test_that("waits between attempts without blocking the session", {
 
 test_that("other work runs while an attempt waits", {
   ticks <- 0L
+  running <- TRUE
   tick <- function() {
+    if (!running) {
+      return()
+    }
     ticks <<- ticks + 1L
     later::later(tick, 0.02)
   }
@@ -98,6 +102,7 @@ test_that("other work runs while an attempt waits", {
   f <- async_retry(stop = stop_after_attempt(2), wait = wait_fixed(0.3)) %@%
     make_flaky(1)
   expect_equal(settle_promise(f())$value, 2L)
+  running <- FALSE
   expect_gt(ticks, 5L)
 })
 

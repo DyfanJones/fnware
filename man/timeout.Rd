@@ -41,6 +41,8 @@ timeout never outlasts an outer one. \code{timeout_remaining()} returns the seco
 left before that deadline, or \code{Inf} outside any \code{timeout()}, so you can pass
 the budget to a library with its own timeout. It does not see deadlines in
 other R processes unless a method passes one on, see \code{\link[=timeout_fn]{timeout_fn()}}.
+
+For functions that return a promise, use \code{\link[=async_timeout]{async_timeout()}}.
 }
 \section{Limitations}{
 

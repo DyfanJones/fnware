@@ -25,8 +25,7 @@ NULL
 #' Decorators that call a function synchronously do not wait for a promise.
 #' Stack `async_retry()` as the outermost decorator, and put only decorators
 #' that expect a promise inside it. [timeout()], for instance, cannot bound a
-#' promise, so a `timeout()` beneath `async_retry()` would only bound the
-#' moment the call is started.
+#' promise, so use [async_timeout()] to cap each attempt.
 #'
 #' The `before_sleep` and `after_sleep` hooks and `retry_error_callback` run in
 #' the event loop, so keep them quick.
