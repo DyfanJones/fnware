@@ -34,17 +34,8 @@ NULL
 #' @export
 rate_limit := decorator(
   function(f, calls, period = 1) {
-    stopifnot(
-      "`calls` must be a single whole number of at least 1" = validator_rate_limit(
-        calls
-      ) &&
-        calls >= 1 &&
-        calls == round(calls),
-      "`period` must be a single number greater than 0" = validator_rate_limit(
-        period
-      ) &&
-        period > 0
-    )
+    check_number(calls, ge = 1, whole = TRUE)
+    check_number(period, gt = 0)
     # Start times of calls still inside the window, oldest first.
     starts <- numeric()
     function(...) {
@@ -61,7 +52,3 @@ rate_limit := decorator(
     }
   }
 )
-
-validator_rate_limit <- function(value) {
-  is.numeric(value) && length(value) == 1L && !is.na(value)
-}

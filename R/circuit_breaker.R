@@ -49,21 +49,8 @@ NULL
 #' @export
 circuit_breaker := decorator(
   function(f, failures = 5, reset_after = 30) {
-    stopifnot(
-      "`failures` must be a single whole number of at least 1" = is.numeric(
-        failures
-      ) &&
-        length(failures) == 1L &&
-        !is.na(failures) &&
-        failures >= 1 &&
-        failures == round(failures),
-      "`reset_after` must be a single number greater than 0" = is.numeric(
-        reset_after
-      ) &&
-        length(reset_after) == 1L &&
-        !is.na(reset_after) &&
-        reset_after > 0
-    )
+    check_number(failures, ge = 1, whole = TRUE)
+    check_number(reset_after, gt = 0)
     status <- "closed"
     count <- 0L
     opened_at <- NA_real_

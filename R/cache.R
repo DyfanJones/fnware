@@ -45,12 +45,18 @@ memoised <- function(f, fn, cache) {
 #' formats are not shared, so changing `format` for an existing `dir` starts with
 #' an empty cache.
 #'
+#' Set `TTL` on `lru_cache()` or `disk_cache()` to expire entries after a number
+#' of seconds, for results that go stale (for example, data fetched from an API).
+#'
 #' Call `lru_cache(maxsize)` to build a decorator, then apply it with `%@%` or by
 #' calling it on a function. `cache` takes no parameters, so it is applied
 #' directly.
 #'
 #' @param f The function to decorate. Usually supplied by `%@%` rather than directly.
 #' @param maxsize Maximum cache size in bytes. Defaults to 1 GiB.
+#' @param TTL Time to live in seconds. Entries older than this are treated as
+#'   missing and recomputed on the next call. Defaults to `Inf`, so entries never
+#'   expire. Not available for `cache()`, which never evicts.
 #' @param format File format for `disk_cache()`: `"rds"` (the default) or `"qs2"`,
 #'   which needs the qs2 package.
 #' @param dir Directory for `disk_cache()` to keep its files in. It is created if
@@ -63,6 +69,9 @@ memoised <- function(f, fn, cache) {
 #' }
 #' slow_square(4) # slow
 #' slow_square(4) # cached
+#'
+#' # Entries expire after 60 seconds
+#' fresh_square <- lru_cache(TTL = 60) %@% function(x) x^2
 #'
 #' slow_cube <- cache %@% function(x) {
 #'   Sys.sleep(0.1)
@@ -79,12 +88,12 @@ memoised <- function(f, fn, cache) {
 #' slow_cube(2) # slow, and saved to `dir`
 #' slow_cube(2) # cached
 #' @rdname lru_cache
-#' @usage lru_cache(f, maxsize = 1024 * 1024^2)
+#' @usage lru_cache(f, maxsize = 1024 * 1024^2, TTL = Inf)
 #' @export
 lru_cache := decorator(
-  function(f, maxsize = 1024 * 1024^2) {
+  function(f, maxsize = 1024 * 1024^2, TTL = Inf) {
     fn <- decorator_context()$fn
-    memoised(f, fn, cache_mem(max_size = maxsize, evict = "lru"))
+    memoised(f, fn, cache_mem(max_size = maxsize, evict = "lru", max_age = TTL))
   }
 )
 
@@ -99,16 +108,22 @@ cache := decorator(
 )
 
 #' @rdname lru_cache
-#' @usage disk_cache(f, dir, maxsize = 1024 * 1024^2, format = c("rds", "qs2"))
+#' @usage disk_cache(f, dir, maxsize = 1024 * 1024^2, TTL = Inf, format = c("rds", "qs2"))
 #' @export
 disk_cache := decorator(
-  function(f, dir, maxsize = 1024 * 1024^2, format = c("rds", "qs2")) {
-    stopifnot(is.character(dir), length(dir) == 1L)
+  function(
+    f,
+    dir,
+    maxsize = 1024 * 1024^2,
+    TTL = Inf,
+    format = c("rds", "qs2")
+  ) {
+    check_string(dir)
     format <- rlang::arg_match(format, c("rds", "qs2"))
     fn <- decorator_context()$fn
     cache <- switch(
       format,
-      rds = cache_disk(dir, max_size = maxsize),
+      rds = cache_disk(dir, max_size = maxsize, max_age = TTL),
       qs2 = {
         rlang::check_installed("qs2", "to use `format = \"qs2\"`.")
         cache_disk(
@@ -116,7 +131,8 @@ disk_cache := decorator(
           max_size = maxsize,
           read_fn = qs2::qs_read,
           write_fn = qs2::qs_save,
-          extension = ".qs2"
+          extension = ".qs2",
+          max_age = TTL
         )
       }
     )

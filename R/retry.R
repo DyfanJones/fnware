@@ -61,9 +61,7 @@ retry := decorator(
     reraise = FALSE,
     retry_error_callback = NULL
   ) {
-    stopifnot(
-      is.null(retry_error_callback) || is.function(retry_error_callback)
-    )
+    check_function(retry_error_callback, null = TRUE)
     function(...) {
       start <- proc.time()[["elapsed"]]
       attempt <- 0L

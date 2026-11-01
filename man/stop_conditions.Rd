@@ -42,6 +42,9 @@ Decide when \code{\link[=retry]{retry()}} gives up. A condition is checked after
 \item \code{stop_before_delay()} stops if sleeping again would reach that many seconds.
 \item \code{stop_any()} stops when any of the given conditions is met.
 \item \code{stop_all()} stops when all of the given conditions are met.
+\code{stop_after_delay()} and \code{stop_before_delay()} only check the clock between
+attempts. They do not interrupt an attempt that is already running, so a call
+that hangs never gets back to them. Use \code{\link[=timeout]{timeout()}} to bound a single attempt.
 }
 }
 \examples{

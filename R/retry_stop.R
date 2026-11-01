@@ -26,6 +26,9 @@ stop_fn := new_generic("class", function(class, state, ...) {
 #' * `stop_before_delay()` stops if sleeping again would reach that many seconds.
 #' * `stop_any()` stops when any of the given conditions is met.
 #' * `stop_all()` stops when all of the given conditions are met.
+#' `stop_after_delay()` and `stop_before_delay()` only check the clock between
+#' attempts. They do not interrupt an attempt that is already running, so a call
+#' that hangs never gets back to them. Use [timeout()] to bound a single attempt.
 #'
 #' @param max_attempt_number Number of attempts to allow.
 #' @param max_delay Seconds since the first attempt.

@@ -36,6 +36,12 @@ reference:
     contents:
       - circuit_breaker
 
+  - title: Timeouts
+    desc: Bound how long a single call can run.
+    contents:
+      - timeout
+      - extending_timeout
+
   - title: Rate limiting
     desc: Limit how often a function can be called.
     contents:

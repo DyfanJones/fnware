@@ -6,22 +6,26 @@
 \alias{disk_cache}
 \title{Cache function results}
 \usage{
-lru_cache(f, maxsize = 1024 * 1024^2)
+lru_cache(f, maxsize = 1024 * 1024^2, TTL = Inf)
 
 cache(f)
 
-disk_cache(f, dir, maxsize = 1024 * 1024^2, format = c("rds", "qs2"))
+disk_cache(f, dir, maxsize = 1024 * 1024^2, TTL = Inf, format = c("rds", "qs2"))
 }
 \arguments{
 \item{f}{The function to decorate. Usually supplied by \verb{\%@\%} rather than directly.}
 
 \item{maxsize}{Maximum cache size in bytes. Defaults to 1 GiB.}
 
-\item{format}{File format for \code{disk_cache()}: \code{"rds"} (the default) or \code{"qs2"},
-which needs the qs2 package.}
+\item{TTL}{Time to live in seconds. Entries older than this are treated as
+missing and recomputed on the next call. Defaults to \code{Inf}, so entries never
+expire. Not available for \code{cache()}, which never evicts.}
 
 \item{dir}{Directory for \code{disk_cache()} to keep its files in. It is created if
 needed. There is no default, so persistence is always a choice.}
+
+\item{format}{File format for \code{disk_cache()}: \code{"rds"} (the default) or \code{"qs2"},
+which needs the qs2 package.}
 }
 \value{
 A decorator.
@@ -47,6 +51,9 @@ Neither round-trips environments or external pointers. Files from the two
 formats are not shared, so changing \code{format} for an existing \code{dir} starts with
 an empty cache.
 
+Set \code{TTL} on \code{lru_cache()} or \code{disk_cache()} to expire entries after a number
+of seconds, for results that go stale (for example, data fetched from an API).
+
 Call \code{lru_cache(maxsize)} to build a decorator, then apply it with \verb{\%@\%} or by
 calling it on a function. \code{cache} takes no parameters, so it is applied
 directly.
@@ -58,6 +65,9 @@ slow_square <- lru_cache() \%@\% function(x) {
 }
 slow_square(4) # slow
 slow_square(4) # cached
+
+# Entries expire after 60 seconds
+fresh_square <- lru_cache(TTL = 60) \%@\% function(x) x^2
 
 slow_cube <- cache \%@\% function(x) {
   Sys.sleep(0.1)
