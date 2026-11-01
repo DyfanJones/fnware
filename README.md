@@ -12,6 +12,7 @@ Popular Python decorators ported to R with the
 | Decorator   | What it does                                          | Python equivalent                                      |
 |-------------|-------------------------------------------------------|--------------------------------------------------------|
 | `retry()`   | Calls a function again when it fails                  | [tenacity](https://github.com/jd/tenacity)             |
+| `async_retry()` | Like `retry()`, but waits without blocking and returns a promise | [tenacity](https://github.com/jd/tenacity) (async) |
 | `lru_cache()` | Caches results, evicting the least recently used    | [`functools.lru_cache`](https://docs.python.org/3/library/functools.html#functools.lru_cache) |
 | `cache` | Caches results, never evicting | [`functools.cache`](https://docs.python.org/3/library/functools.html#functools.cache) |
 | `disk_cache()` | Caches results as files, so they outlive the session | [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/stable/generated/joblib.Memory.html#joblib.Memory) |

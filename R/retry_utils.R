@@ -67,3 +67,36 @@ retry_error <- function(state) {
     )
   )
 }
+
+# Decide what `retry()` and `async_retry()` do after an attempt, so the two
+# loops cannot drift apart. `cfg` is `list(stop, wait, retry, reraise,
+# retry_error_callback)`. Returns one of:
+#   list(action = "return", value = )        finish with this value
+#   list(action = "signal", error = )        finish by signalling this condition
+#   list(action = "sleep", wait =, state = ) wait, then try again
+retry_decide <- function(outcome, attempt, prev_wait, start, cfg) {
+  if (!retry_fn(cfg$retry, outcome)) {
+    if (!is.null(outcome$error)) {
+      return(list(action = "signal", error = outcome$error))
+    }
+    return(list(action = "return", value = outcome$value))
+  }
+  wait_time <- wait_fn(cfg$wait, attempt, prev_wait)
+  state <- list(
+    attempt = attempt,
+    wait = wait_time,
+    elapsed = proc.time()[["elapsed"]] - start,
+    error = outcome$error,
+    value = outcome$value
+  )
+  if (stop_fn(cfg$stop, state)) {
+    if (!is.null(cfg$retry_error_callback)) {
+      return(list(action = "return", value = cfg$retry_error_callback(state)))
+    }
+    if (cfg$reraise && !is.null(state$error)) {
+      return(list(action = "signal", error = state$error))
+    }
+    return(list(action = "signal", error = retry_error(state)))
+  }
+  list(action = "sleep", wait = wait_time, state = state)
+}

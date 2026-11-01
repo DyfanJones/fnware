@@ -62,6 +62,13 @@ retry := decorator(
     retry_error_callback = NULL
   ) {
     check_function(retry_error_callback, null = TRUE)
+    cfg <- list(
+      stop = stop,
+      wait = wait,
+      retry = retry,
+      reraise = reraise,
+      retry_error_callback = retry_error_callback
+    )
     function(...) {
       start <- proc.time()[["elapsed"]]
       attempt <- 0L
@@ -72,33 +79,17 @@ retry := decorator(
           list(value = f(...), error = NULL),
           error = function(err) list(value = NULL, error = err)
         )
-        if (!retry_fn(retry, outcome)) {
-          if (!is.null(outcome$error)) {
-            cnd_signal(outcome$error)
-          }
-          return(outcome$value)
+        step <- retry_decide(outcome, attempt, prev_wait, start, cfg)
+        if (step$action == "return") {
+          return(step$value)
         }
-        wait_time <- wait_fn(wait, attempt, prev_wait)
-        state <- list(
-          attempt = attempt,
-          wait = wait_time,
-          elapsed = proc.time()[["elapsed"]] - start,
-          error = outcome$error,
-          value = outcome$value
-        )
-        if (stop_fn(stop, state)) {
-          if (!is.null(retry_error_callback)) {
-            return(retry_error_callback(state))
-          }
-          if (reraise && !is.null(state$error)) {
-            cnd_signal(state$error)
-          }
-          cnd_signal(retry_error(state))
+        if (step$action == "signal") {
+          cnd_signal(step$error)
         }
-        before_sleep_fn(before_sleep, state)
-        Sys.sleep(wait_time)
-        after_sleep_fn(after_sleep, state)
-        prev_wait <- wait_time
+        before_sleep_fn(before_sleep, step$state)
+        Sys.sleep(step$wait)
+        after_sleep_fn(after_sleep, step$state)
+        prev_wait <- step$wait
       }
     }
   }

@@ -16,7 +16,10 @@ Remotes:
     RConsortium/S7
 Suggests: 
     callr,
+    later,
     litedown,
+    mirai,
+    promises,
     qs2,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
@@ -24,18 +27,19 @@ Config/roxygen2/version: 8.1.1
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Collate: 
-    'cache.R'
-    'circuit_breaker.R'
-    'contextmanager.R'
-    'rate_limit.R'
-    'reexport-S7.R'
-    'reexport-adorn.R'
     'retry_utils.R'
     'retry_after.R'
     'retry_before.R'
     'retry_retry.R'
     'retry_wait.R'
     'retry_stop.R'
+    'async_retry.R'
+    'cache.R'
+    'circuit_breaker.R'
+    'contextmanager.R'
+    'rate_limit.R'
+    'reexport-S7.R'
+    'reexport-adorn.R'
     'retry.R'
     'retry_extend.R'
     'timeout_method.R'

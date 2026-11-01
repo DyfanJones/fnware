@@ -303,6 +303,38 @@ The function runs in a fresh process, so it cannot change variables in your
 session, and its arguments and result must be serialisable. callr is only
 suggested by garnish, so install it first if you want to use this.
 
+## Retrying without blocking
+
+`retry()` sleeps between attempts, so nothing else can run in your R session
+while it waits. When the function already works with
+[promises](https://rstudio.github.io/promises/), as in Shiny, plumber or
+`httr2::req_perform_promise()`, use `async_retry()`. It takes the same
+arguments and the same stop, wait and retry strategies, including ones you wrote
+yourself, but schedules the next attempt with `later` instead of sleeping, and
+returns a promise.
+
+```{r async, eval = requireNamespace("promises", quietly = TRUE) && requireNamespace("later", quietly = TRUE)}
+flaky <- async_retry(
+  stop = stop_after_attempt(5),
+  wait = wait_fixed(0.05)
+) %@% make_flaky(2)
+
+p <- flaky()
+promises::then(p, function(value) cat("resolved:", value, "\n"))
+
+# Shiny and plumber run the event loop for you. In a script, run it yourself.
+while (!later::loop_empty()) later::run_now(0.1)
+```
+
+The function can return a plain value, as above, or a promise. A rejected
+promise counts as a failure, so a `mirai` task or an `httr2` async request is
+retried the same way. When `stop` fires, the promise rejects with the same
+`retry_error` that `retry()` would signal.
+
+`async_retry()` needs the promises and later packages. Put it outermost: a
+decorator inside it that calls the function synchronously, such as
+`timeout()`, cannot wait for or bound a promise.
+
 ## Writing your own strategies
 
 Everything above is built from five kinds of strategy, and you can add your own

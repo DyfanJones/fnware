@@ -25,6 +25,7 @@ reference:
       - before_sleep_none
       - after_sleep_none
       - extending_retry
+      - async_retry
 
   - title: Caching
     desc: Remember a function's results.
