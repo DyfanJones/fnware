@@ -34,6 +34,11 @@ export(stop_before_delay)
 export(stop_fn)
 export(stop_never)
 export(teardown)
+export(timeout)
+export(timeout_base)
+export(timeout_fn)
+export(timeout_r)
+export(timeout_remaining)
 export(validate_args)
 export(validate_return)
 export(wait_base)
@@ -77,6 +82,8 @@ importFrom(cachem,
 importFrom(rlang,
   abort,
   as_function,
+  caller_arg,
+  caller_env,
   cnd_signal,
   hash
 )

@@ -192,6 +192,117 @@ The defaults are `before_sleep_none()` and `after_sleep_none()`. The loggers
 take any function that accepts one string, so you can send the message to
 whatever logging package you use.
 
+## Bounding hung calls
+
+`stop_after_delay()` only checks the clock *between* attempts. If one attempt
+hangs, it never gets the chance. `timeout()` bounds a single call: when the
+time is up it signals a `garnish_timeout_error`, which is an ordinary error, so
+`retry()` treats it like any other failure.
+
+Stack it inside `retry()` so every attempt is capped and a timeout is retried:
+
+```{r timeout-retry}
+slow_work <- function() {
+  # Many short steps, so R can stop between them (see the notes below)
+  for (i in 1:100) Sys.sleep(0.02)
+  "finished"
+}
+
+attempts <- 0
+fetch := retry(stop = stop_after_attempt(3), wait = wait_fixed(0.01)) %@%
+  timeout(0.2) %@%
+  function() {
+    attempts <<- attempts + 1
+    if (attempts < 3) slow_work() else "fast enough"
+  }
+fetch()
+attempts
+```
+
+The first two attempts were cut off after 0.2 seconds and the third finished in
+time. The error records the limit and the function name:
+
+```{r timeout-error}
+slow_call := timeout(0.2) %@% slow_work
+err <- tryCatch(slow_call(), error = identity)
+class(err)
+conditionMessage(err)
+```
+
+Put `timeout()` *inside* `retry()`, as above. Outside it, `retry()` catches the
+time limit error and the limit is already spent, so later attempts would run
+without one.
+
+### Passing the time on
+
+Some libraries have their own timeouts, which can clean up properly.
+`timeout_remaining()` returns the seconds left before the current deadline
+(`Inf` outside any `timeout()`), so you can hand them the budget:
+
+```{r timeout-remaining}
+budgeted <- timeout(10) %@% function() {
+  # e.g. httr2::req_timeout(req, timeout_remaining())
+  round(timeout_remaining())
+}
+budgeted()
+```
+
+Timeouts can nest. The soonest deadline always wins, so an inner `timeout(60)`
+inside an outer `timeout(5)` is cut off after 5 seconds.
+
+### What it cannot stop
+
+The default method, `timeout_r()`, uses base R's `setTimeLimit()`, which R only
+checks at interrupt checkpoints between R expressions. It cannot interrupt:
+
+- Compiled code (C, C++, Rust) that never calls `R_CheckUserInterrupt()`,
+  which includes many blocking network and database calls.
+- A single long `Sys.sleep()`. A loop of short sleeps is fine.
+
+For these, pass `timeout_remaining()` to a native timeout, or use a method that
+runs the work in another process and kills it.
+
+### Writing a timeout method
+
+A method is an S7 class that inherits from `timeout_base`, with a method for
+the `timeout_fn(class, call, seconds)` generic. `call()` runs the decorated
+function and `seconds` is the time left. It must return the value of `call()`
+unchanged, or signal a `garnish_timeout_error`. `timeout()` handles built-in
+and your own methods the same way, adding the function name and limit to the
+message. See `?extending_timeout` for the details.
+
+This one uses the callr package to run the call in a separate R process, which
+is killed when the time is up, even if it is stuck in compiled code. It also
+sets `GARNISH_TIMEOUT_DEADLINE` in the child, so `timeout_remaining()` works
+there too:
+
+```{r timeout-callr, eval = requireNamespace("callr", quietly = TRUE)}
+library(S7)
+
+timeout_callr <- new_class("timeout_callr", parent = timeout_base)
+
+method(timeout_fn, timeout_callr) <- function(class, call, seconds, ...) {
+  deadline <- format(as.numeric(Sys.time()) + seconds, digits = 17)
+  env <- c(callr::rcmd_safe_env(), GARNISH_TIMEOUT_DEADLINE = deadline)
+  tryCatch(
+    callr::r(function(call) call(), args = list(call), timeout = seconds, env = env),
+    callr_timeout_error = function(e) {
+      rlang::abort("Timed out.", class = "garnish_timeout_error")
+    }
+  )
+}
+
+hang := timeout(0.5, method = timeout_callr()) %@% function() {
+  Sys.sleep(10)
+  "never reached"
+}
+tryCatch(hang(), error = function(e) conditionMessage(e))
+```
+
+The function runs in a fresh process, so it cannot change variables in your
+session, and its arguments and result must be serialisable. callr is only
+suggested by garnish, so install it first if you want to use this.
+
 ## Writing your own strategies
 
 Everything above is built from five kinds of strategy, and you can add your own

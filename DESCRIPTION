@@ -15,6 +15,7 @@ Remotes:
     DyfanJones/adorn,
     RConsortium/S7
 Suggests: 
+    callr,
     litedown,
     qs2,
     testthat (>= 3.0.0)
@@ -37,6 +38,9 @@ Collate:
     'retry_stop.R'
     'retry.R'
     'retry_extend.R'
+    'timeout_method.R'
+    'timeout.R'
+    'utils.R'
     'validate.R'
     'zzz.R'
 VignetteBuilder: litedown
