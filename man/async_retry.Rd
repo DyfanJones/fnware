@@ -38,51 +38,35 @@ with \code{attempt}, \code{wait}, \code{elapsed}, \code{error} and \code{value}.
 A decorator. The decorated function returns a promise.
 }
 \description{
-Asynchronous version of \code{\link[=retry]{retry()}}. It makes the same decisions with the same
-\link[=stop_never]{stop}, \link[=wait_fixed]{wait} and \link[=retry_all]{retry} strategies and
-hooks, so any strategy, including your own (\link{extending_retry}), works with
-both. The difference is how it waits: instead of sleeping, it schedules the
-next attempt with \code{\link[later:later]{later::later()}}, so the R session can do other work
-between attempts.
+Asynchronous version of \code{\link[=retry]{retry()}}, for functions that return a
+\link[promises:promise]{promise}. It uses the same strategies and hooks, but
+schedules the next attempt with \code{\link[later:later]{later::later()}} instead of sleeping, so the
+session is free between attempts.
 }
 \details{
-The decorated function always returns a \link[promises:promise]{promise}. It
-resolves with the first acceptable result, and rejects with the last error,
-or a \code{retry_error} condition, once \code{stop} fires, as \code{\link[=retry]{retry()}} would signal.
-The wrapped function may return a promise, such as from
-\code{httr2::req_perform_promise()} or a \link[mirai:mirai]{mirai} task, or a plain
-value. A rejected promise counts as an error. An error thrown directly by the
-function is treated the same way.
+The decorated function returns a promise. It resolves with the first
+acceptable result, and rejects with the last error, or a \code{retry_error} once
+\code{stop} fires. The wrapped function may return a promise or a plain value, and
+a rejection or a thrown error counts as a failure.
 
-The promise only settles while an event loop runs, which Shiny and plumber do
-for you. In a script, run it with \code{later::run_now()}.
-
-Decorators that call a function synchronously do not wait for a promise.
-Stack \code{async_retry()} as the outermost decorator, and put only decorators
-that expect a promise inside it. \code{\link[=timeout]{timeout()}}, for instance, cannot bound a
-promise, so use \code{\link[=async_timeout]{async_timeout()}} to cap each attempt.
-
-The \code{before_sleep} and \code{after_sleep} hooks and \code{retry_error_callback} run in
-the event loop, so keep them quick.
-
-Needs the promises and later packages.
+Use it as the outermost decorator. \code{\link[=timeout]{timeout()}} cannot bound a promise, so cap
+each attempt with \code{\link[=async_timeout]{async_timeout()}}. The hooks and \code{retry_error_callback} run
+in the event loop, so keep them quick. Needs the promises and later packages,
+and an event loop for the promise to settle.
 }
 \examples{
-if (
-  requireNamespace("promises", quietly = TRUE) &&
-    requireNamespace("later", quietly = TRUE)
-) {
-  n <- 0
-  flaky <- function() {
-    n <<- n + 1
-    if (n < 3) stop("not yet")
-    n
-  }
-  f <- async_retry(stop = stop_after_attempt(5), wait = wait_fixed(0.05)) \%@\%
-    flaky
-  promises::then(f(), function(value) cat("worked on attempt", value, "\n"))
+\dontrun{
+n <- 0
+flaky <- function() {
+  n <<- n + 1
+  if (n < 3) stop("not yet")
+  n
+}
+f <- async_retry(stop = stop_after_attempt(5), wait = wait_fixed(0.05)) \%@\%
+  flaky
+promises::then(f(), function(value) cat("worked on attempt", value, "\n"))
 
-  # The promise settles while the event loop runs, which Shiny does for you
-  while (!later::loop_empty()) later::run_now(0.1)
+# Shiny and plumber run the event loop for you. In a script, run it yourself.
+while (!later::loop_empty()) later::run_now(0.1)
 }
 }

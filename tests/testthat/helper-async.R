@@ -32,3 +32,17 @@ drain_loop <- function(timeout = 5) {
   }
   later::loop_empty()
 }
+
+# A promise that resolves with `value` after `delay` seconds.
+delayed <- function(value, delay) {
+  promises::promise(function(resolve, reject) {
+    later::later(function() resolve(value), delay)
+  })
+}
+
+# A promise that rejects with an error after `delay` seconds.
+delayed_error <- function(message, delay = 0) {
+  promises::promise(function(resolve, reject) {
+    later::later(function() reject(simpleError(message)), delay)
+  })
+}

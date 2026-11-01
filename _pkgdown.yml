@@ -31,11 +31,13 @@ reference:
     desc: Remember a function's results.
     contents:
       - lru_cache
+      - async_lru_cache
 
   - title: Circuit breaking
     desc: Stop calling a function that keeps failing.
     contents:
       - circuit_breaker
+      - async_circuit_breaker
 
   - title: Timeouts
     desc: Bound how long a single call can run.
@@ -48,6 +50,7 @@ reference:
     desc: Limit how often a function can be called.
     contents:
       - rate_limit
+      - async_rate_limit
 
   - title: Validation
     desc: Check arguments and return values.

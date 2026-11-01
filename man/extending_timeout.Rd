@@ -22,33 +22,27 @@ timeout_fn(class, call, seconds, ...)
 \code{timeout_fn()} returns the value of \code{call()}.
 }
 \description{
-\code{\link[=timeout]{timeout()}} hands the work of enforcing a limit to a \emph{method}. The built-in
-method is \code{timeout_r()}, which uses \code{\link[=setTimeLimit]{setTimeLimit()}}. To add another, for
-example one that runs the call in a separate process and kills it, make an S7
-class that inherits from \code{timeout_base} and register a method for the
-\code{timeout_fn()} generic with \code{\link[S7:method<-]{S7::method<-()}}. Load S7 with \code{library(S7)} to
-get \code{new_class()} and \verb{method<-}.
+\code{\link[=timeout]{timeout()}} hands the work of enforcing a limit to a \emph{method}. \code{timeout_r()},
+which uses \code{\link[=setTimeLimit]{setTimeLimit()}}, is the built-in. To add another, for example one
+that runs the call in a separate process and kills it, make an S7 class that
+inherits from \code{timeout_base} and register a method for \code{timeout_fn()} with
+\code{\link[S7:method<-]{S7::method<-()}}.
 }
 \details{
-\code{timeout_fn(class, call, seconds)} is called with \code{call}, a function of no
-arguments that runs the decorated function, and \code{seconds}, the time left
-before the effective deadline (the soonest of all enclosing \code{\link[=timeout]{timeout()}}s). It
-must either return the value of \code{call()} unchanged, or signal a condition of
-class \code{garnish_timeout_error} when \code{seconds} run out. \code{\link[=timeout]{timeout()}} adds the
+\code{timeout_fn(class, call, seconds)} gets \code{call}, a function of no arguments
+that runs the decorated function, and \code{seconds}, the time left before the
+effective deadline. It must return the value of \code{call()} unchanged, or signal
+a \code{garnish_timeout_error} when \code{seconds} run out. \code{\link[=timeout]{timeout()}} adds the
 function name and limit to the message, and signals a
-\code{garnish_timeout_method_error} if \code{call()} ran but the method returned a
-different value or swallowed its error. Other errors from \code{call()} should be
-left to propagate.
+\code{garnish_timeout_method_error} if \code{call()} ran but the method returned
+something else or swallowed its error. Other errors should propagate.
 
-A method that runs \code{call()} in another process cannot be checked for the
-contract, and \code{\link[=timeout_remaining]{timeout_remaining()}} only sees deadlines in the process that
-called \code{\link[=timeout]{timeout()}}. To make it work in the child, set the environment
-variable \code{GARNISH_TIMEOUT_DEADLINE} there to the deadline as seconds since
-the epoch, \code{as.numeric(Sys.time()) + seconds}. The retry vignette shows a
-callr method that does this.
-
-If you register methods from another package, call \code{\link[S7:methods_register]{S7::methods_register()}}
-in its \code{.onLoad()}.
+A method that runs \code{call()} in another process cannot be checked for this,
+and \code{\link[=timeout_remaining]{timeout_remaining()}} does not see the parent's deadline there. Set the
+environment variable \code{GARNISH_TIMEOUT_DEADLINE} in the child to
+\code{as.numeric(Sys.time()) + seconds} to pass it on. The retry vignette shows a
+callr method that does. Packages that register methods need
+\code{\link[S7:methods_register]{S7::methods_register()}} in \code{.onLoad()}.
 }
 \examples{
 library(S7)

@@ -20,11 +20,9 @@ async_timeout_later()
 
 \item{seconds}{Time limit for one call, in seconds. A number greater than 0.}
 
-\item{method}{How to enforce the limit: a method such as
-\code{async_timeout_later()}. See "Timeout methods".}
+\item{method}{How to enforce the limit, e.g. \code{async_timeout_later()}.}
 
-\item{class}{An async timeout method object. Methods are dispatched on this
-argument.}
+\item{class}{An async timeout method object, which methods dispatch on.}
 
 \item{call}{A function of no arguments that starts the work and returns a
 promise.}
@@ -32,80 +30,62 @@ promise.}
 \item{...}{Passed to methods.}
 }
 \value{
-\code{async_timeout()} returns a decorator, whose decorated function
-returns a promise. \code{async_timeout_later()} returns a method.
+\code{async_timeout()} returns a decorator whose decorated function returns
+a promise. \code{async_timeout_later()} returns a method, and
 \code{async_timeout_fn()} returns a promise.
 }
 \description{
 Asynchronous version of \code{\link[=timeout]{timeout()}}, for functions that return a
-\link[promises:promise]{promise}, such as \code{httr2::req_perform_promise()} or a
-\link[mirai:mirai]{mirai} task. If the promise has not settled after \code{seconds},
+\link[promises:promise]{promise}. If the promise has not settled after \code{seconds},
 the promise returned by the decorated function rejects with a
-\code{garnish_timeout_error}, the same condition \code{\link[=timeout]{timeout()}} signals. It records
-the limit in \verb{$limit} and the function name in \verb{$fn}, so \code{\link[=async_retry]{async_retry()}}
-retries it like any other failure.
+\code{garnish_timeout_error}, so \code{\link[=async_retry]{async_retry()}} retries it.
 }
 \details{
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{fetch := async_retry(stop = stop_after_attempt(3), wait = wait_exp()) \%@\%
-  async_timeout(5) \%@\%
-  function(url) \{ ... \} # returns a promise
-}\if{html}{\out{</div>}}
-
-The decorated function always returns a promise. The wrapped function may
-return a plain value, which resolves at once, or a promise. An error thrown
-directly by the function rejects the promise.
-
-Unlike \code{\link[=timeout]{timeout()}} it does not need to interrupt R, so it works however the
-promise is produced, but it has limits of its own:
+The wrapped function may return a promise or a plain value. A thrown error
+rejects the promise. Limits:
 \itemize{
-\item It does not stop the work. When the limit passes the caller is told, but
-the underlying request or task keeps running. Use a method that cancels it
-if that matters, see below.
-\item It cannot bound a function that blocks the session before returning the
-promise. The timer needs the event loop, which a blocked session is not
-running. Use \code{\link[=timeout]{timeout()}} for synchronous code.
-\item Nested \code{async_timeout()}s each run their own timer, so the soonest one
-rejects first, but there is no shared deadline to read like
-\code{\link[=timeout_remaining]{timeout_remaining()}}.
+\item It does not stop the work. The caller is told, but the underlying request
+or task keeps running. A custom method can cancel it.
+\item It cannot bound a function that blocks the session before returning its
+promise, as the timer needs the event loop. Use \code{\link[=timeout]{timeout()}} for that.
+\item Nested \code{async_timeout()}s each run their own timer, so the soonest rejects
+first. There is no shared deadline like \code{\link[=timeout_remaining]{timeout_remaining()}}.
 }
 
-Like \code{\link[=async_retry]{async_retry()}}, the promise only settles while an event loop runs.
-Needs the promises and later packages.
+Needs the promises and later packages, and an event loop.
 }
 \section{Timeout methods}{
 
-\code{method} decides how the limit is enforced. \code{async_timeout_later()} is the
-only built-in method. It races the promise against a \code{\link[later:later]{later::later()}} timer
-and cancels the timer once the promise settles.
-
-To write your own, for example one that also cancels a mirai task, make an S7
-class that inherits from \code{async_timeout_base} and register a method for
-\code{async_timeout_fn(class, call, seconds)} with \code{\link[S7:method<-]{S7::method<-()}}. \code{call()}
-starts the work and returns a promise, and \code{seconds} is the limit. The method
-must return a promise that settles with the result of \code{call()}, or rejects
-with a condition of class \code{garnish_timeout_error} once \code{seconds} pass.
-\code{async_timeout()} adds the function name and limit to the error, and signals
-a \code{garnish_timeout_method_error} if the method does not return a promise.
+\code{method} decides how the limit is enforced. \code{async_timeout_later()}, the only
+built-in, races the promise against a \code{\link[later:later]{later::later()}} timer. To write your
+own, make an S7 class inheriting from \code{async_timeout_base} and register a
+method for \code{async_timeout_fn(class, call, seconds)}. \code{call()} starts the work
+and returns a promise. The method must return a promise that settles with
+its result, or rejects with a \code{garnish_timeout_error} once \code{seconds} pass.
+\code{async_timeout()} adds the function name and limit, and signals a
+\code{garnish_timeout_method_error} if the method does not return a promise.
 }
 
 \examples{
-if (
-  requireNamespace("promises", quietly = TRUE) &&
-    requireNamespace("later", quietly = TRUE)
-) {
-  # A stand-in for a slow request: resolves after `delay` seconds
-  slow_request <- function(delay) {
-    promises::promise(function(resolve, reject) {
-      later::later(function() resolve("response"), delay)
-    })
-  }
+\dontrun{
+# A stand-in for a slow request: resolves after `delay` seconds
+slow_request <- function(delay) {
+  promises::promise(function(resolve, reject) {
+    later::later(function() resolve("response"), delay)
+  })
+}
 
-  f <- async_timeout(0.1) \%@\% slow_request
-  promises::then(
-    f(1),
-    onFulfilled = function(value) cat("got", value, "\n"),
-    onRejected = function(err) cat("failed:", conditionMessage(err), "\n")
-  )
-  while (!later::loop_empty()) later::run_now(0.1)
+f <- async_timeout(0.1) \%@\% slow_request
+promises::then(
+  f(1),
+  onFulfilled = function(value) cat("got", value, "\n"),
+  onRejected = function(err) cat("failed:", conditionMessage(err), "\n")
+)
+while (!later::loop_empty()) later::run_now(0.1)
+
+# Cap each attempt of an async_retry()
+fetch <- async_retry(stop = stop_after_attempt(3), wait = wait_exp()) \%@\%
+  async_timeout(5) \%@\%
+  function(url) slow_request(1)
 }
 }

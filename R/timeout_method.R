@@ -3,32 +3,26 @@ NULL
 
 #' Write your own timeout method
 #'
-#' [timeout()] hands the work of enforcing a limit to a *method*. The built-in
-#' method is `timeout_r()`, which uses [setTimeLimit()]. To add another, for
-#' example one that runs the call in a separate process and kills it, make an S7
-#' class that inherits from `timeout_base` and register a method for the
-#' `timeout_fn()` generic with [S7::method<-()]. Load S7 with `library(S7)` to
-#' get `new_class()` and `method<-`.
+#' [timeout()] hands the work of enforcing a limit to a *method*. `timeout_r()`,
+#' which uses [setTimeLimit()], is the built-in. To add another, for example one
+#' that runs the call in a separate process and kills it, make an S7 class that
+#' inherits from `timeout_base` and register a method for `timeout_fn()` with
+#' [S7::method<-()].
 #'
-#' `timeout_fn(class, call, seconds)` is called with `call`, a function of no
-#' arguments that runs the decorated function, and `seconds`, the time left
-#' before the effective deadline (the soonest of all enclosing [timeout()]s). It
-#' must either return the value of `call()` unchanged, or signal a condition of
-#' class `garnish_timeout_error` when `seconds` run out. [timeout()] adds the
+#' `timeout_fn(class, call, seconds)` gets `call`, a function of no arguments
+#' that runs the decorated function, and `seconds`, the time left before the
+#' effective deadline. It must return the value of `call()` unchanged, or signal
+#' a `garnish_timeout_error` when `seconds` run out. [timeout()] adds the
 #' function name and limit to the message, and signals a
-#' `garnish_timeout_method_error` if `call()` ran but the method returned a
-#' different value or swallowed its error. Other errors from `call()` should be
-#' left to propagate.
+#' `garnish_timeout_method_error` if `call()` ran but the method returned
+#' something else or swallowed its error. Other errors should propagate.
 #'
-#' A method that runs `call()` in another process cannot be checked for the
-#' contract, and [timeout_remaining()] only sees deadlines in the process that
-#' called [timeout()]. To make it work in the child, set the environment
-#' variable `GARNISH_TIMEOUT_DEADLINE` there to the deadline as seconds since
-#' the epoch, `as.numeric(Sys.time()) + seconds`. The retry vignette shows a
-#' callr method that does this.
-#'
-#' If you register methods from another package, call [S7::methods_register()]
-#' in its `.onLoad()`.
+#' A method that runs `call()` in another process cannot be checked for this,
+#' and [timeout_remaining()] does not see the parent's deadline there. Set the
+#' environment variable `GARNISH_TIMEOUT_DEADLINE` in the child to
+#' `as.numeric(Sys.time()) + seconds` to pass it on. The retry vignette shows a
+#' callr method that does. Packages that register methods need
+#' [S7::methods_register()] in `.onLoad()`.
 #'
 #' @param class A timeout method object. Methods are dispatched on this argument.
 #' @param call A function of no arguments that runs the decorated function.

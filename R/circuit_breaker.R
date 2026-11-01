@@ -1,5 +1,6 @@
 #' @importFrom adorn := decorator
-#' @importFrom rlang abort
+#' @importFrom rlang cnd_signal
+#' @include circuit_breaker_utils.R
 NULL
 
 #' Stop calling a function that keeps failing
@@ -51,35 +52,21 @@ circuit_breaker := decorator(
   function(f, failures = 5, reset_after = 30) {
     check_number(failures, ge = 1, whole = TRUE)
     check_number(reset_after, gt = 0)
-    status <- "closed"
-    count <- 0L
-    opened_at <- NA_real_
+    circuit <- circuit_state(failures, reset_after)
     function(...) {
-      if (status == "open") {
-        if (proc.time()[["elapsed"]] - opened_at < reset_after) {
-          abort(
-            "Circuit is open: the function failed repeatedly and is not being called.",
-            class = "garnish_circuit_open",
-            call = NULL
-          )
-        }
-        status <<- "half_open"
+      token <- circuit$enter()
+      if (is.null(token)) {
+        cnd_signal(circuit_open_cnd())
       }
       outcome <- tryCatch(
         list(res = withVisible(f(...)), error = NULL),
         error = function(err) list(res = NULL, error = err)
       )
       if (!is.null(outcome$error)) {
-        count <<- count + 1L
-        if (status == "half_open" || count >= failures) {
-          status <<- "open"
-          opened_at <<- proc.time()[["elapsed"]]
-          count <<- 0L
-        }
+        circuit$fail(token)
         stop(outcome$error)
       }
-      status <<- "closed"
-      count <<- 0L
+      circuit$succeed(token)
       if (outcome$res$visible) {
         outcome$res$value
       } else {

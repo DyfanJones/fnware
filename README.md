@@ -18,9 +18,12 @@ Popular Python decorators ported to R with the
 | `lru_cache()` | Caches results, evicting the least recently used    | [`functools.lru_cache`](https://docs.python.org/3/library/functools.html#functools.lru_cache) |
 | `cache` | Caches results, never evicting | [`functools.cache`](https://docs.python.org/3/library/functools.html#functools.cache) |
 | `disk_cache()` | Caches results as files, so they outlive the session | [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/stable/generated/joblib.Memory.html#joblib.Memory) |
+| `async_lru_cache()`, `async_cache`, `async_disk_cache()` | Like the caches above, for functions that return a promise | |
 | `validate_args()`, `validate_return()` | Checks arguments and return values with any validator function | [pydantic `validate_call`](https://docs.pydantic.dev/latest/concepts/validation_decorator/) |
 | `circuit_breaker()` | Stops calling a function after repeated failures, then retries after a cooldown | [pybreaker](https://github.com/danielfm/pybreaker) |
+| `async_circuit_breaker()` | Like `circuit_breaker()`, for functions that return a promise | [pybreaker](https://github.com/danielfm/pybreaker) (async) |
 | `rate_limit()` | Limits how often a function can be called in a time window | [`ratelimit`](https://pypi.org/project/ratelimit/) |
+| `async_rate_limit()` | Like `rate_limit()`, but queues calls instead of blocking | [`ratelimit`](https://pypi.org/project/ratelimit/) (async) |
 | `contextmanager` | Writes setup and teardown once, as `local_`, `with_` and decorator forms | [`contextlib.contextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager) |
 
 ## Installation

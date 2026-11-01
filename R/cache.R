@@ -1,6 +1,7 @@
 #' @importFrom adorn := decorator decorator_context
 #' @importFrom rlang hash
 #' @importFrom cachem cache_mem cache_disk
+#' @include cache_utils.R
 NULL
 
 # Shared body of the caching decorators: `cache` is any cachem-style cache.
@@ -8,15 +9,9 @@ NULL
 # body never changes, so hashing `f` would ignore edits to the real body. Get it
 # from `decorator_context()$fn` in the factory itself, as it reads the call stack.
 memoised <- function(f, fn, cache) {
-  f_hash <- hash(list(formals(fn), as.character(body(fn))))
-  defaults <- Filter(function(x) !identical(x, quote(expr = )), formals(f))
+  key_of <- memo_key(f, fn)
   function(...) {
-    matched <- as.list(match.call(f, as.call(c(quote(f), list(...)))))[-1L]
-    named <- matched[names(matched) %in% names(formals(f))]
-    env <- list2env(named, parent = environment(f))
-    missing_defaults <- defaults[setdiff(names(defaults), names(matched))]
-    args <- c(matched, lapply(missing_defaults, eval, envir = env))
-    key <- hash(c(f_hash, args))
+    key <- key_of(...)
     res <- cache$get(key)
     if (inherits(res, "key_missing")) {
       res <- withVisible(f(...))
@@ -121,21 +116,7 @@ disk_cache := decorator(
     check_string(dir)
     format <- rlang::arg_match(format, c("rds", "qs2"))
     fn <- decorator_context()$fn
-    cache <- switch(
-      format,
-      rds = cache_disk(dir, max_size = maxsize, max_age = TTL),
-      qs2 = {
-        rlang::check_installed("qs2", "to use `format = \"qs2\"`.")
-        cache_disk(
-          dir,
-          max_size = maxsize,
-          read_fn = qs2::qs_read,
-          write_fn = qs2::qs_save,
-          extension = ".qs2",
-          max_age = TTL
-        )
-      }
-    )
+    cache <- new_disk_cache(dir, maxsize, TTL, format)
     memoised(f, fn, cache)
   }
 )

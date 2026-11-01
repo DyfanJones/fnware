@@ -1,6 +1,6 @@
 #' @importFrom adorn := decorator decorator_context
-#' @importFrom rlang abort
-#' @include timeout_method.R
+#' @importFrom rlang abort cnd_signal
+#' @include timeout_method.R timeout_utils.R
 NULL
 
 # Absolute deadlines (in `proc.time()` elapsed seconds) of the timeouts that are
@@ -35,30 +35,6 @@ inherited_remaining <- function() {
 
 is_time_limit_error <- function(cnd) {
   grepl("reached elapsed time limit", conditionMessage(cnd), fixed = TRUE)
-}
-
-timeout_message <- function(name, limit, enclosing = FALSE) {
-  msg <- sprintf(
-    "`%s` timed out: it did not finish within %s second%s.",
-    name,
-    format(limit),
-    if (identical(limit, 1)) "" else "s"
-  )
-  if (enclosing) {
-    msg <- paste(msg, "(cut short by an enclosing timeout)")
-  }
-  msg
-}
-
-timeout_error <- function(name, limit, enclosing = FALSE, call = NULL) {
-  abort(
-    timeout_message(name, limit, enclosing),
-    class = "garnish_timeout_error",
-    limit = limit,
-    fn = name,
-    finalised = TRUE,
-    call = call
-  )
 }
 
 #' Bound how long a call can run
@@ -140,9 +116,10 @@ timeout := decorator(
       })
       bound <- min(outer, start + inherited_remaining())
       enclosing <- bound < deadline
-      remaining <- min(bound, deadline) - start
+      # Never more than this timeout's own limit, whatever the float rounding.
+      remaining <- min(min(bound, deadline) - start, seconds)
       if (remaining <= 0) {
-        timeout_error(name, seconds, enclosing)
+        cnd_signal(timeout_cnd(name, seconds, enclosing))
       }
 
       res <- NULL
@@ -162,7 +139,7 @@ timeout := decorator(
         if (isTRUE(err$finalised)) {
           stop(err)
         }
-        timeout_error(name, seconds, enclosing)
+        cnd_signal(timeout_cnd(name, seconds, enclosing))
       }
       if (started && (is.null(res) || !identical(outcome$value, res$value))) {
         abort(

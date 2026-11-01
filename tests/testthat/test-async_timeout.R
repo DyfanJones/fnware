@@ -1,13 +1,6 @@
 skip_if_not_installed("promises")
 skip_if_not_installed("later")
 
-# A promise that resolves with `value` after `delay` seconds.
-delayed <- function(value, delay) {
-  promises::promise(function(resolve, reject) {
-    later::later(function() resolve(value), delay)
-  })
-}
-
 test_that("a fast promise resolves normally", {
   f <- async_timeout(5) %@% function(x) delayed(x * 2, 0.01)
   p <- f(21)
