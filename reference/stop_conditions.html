@@ -93,7 +93,10 @@
 <li><p><code>stop_after_delay()</code> stops once that many seconds have passed since the first attempt.</p></li>
 <li><p><code>stop_before_delay()</code> stops if sleeping again would reach that many seconds.</p></li>
 <li><p><code>stop_any()</code> stops when any of the given conditions is met.</p></li>
-<li><p><code>stop_all()</code> stops when all of the given conditions are met.</p></li>
+<li><p><code>stop_all()</code> stops when all of the given conditions are met.
+<code>stop_after_delay()</code> and <code>stop_before_delay()</code> only check the clock between
+attempts. They do not interrupt an attempt that is already running, so a call
+that hangs never gets back to them. Use <code><a href="timeout.html">timeout()</a></code> to bound a single attempt.</p></li>
 </ul></div>
 
     <div class="section level2">

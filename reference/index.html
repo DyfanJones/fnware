@@ -102,6 +102,13 @@
 
         </dt>
         <dd>Write your own stop, wait, retry and hook strategies</dd>
+
+        <dt>
+
+          <code><a href="async_retry.html">async_retry()</a></code>
+
+        </dt>
+        <dd>Retry a function without blocking</dd>
       </dl></div><div class="section level2">
       <h2 id="caching">Caching<a class="anchor" aria-label="anchor" href="#caching"></a></h2>
 
@@ -118,6 +125,13 @@
 
         </dt>
         <dd>Cache function results</dd>
+
+        <dt>
+
+          <code><a href="async_lru_cache.html">async_lru_cache()</a></code> <code><a href="async_lru_cache.html">async_cache()</a></code> <code><a href="async_lru_cache.html">async_disk_cache()</a></code>
+
+        </dt>
+        <dd>Cache the results of asynchronous functions</dd>
       </dl></div><div class="section level2">
       <h2 id="circuit-breaking">Circuit breaking<a class="anchor" aria-label="anchor" href="#circuit-breaking"></a></h2>
 
@@ -134,6 +148,43 @@
 
         </dt>
         <dd>Stop calling a function that keeps failing</dd>
+
+        <dt>
+
+          <code><a href="async_circuit_breaker.html">async_circuit_breaker()</a></code>
+
+        </dt>
+        <dd>Stop calling an asynchronous function that keeps failing</dd>
+      </dl></div><div class="section level2">
+      <h2 id="timeouts">Timeouts<a class="anchor" aria-label="anchor" href="#timeouts"></a></h2>
+
+      <div class="section-desc"><p>Bound how long a single call can run.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="timeout.html">timeout_r()</a></code> <code><a href="timeout.html">timeout()</a></code> <code><a href="timeout.html">timeout_remaining()</a></code>
+
+        </dt>
+        <dd>Bound how long a call can run</dd>
+
+        <dt>
+
+          <code><a href="extending_timeout.html">timeout_base()</a></code> <code><a href="extending_timeout.html">timeout_fn()</a></code>
+
+        </dt>
+        <dd>Write your own timeout method</dd>
+
+        <dt>
+
+          <code><a href="async_timeout.html">async_timeout()</a></code> <code><a href="async_timeout.html">async_timeout_base()</a></code> <code><a href="async_timeout.html">async_timeout_fn()</a></code> <code><a href="async_timeout.html">async_timeout_later()</a></code>
+
+        </dt>
+        <dd>Bound how long an asynchronous call can take</dd>
       </dl></div><div class="section level2">
       <h2 id="rate-limiting">Rate limiting<a class="anchor" aria-label="anchor" href="#rate-limiting"></a></h2>
 
@@ -150,6 +201,13 @@
 
         </dt>
         <dd>Limit how often a function can be called</dd>
+
+        <dt>
+
+          <code><a href="async_rate_limit.html">async_rate_limit()</a></code>
+
+        </dt>
+        <dd>Limit how often an asynchronous function can be called</dd>
       </dl></div><div class="section level2">
       <h2 id="validation">Validation<a class="anchor" aria-label="anchor" href="#validation"></a></h2>
 

@@ -55,11 +55,11 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">lru_cache</span><span class="op">(</span><span class="va">f</span>, maxsize <span class="op">=</span> <span class="fl">1024</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">lru_cache</span><span class="op">(</span><span class="va">f</span>, maxsize <span class="op">=</span> <span class="fl">1024</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">2</span>, TTL <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">cache</span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">disk_cache</span><span class="op">(</span><span class="va">f</span>, <span class="va">dir</span>, maxsize <span class="op">=</span> <span class="fl">1024</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">2</span>, format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rds"</span>, <span class="st">"qs2"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">disk_cache</span><span class="op">(</span><span class="va">f</span>, <span class="va">dir</span>, maxsize <span class="op">=</span> <span class="fl">1024</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">2</span>, TTL <span class="op">=</span> <span class="cn">Inf</span>, format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rds"</span>, <span class="st">"qs2"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -74,14 +74,20 @@
 <dd><p>Maximum cache size in bytes. Defaults to 1 GiB.</p></dd>
 
 
-<dt id="arg-format">format<a class="anchor" aria-label="anchor" href="#arg-format"></a></dt>
-<dd><p>File format for <code>disk_cache()</code>: <code>"rds"</code> (the default) or <code>"qs2"</code>,
-which needs the qs2 package.</p></dd>
+<dt id="arg-ttl">TTL<a class="anchor" aria-label="anchor" href="#arg-ttl"></a></dt>
+<dd><p>Time to live in seconds. Entries older than this are treated as
+missing and recomputed on the next call. Defaults to <code>Inf</code>, so entries never
+expire. Not available for <code>cache()</code>, which never evicts.</p></dd>
 
 
 <dt id="arg-dir">dir<a class="anchor" aria-label="anchor" href="#arg-dir"></a></dt>
 <dd><p>Directory for <code>disk_cache()</code> to keep its files in. It is created if
 needed. There is no default, so persistence is always a choice.</p></dd>
+
+
+<dt id="arg-format">format<a class="anchor" aria-label="anchor" href="#arg-format"></a></dt>
+<dd><p>File format for <code>disk_cache()</code>: <code>"rds"</code> (the default) or <code>"qs2"</code>,
+which needs the qs2 package.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -103,6 +109,8 @@ so editing the function invalidates them. Changes to anything it calls do not.
 Neither round-trips environments or external pointers. Files from the two
 formats are not shared, so changing <code>format</code> for an existing <code>dir</code> starts with
 an empty cache.</p>
+<p>Set <code>TTL</code> on <code>lru_cache()</code> or <code>disk_cache()</code> to expire entries after a number
+of seconds, for results that go stale (for example, data fetched from an API).</p>
 <p>Call <code>lru_cache(maxsize)</code> to build a decorator, then apply it with <code>%@%</code> or by
 calling it on a function. <code>cache</code> takes no parameters, so it is applied
 directly.</p>
@@ -118,6 +126,9 @@ directly.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 16</span>
 <span class="r-in"><span><span class="fu">slow_square</span><span class="op">(</span><span class="fl">4</span><span class="op">)</span> <span class="co"># cached</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 16</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Entries expire after 60 seconds</span></span></span>
+<span class="r-in"><span><span class="va">fresh_square</span> <span class="op">&lt;-</span> <span class="fu">lru_cache</span><span class="op">(</span>TTL <span class="op">=</span> <span class="fl">60</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">^</span><span class="fl">2</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">slow_cube</span> <span class="op">&lt;-</span> <span class="va">cache</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span></span></span>

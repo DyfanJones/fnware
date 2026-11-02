@@ -221,6 +221,63 @@ the order from outside to inside is
 [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md),
 [`rate_limit()`](https://dyfanjones.github.io/garnish/reference/rate_limit.md).
 
+## With promises
+
+[`async_circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/async_circuit_breaker.md)
+is the version for functions that return a promise, such as
+[`httr2::req_perform_promise()`](https://httr2.r-lib.org/reference/req_perform_promise.html)
+or a `mirai` task. It takes the same arguments and keeps the same three
+states, and a call fails when its promise rejects. An open circuit
+returns a promise that is already rejected with a `garnish_circuit_open`
+error, without calling the function.
+
+``` r
+
+down <- function() promises::promise_reject(simpleError("service down"))
+fetch <- async_circuit_breaker(failures = 2, reset_after = 60) %@% down
+
+# Failures are counted when a promise settles, so let each call settle
+try_once <- function() {
+  promises::then(
+    fetch(),
+    onRejected = function(err) cat(class(err)[[1]], "\n")
+  )
+  while (!later::loop_empty()) later::run_now(0.1)
+}
+try_once()
+```
+
+    ## simpleError
+
+``` r
+
+try_once()
+```
+
+    ## simpleError
+
+``` r
+
+try_once() # the circuit is open: down() is not called
+```
+
+    ## garnish_circuit_open
+
+Asynchronous calls overlap, which adds a few rules. A failure is counted
+when its promise rejects, so calls made before earlier ones have settled
+all go through. While the circuit is half-open only one trial call runs,
+and other calls are refused until it settles. A call that started before
+the circuit opened and finishes after it does not close the circuit. A
+trial that never settles is abandoned after `reset_after` seconds, so
+put
+[`async_timeout()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md)
+inside to bound it sooner.
+
+Stack it outside
+[`async_retry()`](https://dyfanjones.github.io/garnish/reference/async_retry.md)
+in the same way as above, and see the retry vignette for
+[`async_timeout()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md).
+
 ## Notes
 
 - **State belongs to the decorated function.** Two functions decorated

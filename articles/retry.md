@@ -277,6 +277,264 @@ and
 The loggers take any function that accepts one string, so you can send
 the message to whatever logging package you use.
 
+## Bounding hung calls
+
+[`stop_after_delay()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md)
+only checks the clock *between* attempts. If one attempt hangs, it never
+gets the chance.
+[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+bounds a single call: when the time is up it signals a
+`garnish_timeout_error`, which is an ordinary error, so
+[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+treats it like any other failure.
+
+Stack it inside
+[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) so
+every attempt is capped and a timeout is retried:
+
+``` r
+
+slow_work <- function() {
+  # Many short steps, so R can stop between them (see the notes below)
+  for (i in 1:100) Sys.sleep(0.02)
+  "finished"
+}
+
+attempts <- 0
+fetch := retry(stop = stop_after_attempt(3), wait = wait_fixed(0.01)) %@%
+  timeout(0.2) %@%
+  function() {
+    attempts <<- attempts + 1
+    if (attempts < 3) slow_work() else "fast enough"
+  }
+fetch()
+```
+
+    ## [1] "fast enough"
+
+``` r
+
+attempts
+```
+
+    ## [1] 3
+
+The first two attempts were cut off after 0.2 seconds and the third
+finished in time. The error records the limit and the function name:
+
+``` r
+
+slow_call := timeout(0.2) %@% slow_work
+err <- tryCatch(slow_call(), error = identity)
+class(err)
+```
+
+    ## [1] "garnish_timeout_error" "rlang_error"           "error"                
+    ## [4] "condition"
+
+``` r
+
+conditionMessage(err)
+```
+
+    ## [1] "`slow_call` timed out: it did not finish within 0.2 seconds."
+
+Put
+[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+*inside*
+[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md), as
+above. Outside it,
+[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+catches the time limit error and the limit is already spent, so later
+attempts would run without one.
+
+### Passing the time on
+
+Some libraries have their own timeouts, which can clean up properly.
+[`timeout_remaining()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+returns the seconds left before the current deadline (`Inf` outside any
+[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)),
+so you can hand them the budget:
+
+``` r
+
+budgeted <- timeout(10) %@% function() {
+  # e.g. httr2::req_timeout(req, timeout_remaining())
+  round(timeout_remaining())
+}
+budgeted()
+```
+
+    ## [1] 10
+
+Timeouts can nest. The soonest deadline always wins, so an inner
+`timeout(60)` inside an outer `timeout(5)` is cut off after 5 seconds.
+
+### What it cannot stop
+
+The default method,
+[`timeout_r()`](https://dyfanjones.github.io/garnish/reference/timeout.md),
+uses base R’s
+[`setTimeLimit()`](https://rdrr.io/r/base/setTimeLimit.html), which R
+only checks at interrupt checkpoints between R expressions. It cannot
+interrupt:
+
+- Compiled code (C, C++, Rust) that never calls
+  `R_CheckUserInterrupt()`, which includes many blocking network and
+  database calls.
+- A single long [`Sys.sleep()`](https://rdrr.io/r/base/Sys.sleep.html).
+  A loop of short sleeps is fine.
+
+For these, pass
+[`timeout_remaining()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+to a native timeout, or use a method that runs the work in another
+process and kills it.
+
+### Writing a timeout method
+
+A method is an S7 class that inherits from `timeout_base`, with a method
+for the `timeout_fn(class, call, seconds)` generic.
+[`call()`](https://rdrr.io/r/base/call.html) runs the decorated function
+and `seconds` is the time left. It must return the value of
+[`call()`](https://rdrr.io/r/base/call.html) unchanged, or signal a
+`garnish_timeout_error`.
+[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+handles built-in and your own methods the same way, adding the function
+name and limit to the message. See
+[`?extending_timeout`](https://dyfanjones.github.io/garnish/reference/extending_timeout.md)
+for the details.
+
+This one uses the callr package to run the call in a separate R process,
+which is killed when the time is up, even if it is stuck in compiled
+code. It also sets `GARNISH_TIMEOUT_DEADLINE` in the child, so
+[`timeout_remaining()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+works there too:
+
+``` r
+
+library(S7)
+
+timeout_callr <- new_class("timeout_callr", parent = timeout_base)
+
+method(timeout_fn, timeout_callr) <- function(class, call, seconds, ...) {
+  deadline <- format(as.numeric(Sys.time()) + seconds, digits = 17)
+  env <- c(callr::rcmd_safe_env(), GARNISH_TIMEOUT_DEADLINE = deadline)
+  tryCatch(
+    callr::r(function(call) call(), args = list(call), timeout = seconds, env = env),
+    callr_timeout_error = function(e) {
+      rlang::abort("Timed out.", class = "garnish_timeout_error")
+    }
+  )
+}
+
+hang := timeout(0.5, method = timeout_callr()) %@% function() {
+  Sys.sleep(10)
+  "never reached"
+}
+tryCatch(hang(), error = function(e) conditionMessage(e))
+```
+
+    ## [1] "`hang` timed out: it did not finish within 0.5 seconds."
+
+The function runs in a fresh process, so it cannot change variables in
+your session, and its arguments and result must be serialisable. callr
+is only suggested by garnish, so install it first if you want to use
+this.
+
+## Retrying without blocking
+
+[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+sleeps between attempts, so nothing else can run in your R session while
+it waits. When the function already works with
+[promises](https://rstudio.github.io/promises/), as in Shiny, plumber or
+[`httr2::req_perform_promise()`](https://httr2.r-lib.org/reference/req_perform_promise.html),
+use
+[`async_retry()`](https://dyfanjones.github.io/garnish/reference/async_retry.md).
+It takes the same arguments and the same stop, wait and retry
+strategies, including ones you wrote yourself, but schedules the next
+attempt with `later` instead of sleeping, and returns a promise.
+
+``` r
+
+flaky <- async_retry(
+  stop = stop_after_attempt(5),
+  wait = wait_fixed(0.05)
+) %@% make_flaky(2)
+
+p <- flaky()
+promises::then(p, function(value) cat("resolved:", value, "\n"))
+
+# Shiny and plumber run the event loop for you. In a script, run it yourself.
+while (!later::loop_empty()) later::run_now(0.1)
+```
+
+    ## resolved: worked on call 3
+
+The function can return a plain value, as above, or a promise. A
+rejected promise counts as a failure, so a `mirai` task or an `httr2`
+async request is retried the same way. When `stop` fires, the promise
+rejects with the same `retry_error` that
+[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+would signal.
+
+[`async_retry()`](https://dyfanjones.github.io/garnish/reference/async_retry.md)
+needs the promises and later packages. Put it outermost: a decorator
+inside it that calls the function synchronously, such as
+[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md),
+cannot wait for or bound a promise.
+
+### Bounding a slow promise
+
+[`async_timeout()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md)
+is the promise version of
+[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md).
+If the promise has not settled after the limit, the promise it returns
+rejects with the same `garnish_timeout_error`, which
+[`async_retry()`](https://dyfanjones.github.io/garnish/reference/async_retry.md)
+retries:
+
+``` r
+
+# A stand-in for a request: resolves with `value` after `delay` seconds
+request <- function(value, delay) {
+  promises::promise(function(resolve, reject) {
+    later::later(function() resolve(value), delay)
+  })
+}
+
+calls <- 0
+fetch := async_retry(stop = stop_after_attempt(3)) %@%
+  async_timeout(0.1) %@%
+  function() {
+    calls <<- calls + 1
+    if (calls < 3) request("too slow", 1) else request("in time", 0.01)
+  }
+
+promises::then(fetch(), function(value) cat("resolved:", value, "\n"))
+while (!later::loop_empty()) later::run_now(0.1)
+```
+
+    ## resolved: in time
+
+``` r
+
+calls
+```
+
+    ## [1] 3
+
+It tells the caller to stop waiting but does not stop the work, so the
+first two requests above are still running when the third finishes. A
+method that also cancels the work, for example a `mirai` task, can be
+written with `async_timeout_base` and
+[`async_timeout_fn()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md),
+the same way as for
+[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md).
+It cannot bound a function that blocks the session before it returns a
+promise. Use
+[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+for that.
+
 ## Writing your own strategies
 
 Everything above is built from five kinds of strategy, and you can add

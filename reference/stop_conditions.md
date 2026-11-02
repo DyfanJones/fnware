@@ -54,6 +54,11 @@ A stop condition to pass to
 - `stop_any()` stops when any of the given conditions is met.
 
 - `stop_all()` stops when all of the given conditions are met.
+  `stop_after_delay()` and `stop_before_delay()` only check the clock
+  between attempts. They do not interrupt an attempt that is already
+  running, so a call that hangs never gets back to them. Use
+  [`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+  to bound a single attempt.
 
 ## Examples
 

@@ -11,10 +11,16 @@
 <url><loc>https://dyfanjones.github.io/garnish/index.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/after_sleep.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/as_decorator.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/async_circuit_breaker.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/async_lru_cache.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/async_rate_limit.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/async_retry.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/async_timeout.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/before_sleep.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/circuit_breaker.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/contextmanager.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/extending_retry.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/extending_timeout.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/index.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/lru_cache.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/rate_limit.html</loc></url>
@@ -22,6 +28,7 @@
 <url><loc>https://dyfanjones.github.io/garnish/reference/retry.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/retry_conditions.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/stop_conditions.html</loc></url>
+<url><loc>https://dyfanjones.github.io/garnish/reference/timeout.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/validate_args.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/wait_strategies.html</loc></url>
 <url><loc>https://dyfanjones.github.io/garnish/reference/with_context.html</loc></url>

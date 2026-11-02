@@ -15,16 +15,16 @@ teardown(expr)
 
 ## Arguments
 
+- f:
+
+  The function to decorate. Usually supplied by `%@%` rather than
+  directly.
+
 - expr:
 
   Code that releases the resource. Evaluated in the setup function's
   environment when the context ends, so it can use the setup's local
   variables.
-
-- f:
-
-  The function to decorate. Usually supplied by `%@%` rather than
-  directly.
 
 ## Value
 

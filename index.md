@@ -6,12 +6,18 @@ Popular Python decorators ported to R with the
 | Decorator | What it does | Python equivalent |
 |----|----|----|
 | [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) | Calls a function again when it fails | [tenacity](https://github.com/jd/tenacity) |
+| [`async_retry()`](https://dyfanjones.github.io/garnish/reference/async_retry.md) | Like [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md), but waits without blocking and returns a promise | [tenacity](https://github.com/jd/tenacity) (async) |
+| [`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md) | Stops a single call that runs too long | [wrapt-timeout-decorator](https://github.com/bitranox/wrapt_timeout_decorator) |
+| [`async_timeout()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md) | Like [`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md), but for functions that return a promise | [`asyncio.timeout`](https://docs.python.org/3/library/asyncio-task.html#asyncio.timeout) |
 | [`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md) | Caches results, evicting the least recently used | [`functools.lru_cache`](https://docs.python.org/3/library/functools.html#functools.lru_cache) |
 | `cache` | Caches results, never evicting | [`functools.cache`](https://docs.python.org/3/library/functools.html#functools.cache) |
-| [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md) | Caches results as files, so they outlive the session | [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/stable/memory.html) |
+| [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md) | Caches results as files, so they outlive the session | [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/stable/generated/joblib.Memory.html#joblib.Memory) |
+| [`async_lru_cache()`](https://dyfanjones.github.io/garnish/reference/async_lru_cache.md), `async_cache`, [`async_disk_cache()`](https://dyfanjones.github.io/garnish/reference/async_lru_cache.md) | Like the caches above, for functions that return a promise |  |
 | [`validate_args()`](https://dyfanjones.github.io/garnish/reference/validate_args.md), [`validate_return()`](https://dyfanjones.github.io/garnish/reference/validate_args.md) | Checks arguments and return values with any validator function | [pydantic `validate_call`](https://docs.pydantic.dev/latest/concepts/validation_decorator/) |
 | [`circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md) | Stops calling a function after repeated failures, then retries after a cooldown | [pybreaker](https://github.com/danielfm/pybreaker) |
+| [`async_circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/async_circuit_breaker.md) | Like [`circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md), for functions that return a promise | [pybreaker](https://github.com/danielfm/pybreaker) (async) |
 | [`rate_limit()`](https://dyfanjones.github.io/garnish/reference/rate_limit.md) | Limits how often a function can be called in a time window | [`ratelimit`](https://pypi.org/project/ratelimit/) |
+| [`async_rate_limit()`](https://dyfanjones.github.io/garnish/reference/async_rate_limit.md) | Like [`rate_limit()`](https://dyfanjones.github.io/garnish/reference/rate_limit.md), but queues calls instead of blocking | [`ratelimit`](https://pypi.org/project/ratelimit/) (async) |
 | `contextmanager` | Writes setup and teardown once, as `local_`, `with_` and decorator forms | [`contextlib.contextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager) |
 
 ## Installation

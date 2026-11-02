@@ -86,6 +86,22 @@
 <td><a href="https://github.com/jd/tenacity" class="external-link">tenacity</a></td>
 </tr>
 <tr>
+<td><code><a href="reference/async_retry.html">async_retry()</a></code></td>
+<td>Like <code><a href="reference/retry.html">retry()</a></code>, but waits without blocking and returns a promise</td>
+<td>
+<a href="https://github.com/jd/tenacity" class="external-link">tenacity</a> (async)</td>
+</tr>
+<tr>
+<td><code><a href="reference/timeout.html">timeout()</a></code></td>
+<td>Stops a single call that runs too long</td>
+<td><a href="https://github.com/bitranox/wrapt_timeout_decorator" class="external-link">wrapt-timeout-decorator</a></td>
+</tr>
+<tr>
+<td><code><a href="reference/async_timeout.html">async_timeout()</a></code></td>
+<td>Like <code><a href="reference/timeout.html">timeout()</a></code>, but for functions that return a promise</td>
+<td><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.timeout" class="external-link"><code>asyncio.timeout</code></a></td>
+</tr>
+<tr>
 <td><code><a href="reference/lru_cache.html">lru_cache()</a></code></td>
 <td>Caches results, evicting the least recently used</td>
 <td><a href="https://docs.python.org/3/library/functools.html#functools.lru_cache" class="external-link"><code>functools.lru_cache</code></a></td>
@@ -98,7 +114,14 @@
 <tr>
 <td><code><a href="reference/lru_cache.html">disk_cache()</a></code></td>
 <td>Caches results as files, so they outlive the session</td>
-<td><a href="https://joblib.readthedocs.io/en/stable/memory.html" class="external-link"><code>joblib.Memory.cache</code></a></td>
+<td><a href="https://joblib.readthedocs.io/en/stable/generated/joblib.Memory.html#joblib.Memory" class="external-link"><code>joblib.Memory.cache</code></a></td>
+</tr>
+<tr>
+<td>
+<code><a href="reference/async_lru_cache.html">async_lru_cache()</a></code>, <code>async_cache</code>, <code><a href="reference/async_lru_cache.html">async_disk_cache()</a></code>
+</td>
+<td>Like the caches above, for functions that return a promise</td>
+<td></td>
 </tr>
 <tr>
 <td>
@@ -113,9 +136,21 @@
 <td><a href="https://github.com/danielfm/pybreaker" class="external-link">pybreaker</a></td>
 </tr>
 <tr>
+<td><code><a href="reference/async_circuit_breaker.html">async_circuit_breaker()</a></code></td>
+<td>Like <code><a href="reference/circuit_breaker.html">circuit_breaker()</a></code>, for functions that return a promise</td>
+<td>
+<a href="https://github.com/danielfm/pybreaker" class="external-link">pybreaker</a> (async)</td>
+</tr>
+<tr>
 <td><code><a href="reference/rate_limit.html">rate_limit()</a></code></td>
 <td>Limits how often a function can be called in a time window</td>
 <td><a href="https://pypi.org/project/ratelimit/" class="external-link"><code>ratelimit</code></a></td>
+</tr>
+<tr>
+<td><code><a href="reference/async_rate_limit.html">async_rate_limit()</a></code></td>
+<td>Like <code><a href="reference/rate_limit.html">rate_limit()</a></code>, but queues calls instead of blocking</td>
+<td>
+<a href="https://pypi.org/project/ratelimit/" class="external-link"><code>ratelimit</code></a> (async)</td>
 </tr>
 <tr>
 <td><code>contextmanager</code></td>

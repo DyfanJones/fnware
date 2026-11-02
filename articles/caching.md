@@ -303,6 +303,49 @@ fast(3)
 The two formats do not share files. Changing `format` for an existing
 `dir` starts with an empty cache.
 
+## With promises
+
+[`async_lru_cache()`](https://dyfanjones.github.io/garnish/reference/async_lru_cache.md),
+`async_cache` and
+[`async_disk_cache()`](https://dyfanjones.github.io/garnish/reference/async_lru_cache.md)
+are the versions for functions that return a promise. They take the same
+arguments and always return a promise. Three things differ:
+
+- The value a promise resolves with is cached, not the promise, so a
+  call that rejects is not cached and the next call tries again.
+- Identical calls made while one is still running share its promise, so
+  a burst of the same request makes one call.
+- Because only values are stored,
+  [`async_disk_cache()`](https://dyfanjones.github.io/garnish/reference/async_lru_cache.md)
+  works, and it reads and writes the same files as
+  [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md).
+
+``` r
+
+requests <- 0
+lookup <- async_lru_cache() %@% function(id) {
+  requests <<- requests + 1
+  promises::promise(function(resolve, reject) {
+    later::later(function() resolve(id * 2), 0.05)
+  })
+}
+
+# Three identical calls at once make one request
+for (i in 1:3) promises::then(lookup(21), function(value) cat(value, "\n"))
+while (!later::loop_empty()) later::run_now(0.05)
+```
+
+    ## 42 
+    ## 42 
+    ## 42
+
+``` r
+
+requests
+```
+
+    ## [1] 1
+
 ## When not to cache
 
 Caching assumes that the same arguments give the same answer, and that
@@ -327,3 +370,5 @@ the function has no effects you need to happen every time.
   [`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md).
 - You want results to survive a restart, or share between sessions:
   [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md).
+- The function returns a promise: the `async_` version of whichever of
+  these fits.

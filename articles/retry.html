@@ -349,6 +349,199 @@ accepts one string, so you can send the message to whatever logging
 package you use.</p>
 </div>
 <div class="section level2">
+<h2 id="bounding-hung-calls">Bounding hung calls<a class="anchor" aria-label="anchor" href="#bounding-hung-calls"></a>
+</h2>
+<p><code><a href="../reference/stop_conditions.html">stop_after_delay()</a></code> only checks the clock
+<em>between</em> attempts. If one attempt hangs, it never gets the
+chance. <code><a href="../reference/timeout.html">timeout()</a></code> bounds a single call: when the time is up
+it signals a <code>garnish_timeout_error</code>, which is an ordinary
+error, so <code><a href="../reference/retry.html">retry()</a></code> treats it like any other failure.</p>
+<p>Stack it inside <code><a href="../reference/retry.html">retry()</a></code> so every attempt is capped and a
+timeout is retried:</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">slow_work</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Many short steps, so R can stop between them (see the notes below)</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep</a></span><span class="op">(</span><span class="fl">0.02</span><span class="op">)</span></span>
+<span>  <span class="st">"finished"</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">attempts</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">fetch</span> <span class="op">:=</span> <span class="fu"><a href="../reference/retry.html">retry</a></span><span class="op">(</span>stop <span class="op">=</span> <span class="fu"><a href="../reference/stop_conditions.html">stop_after_attempt</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, wait <span class="op">=</span> <span class="fu"><a href="../reference/wait_strategies.html">wait_fixed</a></span><span class="op">(</span><span class="fl">0.01</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span></span>
+<span>  <span class="fu"><a href="../reference/timeout.html">timeout</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span></span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">attempts</span> <span class="op">&lt;&lt;-</span> <span class="va">attempts</span> <span class="op">+</span> <span class="fl">1</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="va">attempts</span> <span class="op">&lt;</span> <span class="fl">3</span><span class="op">)</span> <span class="fu">slow_work</span><span class="op">(</span><span class="op">)</span> <span class="kw">else</span> <span class="st">"fast enough"</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="fu">fetch</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "fast enough"</span></span></code></pre>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">attempts</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 3</span></span></code></pre>
+<p>The first two attempts were cut off after 0.2 seconds and the third
+finished in time. The error records the limit and the function name:</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">slow_call</span> <span class="op">:=</span> <span class="fu"><a href="../reference/timeout.html">timeout</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_work</span></span>
+<span><span class="va">err</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="fu">slow_call</span><span class="op">(</span><span class="op">)</span>, error <span class="op">=</span> <span class="va">identity</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">err</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "garnish_timeout_error" "rlang_error"           "error"                </span></span>
+<span><span class="co">## [4] "condition"</span></span></code></pre>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">conditionMessage</a></span><span class="op">(</span><span class="va">err</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "`slow_call` timed out: it did not finish within 0.2 seconds."</span></span></code></pre>
+<p>Put <code><a href="../reference/timeout.html">timeout()</a></code> <em>inside</em> <code><a href="../reference/retry.html">retry()</a></code>, as
+above. Outside it, <code><a href="../reference/retry.html">retry()</a></code> catches the time limit error and
+the limit is already spent, so later attempts would run without one.</p>
+<div class="section level3">
+<h3 id="passing-the-time-on">Passing the time on<a class="anchor" aria-label="anchor" href="#passing-the-time-on"></a>
+</h3>
+<p>Some libraries have their own timeouts, which can clean up properly.
+<code><a href="../reference/timeout.html">timeout_remaining()</a></code> returns the seconds left before the
+current deadline (<code>Inf</code> outside any <code><a href="../reference/timeout.html">timeout()</a></code>),
+so you can hand them the budget:</p>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">budgeted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/timeout.html">timeout</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># e.g. httr2::req_timeout(req, timeout_remaining())</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="../reference/timeout.html">timeout_remaining</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu">budgeted</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 10</span></span></code></pre>
+<p>Timeouts can nest. The soonest deadline always wins, so an inner
+<code>timeout(60)</code> inside an outer <code>timeout(5)</code> is cut
+off after 5 seconds.</p>
+</div>
+<div class="section level3">
+<h3 id="what-it-cannot-stop">What it cannot stop<a class="anchor" aria-label="anchor" href="#what-it-cannot-stop"></a>
+</h3>
+<p>The default method, <code><a href="../reference/timeout.html">timeout_r()</a></code>, uses base R’s
+<code><a href="https://rdrr.io/r/base/setTimeLimit.html" class="external-link">setTimeLimit()</a></code>, which R only checks at interrupt
+checkpoints between R expressions. It cannot interrupt:</p>
+<ul>
+<li>Compiled code (C, C++, Rust) that never calls
+<code>R_CheckUserInterrupt()</code>, which includes many blocking
+network and database calls.</li>
+<li>A single long <code><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep()</a></code>. A loop of short sleeps is
+fine.</li>
+</ul>
+<p>For these, pass <code><a href="../reference/timeout.html">timeout_remaining()</a></code> to a native timeout,
+or use a method that runs the work in another process and kills it.</p>
+</div>
+<div class="section level3">
+<h3 id="writing-a-timeout-method">Writing a timeout method<a class="anchor" aria-label="anchor" href="#writing-a-timeout-method"></a>
+</h3>
+<p>A method is an S7 class that inherits from <code>timeout_base</code>,
+with a method for the <code>timeout_fn(class, call, seconds)</code>
+generic. <code><a href="https://rdrr.io/r/base/call.html" class="external-link">call()</a></code> runs the decorated function and
+<code>seconds</code> is the time left. It must return the value of
+<code><a href="https://rdrr.io/r/base/call.html" class="external-link">call()</a></code> unchanged, or signal a
+<code>garnish_timeout_error</code>. <code><a href="../reference/timeout.html">timeout()</a></code> handles
+built-in and your own methods the same way, adding the function name and
+limit to the message. See <code><a href="../reference/extending_timeout.html">?extending_timeout</a></code> for the
+details.</p>
+<p>This one uses the callr package to run the call in a separate R
+process, which is killed when the time is up, even if it is stuck in
+compiled code. It also sets <code>GARNISH_TIMEOUT_DEADLINE</code> in the
+child, so <code><a href="../reference/timeout.html">timeout_remaining()</a></code> works there too:</p>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rconsortium.github.io/S7/" class="external-link">S7</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">timeout_callr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rconsortium.github.io/S7/reference/new_class.html" class="external-link">new_class</a></span><span class="op">(</span><span class="st">"timeout_callr"</span>, parent <span class="op">=</span> <span class="va">timeout_base</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rconsortium.github.io/S7/reference/method.html" class="external-link">method</a></span><span class="op">(</span><span class="va">timeout_fn</span>, <span class="va">timeout_callr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">class</span>, <span class="va">call</span>, <span class="va">seconds</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">deadline</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="va">seconds</span>, digits <span class="op">=</span> <span class="fl">17</span><span class="op">)</span></span>
+<span>  <span class="va">env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">callr</span><span class="fu">::</span><span class="fu"><a href="https://callr.r-lib.org/reference/rcmd_safe_env.html" class="external-link">rcmd_safe_env</a></span><span class="op">(</span><span class="op">)</span>, GARNISH_TIMEOUT_DEADLINE <span class="op">=</span> <span class="va">deadline</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span>
+<span>    <span class="fu">callr</span><span class="fu">::</span><span class="fu"><a href="https://callr.r-lib.org/reference/r.html" class="external-link">r</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">call</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/call.html" class="external-link">call</a></span><span class="op">(</span><span class="op">)</span>, args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">call</span><span class="op">)</span>, timeout <span class="op">=</span> <span class="va">seconds</span>, env <span class="op">=</span> <span class="va">env</span><span class="op">)</span>,</span>
+<span>    callr_timeout_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/abort.html" class="external-link">abort</a></span><span class="op">(</span><span class="st">"Timed out."</span>, class <span class="op">=</span> <span class="st">"garnish_timeout_error"</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">hang</span> <span class="op">:=</span> <span class="fu"><a href="../reference/timeout.html">timeout</a></span><span class="op">(</span><span class="fl">0.5</span>, method <span class="op">=</span> <span class="fu">timeout_callr</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
+<span>  <span class="st">"never reached"</span></span>
+<span><span class="op">}</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="fu">hang</span><span class="op">(</span><span class="op">)</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">conditionMessage</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "`hang` timed out: it did not finish within 0.5 seconds."</span></span></code></pre>
+<p>The function runs in a fresh process, so it cannot change variables
+in your session, and its arguments and result must be serialisable.
+callr is only suggested by garnish, so install it first if you want to
+use this.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="retrying-without-blocking">Retrying without blocking<a class="anchor" aria-label="anchor" href="#retrying-without-blocking"></a>
+</h2>
+<p><code><a href="../reference/retry.html">retry()</a></code> sleeps between attempts, so nothing else can run
+in your R session while it waits. When the function already works with
+<a href="https://rstudio.github.io/promises/" class="external-link">promises</a>, as in Shiny,
+plumber or <code><a href="https://httr2.r-lib.org/reference/req_perform_promise.html" class="external-link">httr2::req_perform_promise()</a></code>, use
+<code><a href="../reference/async_retry.html">async_retry()</a></code>. It takes the same arguments and the same
+stop, wait and retry strategies, including ones you wrote yourself, but
+schedules the next attempt with <code>later</code> instead of sleeping,
+and returns a promise.</p>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">flaky</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/async_retry.html">async_retry</a></span><span class="op">(</span></span>
+<span>  stop <span class="op">=</span> <span class="fu"><a href="../reference/stop_conditions.html">stop_after_attempt</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span>,</span>
+<span>  wait <span class="op">=</span> <span class="fu"><a href="../reference/wait_strategies.html">wait_fixed</a></span><span class="op">(</span><span class="fl">0.05</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="fu">make_flaky</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">flaky</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">promises</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/promises/reference/then.html" class="external-link">then</a></span><span class="op">(</span><span class="va">p</span>, <span class="kw">function</span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"resolved:"</span>, <span class="va">value</span>, <span class="st">"\n"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Shiny and plumber run the event loop for you. In a script, run it yourself.</span></span>
+<span><span class="kw">while</span> <span class="op">(</span><span class="op">!</span><span class="fu">later</span><span class="fu">::</span><span class="fu"><a href="https://later.r-lib.org/reference/loop_empty.html" class="external-link">loop_empty</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu">later</span><span class="fu">::</span><span class="fu"><a href="https://later.r-lib.org/reference/run_now.html" class="external-link">run_now</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## resolved: worked on call 3</span></span></code></pre>
+<p>The function can return a plain value, as above, or a promise. A
+rejected promise counts as a failure, so a <code>mirai</code> task or an
+<code>httr2</code> async request is retried the same way. When
+<code>stop</code> fires, the promise rejects with the same
+<code>retry_error</code> that <code><a href="../reference/retry.html">retry()</a></code> would signal.</p>
+<p><code><a href="../reference/async_retry.html">async_retry()</a></code> needs the promises and later packages. Put
+it outermost: a decorator inside it that calls the function
+synchronously, such as <code><a href="../reference/timeout.html">timeout()</a></code>, cannot wait for or bound
+a promise.</p>
+<div class="section level3">
+<h3 id="bounding-a-slow-promise">Bounding a slow promise<a class="anchor" aria-label="anchor" href="#bounding-a-slow-promise"></a>
+</h3>
+<p><code><a href="../reference/async_timeout.html">async_timeout()</a></code> is the promise version of
+<code><a href="../reference/timeout.html">timeout()</a></code>. If the promise has not settled after the limit,
+the promise it returns rejects with the same
+<code>garnish_timeout_error</code>, which <code><a href="../reference/async_retry.html">async_retry()</a></code>
+retries:</p>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># A stand-in for a request: resolves with `value` after `delay` seconds</span></span>
+<span><span class="va">request</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">value</span>, <span class="va">delay</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">promises</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/promises/reference/promise.html" class="external-link">promise</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">resolve</span>, <span class="va">reject</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu">later</span><span class="fu">::</span><span class="fu"><a href="https://later.r-lib.org/reference/later.html" class="external-link">later</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu">resolve</span><span class="op">(</span><span class="va">value</span><span class="op">)</span>, <span class="va">delay</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">calls</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">fetch</span> <span class="op">:=</span> <span class="fu"><a href="../reference/async_retry.html">async_retry</a></span><span class="op">(</span>stop <span class="op">=</span> <span class="fu"><a href="../reference/stop_conditions.html">stop_after_attempt</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span></span>
+<span>  <span class="fu"><a href="../reference/async_timeout.html">async_timeout</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span></span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">calls</span> <span class="op">&lt;&lt;-</span> <span class="va">calls</span> <span class="op">+</span> <span class="fl">1</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="va">calls</span> <span class="op">&lt;</span> <span class="fl">3</span><span class="op">)</span> <span class="fu">request</span><span class="op">(</span><span class="st">"too slow"</span>, <span class="fl">1</span><span class="op">)</span> <span class="kw">else</span> <span class="fu">request</span><span class="op">(</span><span class="st">"in time"</span>, <span class="fl">0.01</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span><span class="fu">promises</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/promises/reference/then.html" class="external-link">then</a></span><span class="op">(</span><span class="fu">fetch</span><span class="op">(</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"resolved:"</span>, <span class="va">value</span>, <span class="st">"\n"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw">while</span> <span class="op">(</span><span class="op">!</span><span class="fu">later</span><span class="fu">::</span><span class="fu"><a href="https://later.r-lib.org/reference/loop_empty.html" class="external-link">loop_empty</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu">later</span><span class="fu">::</span><span class="fu"><a href="https://later.r-lib.org/reference/run_now.html" class="external-link">run_now</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## resolved: in time</span></span></code></pre>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">calls</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 3</span></span></code></pre>
+<p>It tells the caller to stop waiting but does not stop the work, so
+the first two requests above are still running when the third finishes.
+A method that also cancels the work, for example a <code>mirai</code>
+task, can be written with <code>async_timeout_base</code> and
+<code><a href="../reference/async_timeout.html">async_timeout_fn()</a></code>, the same way as for
+<code><a href="../reference/timeout.html">timeout()</a></code>. It cannot bound a function that blocks the
+session before it returns a promise. Use <code><a href="../reference/timeout.html">timeout()</a></code> for
+that.</p>
+</div>
+</div>
+<div class="section level2">
 <h2 id="writing-your-own-strategies">Writing your own strategies<a class="anchor" aria-label="anchor" href="#writing-your-own-strategies"></a>
 </h2>
 <p>Everything above is built from five kinds of strategy, and you can
@@ -406,7 +599,7 @@ built-in strategies work the same way, and yours combine with them.</p>
 </tbody>
 </table>
 <p>A wait that grows by a fixed step each attempt:</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rconsortium.github.io/S7/" class="external-link">S7</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">wait_linear</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rconsortium.github.io/S7/reference/new_class.html" class="external-link">new_class</a></span><span class="op">(</span></span>
@@ -424,7 +617,7 @@ built-in strategies work the same way, and yours combine with them.</p>
 <pre><code><span><span class="co">## [1] 6</span></span></code></pre>
 <p>It composes like the built-in waits, with <code>+</code> and in
 <code><a href="../reference/wait_strategies.html">wait_chain()</a></code>:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extending_retry.html">wait_fn</a></span><span class="op">(</span><span class="fu">wait_linear</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="../reference/wait_strategies.html">wait_fixed</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>, attempt <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 5</span></span></code></pre>
 <p>A stop condition gets the <code>state</code> list described in
@@ -432,7 +625,7 @@ built-in strategies work the same way, and yours combine with them.</p>
 <code>wait</code>, <code>elapsed</code>, <code>error</code> and
 <code>value</code>. This one gives up once an attempt fails with a
 message matching a pattern:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">stop_on_message</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rconsortium.github.io/S7/reference/new_class.html" class="external-link">new_class</a></span><span class="op">(</span></span>
 <span>  <span class="st">"stop_on_message"</span>,</span>
 <span>  parent <span class="op">=</span> <span class="va">stop_base</span>,</span>
@@ -460,7 +653,7 @@ message matching a pattern:</p>
 <p>A retry condition gets <code>outcome</code>, a list with
 <code>value</code> and <code>error</code>, one of which is
 <code>NULL</code>:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">retry_if_negative</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rconsortium.github.io/S7/reference/new_class.html" class="external-link">new_class</a></span><span class="op">(</span><span class="st">"retry_if_negative"</span>, parent <span class="op">=</span> <span class="va">retry_base</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rconsortium.github.io/S7/reference/method.html" class="external-link">method</a></span><span class="op">(</span><span class="va">retry_fn</span>, <span class="va">retry_if_negative</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">class</span>, <span class="va">outcome</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
@@ -475,7 +668,7 @@ message matching a pattern:</p>
 <span><span class="op">}</span></span>
 <span><span class="fu">next_value</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 5</span></span></code></pre>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">i</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 3</span></span></code></pre>
 <p>If you write strategies in a package, call
@@ -485,7 +678,7 @@ methods are registered when it loads.</p>
 <div class="section level2">
 <h2 id="putting-it-together">Putting it together<a class="anchor" aria-label="anchor" href="#putting-it-together"></a>
 </h2>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fetch</span> <span class="op">:=</span> <span class="fu"><a href="../reference/retry.html">retry</a></span><span class="op">(</span></span>
 <span>  stop <span class="op">=</span> <span class="fu"><a href="../reference/stop_conditions.html">stop_any</a></span><span class="op">(</span><span class="fu"><a href="../reference/stop_conditions.html">stop_after_attempt</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="../reference/stop_conditions.html">stop_after_delay</a></span><span class="op">(</span><span class="fl">30</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  wait <span class="op">=</span> <span class="fu"><a href="../reference/wait_strategies.html">wait_exp_jitter</a></span><span class="op">(</span>base <span class="op">=</span> <span class="fl">0.5</span>, jitter <span class="op">=</span> <span class="st">"full"</span><span class="op">)</span>,</span>

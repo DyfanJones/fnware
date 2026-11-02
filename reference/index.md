@@ -59,6 +59,9 @@ Call a function again when it fails.
   [`stop_fn()`](https://dyfanjones.github.io/garnish/reference/extending_retry.md)
   : Write your own stop, wait, retry and hook strategies
 
+- [`async_retry()`](https://dyfanjones.github.io/garnish/reference/async_retry.md)
+  : Retry a function without blocking
+
 ## Caching
 
 Remember a function’s results.
@@ -67,6 +70,10 @@ Remember a function’s results.
   [`cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
   [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
   : Cache function results
+- [`async_lru_cache()`](https://dyfanjones.github.io/garnish/reference/async_lru_cache.md)
+  [`async_cache()`](https://dyfanjones.github.io/garnish/reference/async_lru_cache.md)
+  [`async_disk_cache()`](https://dyfanjones.github.io/garnish/reference/async_lru_cache.md)
+  : Cache the results of asynchronous functions
 
 ## Circuit breaking
 
@@ -74,6 +81,25 @@ Stop calling a function that keeps failing.
 
 - [`circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md)
   : Stop calling a function that keeps failing
+- [`async_circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/async_circuit_breaker.md)
+  : Stop calling an asynchronous function that keeps failing
+
+## Timeouts
+
+Bound how long a single call can run.
+
+- [`timeout_r()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+  [`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+  [`timeout_remaining()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+  : Bound how long a call can run
+- [`timeout_base()`](https://dyfanjones.github.io/garnish/reference/extending_timeout.md)
+  [`timeout_fn()`](https://dyfanjones.github.io/garnish/reference/extending_timeout.md)
+  : Write your own timeout method
+- [`async_timeout()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md)
+  [`async_timeout_base()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md)
+  [`async_timeout_fn()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md)
+  [`async_timeout_later()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md)
+  : Bound how long an asynchronous call can take
 
 ## Rate limiting
 
@@ -81,6 +107,8 @@ Limit how often a function can be called.
 
 - [`rate_limit()`](https://dyfanjones.github.io/garnish/reference/rate_limit.md)
   : Limit how often a function can be called
+- [`async_rate_limit()`](https://dyfanjones.github.io/garnish/reference/async_rate_limit.md)
+  : Limit how often an asynchronous function can be called
 
 ## Validation
 

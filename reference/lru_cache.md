@@ -6,11 +6,11 @@ arguments (including defaults).
 ## Usage
 
 ``` r
-lru_cache(f, maxsize = 1024 * 1024^2)
+lru_cache(f, maxsize = 1024 * 1024^2, TTL = Inf)
 
 cache(f)
 
-disk_cache(f, dir, maxsize = 1024 * 1024^2, format = c("rds", "qs2"))
+disk_cache(f, dir, maxsize = 1024 * 1024^2, TTL = Inf, format = c("rds", "qs2"))
 ```
 
 ## Arguments
@@ -24,15 +24,21 @@ disk_cache(f, dir, maxsize = 1024 * 1024^2, format = c("rds", "qs2"))
 
   Maximum cache size in bytes. Defaults to 1 GiB.
 
-- format:
+- TTL:
 
-  File format for `disk_cache()`: `"rds"` (the default) or `"qs2"`,
-  which needs the qs2 package.
+  Time to live in seconds. Entries older than this are treated as
+  missing and recomputed on the next call. Defaults to `Inf`, so entries
+  never expire. Not available for `cache()`, which never evicts.
 
 - dir:
 
   Directory for `disk_cache()` to keep its files in. It is created if
   needed. There is no default, so persistence is always a choice.
+
+- format:
+
+  File format for `disk_cache()`: `"rds"` (the default) or `"qs2"`,
+  which needs the qs2 package.
 
 ## Value
 
@@ -58,6 +64,10 @@ large objects. Neither round-trips environments or external pointers.
 Files from the two formats are not shared, so changing `format` for an
 existing `dir` starts with an empty cache.
 
+Set `TTL` on `lru_cache()` or `disk_cache()` to expire entries after a
+number of seconds, for results that go stale (for example, data fetched
+from an API).
+
 Call `lru_cache(maxsize)` to build a decorator, then apply it with `%@%`
 or by calling it on a function. `cache` takes no parameters, so it is
 applied directly.
@@ -73,6 +83,9 @@ slow_square(4) # slow
 #> [1] 16
 slow_square(4) # cached
 #> [1] 16
+
+# Entries expire after 60 seconds
+fresh_square <- lru_cache(TTL = 60) %@% function(x) x^2
 
 slow_cube <- cache %@% function(x) {
   Sys.sleep(0.1)
