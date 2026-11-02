@@ -31,7 +31,9 @@ make_flaky <- function(fail_times) {
   calls <- 0
   function() {
     calls <<- calls + 1
-    if (calls <= fail_times) stop("not yet (call ", calls, ")")
+    if (calls <= fail_times) {
+      stop("not yet (call ", calls, ")")
+    }
     paste("worked on call", calls)
   }
 }
@@ -86,7 +88,11 @@ If you would rather see the original error, set `reraise = TRUE`:
 ``` r
 
 loud := retry(stop = stop_after_attempt(2), reraise = TRUE) %@% make_flaky(Inf)
-tryCatch(loud(), retry_error = function(e) "retry_error", error = conditionMessage)
+tryCatch(
+  loud(),
+  retry_error = function(e) "retry_error",
+  error = conditionMessage
+)
 ```
 
     ## [1] "not yet (call 2)"
@@ -100,7 +106,8 @@ receives the final state, a list with `attempt`, `wait`, `elapsed`,
 safe <- retry(
   stop = stop_after_attempt(2),
   retry_error_callback = function(state) "fallback"
-) %@% make_flaky(Inf)
+) %@%
+  make_flaky(Inf)
 safe()
 ```
 
@@ -144,7 +151,8 @@ doubles the wait each time:
 patient <- retry(
   stop = stop_after_attempt(4),
   wait = wait_exp(multiplier = 0.01)
-) %@% make_flaky(3)
+) %@%
+  make_flaky(3)
 system.time(res <- patient())[["elapsed"]] > 0.05
 ```
 
@@ -201,10 +209,11 @@ calls <- 0
 fetch <- retry(
   stop = stop_after_attempt(3),
   retry = retry_if_error("http_error")
-) %@% function() {
-  calls <<- calls + 1
-  rlang::abort("bad request", class = "client_error")
-}
+) %@%
+  function() {
+    calls <<- calls + 1
+    rlang::abort("bad request", class = "client_error")
+  }
 try(fetch(), silent = TRUE)
 calls
 ```
@@ -235,10 +244,11 @@ polls <- 0
 poll <- retry(
   stop = stop_after_attempt(5),
   retry = retry_if_result(is.null)
-) %@% function() {
-  polls <<- polls + 1
-  if (polls < 3) NULL else "ready"
-}
+) %@%
+  function() {
+    polls <<- polls + 1
+    if (polls < 3) NULL else "ready"
+  }
 poll()
 ```
 
@@ -259,7 +269,8 @@ logged <- retry(
   wait = wait_fixed(0.01),
   before_sleep = before_sleep_log(function(msg) cat(msg, "\n")),
   after_sleep = after_sleep_log(function(msg) cat(msg, "\n"))
-) %@% make_flaky(2)
+) %@%
+  make_flaky(2)
 logged()
 ```
 
@@ -296,7 +307,9 @@ every attempt is capped and a timeout is retried:
 
 slow_work <- function() {
   # Many short steps, so R can stop between them (see the notes below)
-  for (i in 1:100) Sys.sleep(0.02)
+  for (i in 1:100) {
+    Sys.sleep(0.02)
+  }
   "finished"
 }
 
@@ -358,10 +371,11 @@ so you can hand them the budget:
 
 ``` r
 
-budgeted := timeout(10) %@% function() {
-  # e.g. httr2::req_timeout(req, timeout_remaining())
-  round(timeout_remaining())
-}
+budgeted := timeout(10) %@%
+  function() {
+    # e.g. httr2::req_timeout(req, timeout_remaining())
+    round(timeout_remaining())
+  }
 budgeted()
 ```
 
@@ -414,23 +428,29 @@ works there too:
 
 library(S7)
 
-timeout_callr <- new_class("timeout_callr", parent = timeout_base)
+timeout_callr := new_class(parent = timeout_base)
 
 method(timeout_fn, timeout_callr) <- function(class, call, seconds, ...) {
   deadline <- format(as.numeric(Sys.time()) + seconds, digits = 17)
   env <- c(callr::rcmd_safe_env(), GARNISH_TIMEOUT_DEADLINE = deadline)
   tryCatch(
-    callr::r(function(call) call(), args = list(call), timeout = seconds, env = env),
+    callr::r(
+      function(call) call(),
+      args = list(call),
+      timeout = seconds,
+      env = env
+    ),
     callr_timeout_error = function(e) {
       rlang::abort("Timed out.", class = "garnish_timeout_error")
     }
   )
 }
 
-hang := timeout(0.5, method = timeout_callr()) %@% function() {
-  Sys.sleep(10)
-  "never reached"
-}
+hang := timeout(0.5, method = timeout_callr()) %@%
+  function() {
+    Sys.sleep(10)
+    "never reached"
+  }
 tryCatch(hang(), error = function(e) conditionMessage(e))
 ```
 
@@ -459,13 +479,16 @@ attempt with `later` instead of sleeping, and returns a promise.
 flaky <- async_retry(
   stop = stop_after_attempt(5),
   wait = wait_fixed(0.05)
-) %@% make_flaky(2)
+) %@%
+  make_flaky(2)
 
 p <- flaky()
 promises::then(p, function(value) cat("resolved:", value, "\n"))
 
 # Shiny and plumber run the event loop for you. In a script, run it yourself.
-while (!later::loop_empty()) later::run_now(0.1)
+while (!later::loop_empty()) {
+  later::run_now(0.1)
+}
 ```
 
     ## resolved: worked on call 3
@@ -511,7 +534,9 @@ fetch := async_retry(stop = stop_after_attempt(3)) %@%
   }
 
 promises::then(fetch(), function(value) cat("resolved:", value, "\n"))
-while (!later::loop_empty()) later::run_now(0.1)
+while (!later::loop_empty()) {
+  later::run_now(0.1)
+}
 ```
 
     ## resolved: in time
@@ -557,14 +582,18 @@ A wait that grows by a fixed step each attempt:
 
 library(S7)
 
-wait_linear <- new_class(
-  "wait_linear",
+wait_linear := new_class(
   parent = wait_base,
   properties = list(step = class_numeric),
   constructor = function(step = 1) new_object(wait_base(), step = step)
 )
 
-method(wait_fn, wait_linear) <- function(class, attempt, prev_wait = NULL, ...) {
+method(wait_fn, wait_linear) <- function(
+  class,
+  attempt,
+  prev_wait = NULL,
+  ...
+) {
   class@step * attempt
 }
 
@@ -590,8 +619,7 @@ gives up once an attempt fails with a message matching a pattern:
 
 ``` r
 
-stop_on_message <- new_class(
-  "stop_on_message",
+stop_on_message := new_class(
   parent = stop_base,
   properties = list(pattern = class_character),
   constructor = function(pattern) new_object(stop_base(), pattern = pattern)
@@ -604,10 +632,11 @@ method(stop_fn, stop_on_message) <- function(class, state, ...) {
 attempts <- 0
 fatal <- retry(
   stop = stop_any(stop_after_attempt(5), stop_on_message("permission denied"))
-) %@% function() {
-  attempts <<- attempts + 1
-  stop("permission denied")
-}
+) %@%
+  function() {
+    attempts <<- attempts + 1
+    stop("permission denied")
+  }
 try(fatal(), silent = TRUE)
 attempts
 ```
@@ -624,7 +653,7 @@ of which is `NULL`:
 
 ``` r
 
-retry_if_negative <- new_class("retry_if_negative", parent = retry_base)
+retry_if_negative := new_class(parent = retry_base)
 
 method(retry_fn, retry_if_negative) <- function(class, outcome, ...) {
   is.null(outcome$error) && outcome$value < 0
@@ -632,10 +661,11 @@ method(retry_fn, retry_if_negative) <- function(class, outcome, ...) {
 
 vals <- c(-1, -1, 5)
 i <- 0
-next_value := retry(retry = retry_if_negative()) %@% function() {
-  i <<- i + 1
-  vals[[i]]
-}
+next_value := retry(retry = retry_if_negative()) %@%
+  function() {
+    i <<- i + 1
+    vals[[i]]
+  }
 next_value()
 ```
 
@@ -662,9 +692,10 @@ fetch := retry(
   retry = retry_if_error_message(match = "timeout|503"),
   before_sleep = before_sleep_log(),
   reraise = TRUE
-) %@% function(url) {
-  # ...
-}
+) %@%
+  function(url) {
+    # ...
+  }
 ```
 
 ## Notes

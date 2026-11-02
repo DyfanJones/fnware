@@ -108,8 +108,7 @@ in its `.onLoad()`.
 library(S7)
 
 # Wait `step` seconds longer after each failure
-wait_linear <- new_class(
-  "wait_linear",
+wait_linear := new_class(
   parent = wait_base,
   properties = list(step = new_property(class_numeric, default = 1))
 )
