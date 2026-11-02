@@ -42,6 +42,10 @@ NULL
 #'
 #' f <- timeout(3, method = timeout_log()) %@% function() "ok"
 #' f()
+#' @name extending_timeout
+#' @aliases timeout_base timeout_fn
+NULL
+
 #' @rdname extending_timeout
 #' @export
 timeout_base := new_class(abstract = TRUE)
