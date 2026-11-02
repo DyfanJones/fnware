@@ -33,7 +33,7 @@ service <- function() {
   stop("service down")
 }
 
-guarded <- circuit_breaker(failures = 2, reset_after = 1) %@% service
+guarded := circuit_breaker(failures = 2, reset_after = 1) %@% service
 ```
 
 The first two calls reach `service()` and fail with its own error:
@@ -95,7 +95,7 @@ closes:
 
 healthy <- FALSE
 fn <- function() if (healthy) "back up" else stop("service down")
-guarded <- circuit_breaker(failures = 2, reset_after = 0.5) %@% fn
+guarded := circuit_breaker(failures = 2, reset_after = 0.5) %@% fn
 
 try(guarded(), silent = TRUE)
 try(guarded(), silent = TRUE)
@@ -138,7 +138,7 @@ fn <- function() {
   i <<- i + 1
   if (outcomes[[i]] == "error") stop("failed") else "ok"
 }
-guarded <- circuit_breaker(failures = 2) %@% fn
+guarded := circuit_breaker(failures = 2) %@% fn
 
 try(guarded(), silent = TRUE)
 guarded() # the success resets the count
@@ -163,7 +163,7 @@ else, such as a cached value, instead of failing:
 ``` r
 
 fn <- function() stop("service down")
-guarded <- circuit_breaker(failures = 1, reset_after = 60) %@% fn
+guarded := circuit_breaker(failures = 1, reset_after = 60) %@% fn
 try(guarded(), silent = TRUE) # opens the circuit
 
 fetch_or_default <- function() {
@@ -234,7 +234,7 @@ error, without calling the function.
 ``` r
 
 down <- function() promises::promise_reject(simpleError("service down"))
-fetch <- async_circuit_breaker(failures = 2, reset_after = 60) %@% down
+fetch := async_circuit_breaker(failures = 2, reset_after = 60) %@% down
 
 # Failures are counted when a promise settles, so let each call settle
 try_once <- function() {

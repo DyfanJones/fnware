@@ -36,7 +36,7 @@ slow_square <- function(x) {
 
 ``` r
 
-square <- lru_cache() %@% slow_square
+square := lru_cache() %@% slow_square
 square(4)
 ```
 
@@ -66,7 +66,7 @@ apply it directly:
 
 ``` r
 
-square <- cache %@% slow_square
+square := cache %@% slow_square
 square(4)
 ```
 
@@ -93,7 +93,7 @@ call differently does not miss the cache:
 
 ``` r
 
-area <- lru_cache() %@% function(w, h = 2) {
+area := lru_cache() %@% function(w, h = 2) {
   cat("  computing\n")
   w * h
 }
@@ -148,7 +148,7 @@ area(3, 5)
 ``` r
 
 attempts <- 0
-f <- lru_cache() %@% function() {
+f := lru_cache() %@% function() {
   attempts <<- attempts + 1
   if (attempts < 2) stop("first call fails")
   "ok"
@@ -183,7 +183,7 @@ recently goes first.
 
 ``` r
 
-g <- lru_cache(maxsize = 7000) %@% function(i) {
+g := lru_cache(maxsize = 7000) %@% function(i) {
   cat("  computing", i, "\n")
   numeric(200) + i # roughly 2 KB per entry, so three fit
 }
@@ -221,7 +221,7 @@ directory would disappear with the session and defeat the point.
 ``` r
 
 dir <- tempfile("garnish-cache")
-square <- disk_cache(dir) %@% slow_square
+square := disk_cache(dir) %@% slow_square
 square(7)
 ```
 
@@ -248,7 +248,7 @@ reuses the files:
 
 ``` r
 
-square_again <- disk_cache(dir) %@% slow_square
+square_again := disk_cache(dir) %@% slow_square
 square_again(7)
 ```
 
@@ -262,8 +262,8 @@ fresh cache for that function. Entries from the old version stay in
 
 ``` r
 
-v1 <- disk_cache(dir) %@% function(x) x + 1
-v2 <- disk_cache(dir) %@% function(x) x + 2
+v1 := disk_cache(dir) %@% function(x) x + 1
+v2 := disk_cache(dir) %@% function(x) x + 2
 c(v1(1), v2(1))
 ```
 
@@ -285,7 +285,7 @@ to read back on one machine, so measure your own data.
 
 ``` r
 
-fast <- disk_cache(tempfile("garnish-cache"), format = "qs2") %@% slow_square
+fast := disk_cache(tempfile("garnish-cache"), format = "qs2") %@% slow_square
 fast(3)
 ```
 
@@ -323,7 +323,7 @@ arguments and always return a promise. Three things differ:
 ``` r
 
 requests <- 0
-lookup <- async_lru_cache() %@% function(id) {
+lookup := async_lru_cache() %@% function(id) {
   requests <<- requests + 1
   promises::promise(function(resolve, reject) {
     later::later(function() resolve(id * 2), 0.05)

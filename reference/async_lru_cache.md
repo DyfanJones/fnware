@@ -77,7 +77,7 @@ Needs the promises package and an event loop.
 ``` r
 if (FALSE) { # \dontrun{
 calls <- 0
-request <- async_lru_cache() %@% function(id) {
+request := async_lru_cache() %@% function(id) {
   calls <<- calls + 1
   promises::promise(function(resolve, reject) {
     later::later(function() resolve(id * 2), 0.05)
@@ -89,6 +89,6 @@ while (!later::loop_empty()) later::run_now(0.05)
 calls
 
 # Results survive the session on disk
-f <- async_disk_cache(tempfile()) %@% function(x) x^2
+f := async_disk_cache(tempfile()) %@% function(x) x^2
 } # }
 ```

@@ -126,7 +126,7 @@ work:</p>
 <h2 id="in-memory">In memory<a class="anchor" aria-label="anchor" href="#in-memory"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">square</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lru_cache.html">lru_cache</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_square</span></span>
+<code class="sourceCode R"><span><span class="va">square</span> <span class="op">:=</span> <span class="fu"><a href="../reference/lru_cache.html">lru_cache</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_square</span></span>
 <span><span class="fu">square</span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   computing 4</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 16</span></span></code></pre>
@@ -141,7 +141,7 @@ work:</p>
 <code>cache</code> is the same but has no size limit, and takes no
 parameters, so apply it directly:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">square</span> <span class="op">&lt;-</span> <span class="va">cache</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_square</span></span>
+<code class="sourceCode R"><span><span class="va">square</span> <span class="op">:=</span> <span class="va">cache</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_square</span></span>
 <span><span class="fu">square</span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   computing 4</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 16</span></span></code></pre>
@@ -157,7 +157,7 @@ small.</p>
 <p>The key is the <em>matched</em> arguments including defaults, so
 spelling a call differently does not miss the cache:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">area</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lru_cache.html">lru_cache</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">w</span>, <span class="va">h</span> <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="va">area</span> <span class="op">:=</span> <span class="fu"><a href="../reference/lru_cache.html">lru_cache</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">w</span>, <span class="va">h</span> <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  computing\n"</span><span class="op">)</span></span>
 <span>  <span class="va">w</span> <span class="op">*</span> <span class="va">h</span></span>
 <span><span class="op">}</span></span>
@@ -192,7 +192,7 @@ tried again next time.</li>
 </ul>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">attempts</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lru_cache.html">lru_cache</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="va">f</span> <span class="op">:=</span> <span class="fu"><a href="../reference/lru_cache.html">lru_cache</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">attempts</span> <span class="op">&lt;&lt;-</span> <span class="va">attempts</span> <span class="op">+</span> <span class="fl">1</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="va">attempts</span> <span class="op">&lt;</span> <span class="fl">2</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"first call fails"</span><span class="op">)</span></span>
 <span>  <span class="st">"ok"</span></span>
@@ -215,7 +215,7 @@ tried again next time.</li>
 Python. When the cache is over that, the entry used least recently goes
 first.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lru_cache.html">lru_cache</a></span><span class="op">(</span>maxsize <span class="op">=</span> <span class="fl">7000</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="va">g</span> <span class="op">:=</span> <span class="fu"><a href="../reference/lru_cache.html">lru_cache</a></span><span class="op">(</span>maxsize <span class="op">=</span> <span class="fl">7000</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  computing"</span>, <span class="va">i</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span> <span class="op">+</span> <span class="va">i</span> <span class="co"># roughly 2 KB per entry, so three fit</span></span>
 <span><span class="op">}</span></span>
@@ -241,7 +241,7 @@ There is no default for <code>dir</code>: a temporary directory would
 disappear with the session and defeat the point.</p>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"garnish-cache"</span><span class="op">)</span></span>
-<span><span class="va">square</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lru_cache.html">disk_cache</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_square</span></span>
+<span><span class="va">square</span> <span class="op">:=</span> <span class="fu"><a href="../reference/lru_cache.html">disk_cache</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_square</span></span>
 <span><span class="fu">square</span><span class="op">(</span><span class="fl">7</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   computing 7</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 49</span></span></code></pre>
@@ -254,7 +254,7 @@ disappear with the session and defeat the point.</p>
 <p>A second decoration of the same function, such as in a new session,
 reuses the files:</p>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">square_again</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lru_cache.html">disk_cache</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_square</span></span>
+<code class="sourceCode R"><span><span class="va">square_again</span> <span class="op">:=</span> <span class="fu"><a href="../reference/lru_cache.html">disk_cache</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_square</span></span>
 <span><span class="fu">square_again</span><span class="op">(</span><span class="fl">7</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 49</span></span></code></pre>
 <div class="section level3">
@@ -264,8 +264,8 @@ reuses the files:</p>
 starts a fresh cache for that function. Entries from the old version
 stay in <code>dir</code> until they are evicted:</p>
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">v1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lru_cache.html">disk_cache</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">1</span></span>
-<span><span class="va">v2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lru_cache.html">disk_cache</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">2</span></span>
+<code class="sourceCode R"><span><span class="va">v1</span> <span class="op">:=</span> <span class="fu"><a href="../reference/lru_cache.html">disk_cache</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">1</span></span>
+<span><span class="va">v2</span> <span class="op">:=</span> <span class="fu"><a href="../reference/lru_cache.html">disk_cache</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">2</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">v1</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, <span class="fu">v2</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 2 3</span></span></code></pre>
 <p>What it does <strong>not</strong> notice is a change to something the
@@ -283,7 +283,7 @@ frame of one million rows, qs2 was about seven times faster to write and
 three and a half times faster to read back on one machine, so measure
 your own data.</p>
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fast</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lru_cache.html">disk_cache</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"garnish-cache"</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"qs2"</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_square</span></span>
+<code class="sourceCode R"><span><span class="va">fast</span> <span class="op">:=</span> <span class="fu"><a href="../reference/lru_cache.html">disk_cache</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"garnish-cache"</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"qs2"</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_square</span></span>
 <span><span class="fu">fast</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   computing 3</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 9</span></span></code></pre>
@@ -312,7 +312,7 @@ works, and it reads and writes the same files as
 </ul>
 <div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">requests</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span><span class="va">lookup</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/async_lru_cache.html">async_lru_cache</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="va">lookup</span> <span class="op">:=</span> <span class="fu"><a href="../reference/async_lru_cache.html">async_lru_cache</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">requests</span> <span class="op">&lt;&lt;-</span> <span class="va">requests</span> <span class="op">+</span> <span class="fl">1</span></span>
 <span>  <span class="fu">promises</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/promises/reference/promise.html" class="external-link">promise</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">resolve</span>, <span class="va">reject</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu">later</span><span class="fu">::</span><span class="fu"><a href="https://later.r-lib.org/reference/later.html" class="external-link">later</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu">resolve</span><span class="op">(</span><span class="va">id</span> <span class="op">*</span> <span class="fl">2</span><span class="op">)</span>, <span class="fl">0.05</span><span class="op">)</span></span>

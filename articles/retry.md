@@ -43,7 +43,7 @@ with `%@%`, or by calling it on the function:
 
 ``` r
 
-flaky <- retry(stop = stop_after_attempt(5)) %@% make_flaky(2)
+flaky := retry(stop = stop_after_attempt(5)) %@% make_flaky(2)
 flaky()
 ```
 
@@ -56,7 +56,7 @@ flaky()
 
 ``` r
 
-never_works <- retry(stop = stop_after_attempt(3)) %@% make_flaky(Inf)
+never_works := retry(stop = stop_after_attempt(3)) %@% make_flaky(Inf)
 never_works()
 ```
 
@@ -67,7 +67,7 @@ The condition records what happened, so you can catch it and look:
 
 ``` r
 
-fresh <- retry(stop = stop_after_attempt(3)) %@% make_flaky(Inf)
+fresh := retry(stop = stop_after_attempt(3)) %@% make_flaky(Inf)
 err <- tryCatch(fresh(), retry_error = identity)
 err$attempt
 ```
@@ -85,7 +85,7 @@ If you would rather see the original error, set `reraise = TRUE`:
 
 ``` r
 
-loud <- retry(stop = stop_after_attempt(2), reraise = TRUE) %@% make_flaky(Inf)
+loud := retry(stop = stop_after_attempt(2), reraise = TRUE) %@% make_flaky(Inf)
 tryCatch(loud(), retry_error = function(e) "retry_error", error = conditionMessage)
 ```
 
@@ -358,7 +358,7 @@ so you can hand them the budget:
 
 ``` r
 
-budgeted <- timeout(10) %@% function() {
+budgeted := timeout(10) %@% function() {
   # e.g. httr2::req_timeout(req, timeout_remaining())
   round(timeout_remaining())
 }
@@ -632,7 +632,7 @@ method(retry_fn, retry_if_negative) <- function(class, outcome, ...) {
 
 vals <- c(-1, -1, 5)
 i <- 0
-next_value <- retry(retry = retry_if_negative()) %@% function() {
+next_value := retry(retry = retry_if_negative()) %@% function() {
   i <<- i + 1
   vals[[i]]
 }

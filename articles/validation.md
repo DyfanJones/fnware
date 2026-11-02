@@ -14,7 +14,7 @@ does the same for the value a function hands back.
 
 ``` r
 
-scale_by <- validate_args(x = is.numeric, n = ~ .x > 0) %@% function(x, n = 1) {
+scale_by := validate_args(x = is.numeric, n = ~ .x > 0) %@% function(x, n = 1) {
   x * n
 }
 scale_by(2, 3)
@@ -65,7 +65,7 @@ check_string <- function(x) {
   if (is.character(x) && length(x) == 1L) TRUE else "must be a single string"
 }
 
-greet <- validate_args(name = check_string) %@% function(name) {
+greet := validate_args(name = check_string) %@% function(name) {
   paste("Hello", name)
 }
 greet("Ada")
@@ -96,7 +96,7 @@ caught on the first call:
 
 ``` r
 
-bad_default <- validate_args(n = ~ .x > 0) %@% function(x, n = -1) x * n
+bad_default := validate_args(n = ~ .x > 0) %@% function(x, n = -1) x * n
 bad_default(2)
 ```
 
@@ -128,7 +128,7 @@ function rather than in the caller.
 
 ``` r
 
-parse_port <- validate_return(~ is.integer(.x) && .x > 0) %@% function(s) {
+parse_port := validate_return(~ is.integer(.x) && .x > 0) %@% function(s) {
   as.integer(s)
 }
 parse_port("8080")
@@ -171,7 +171,7 @@ so bad input is rejected before any work is done:
 
 ``` r
 
-lookup <- validate_args(id = is.numeric) %@%
+lookup := validate_args(id = is.numeric) %@%
   cache %@%
   function(id) {
     cat("  looking up", id, "\n")

@@ -75,7 +75,7 @@ applied directly.
 ## Examples
 
 ``` r
-slow_square <- lru_cache() %@% function(x) {
+slow_square := lru_cache() %@% function(x) {
   Sys.sleep(0.1)
   x^2
 }
@@ -85,9 +85,9 @@ slow_square(4) # cached
 #> [1] 16
 
 # Entries expire after 60 seconds
-fresh_square <- lru_cache(TTL = 60) %@% function(x) x^2
+fresh_square := lru_cache(TTL = 60) %@% function(x) x^2
 
-slow_cube <- cache %@% function(x) {
+slow_cube := cache %@% function(x) {
   Sys.sleep(0.1)
   x^3
 }
@@ -97,7 +97,7 @@ slow_cube(2) # cached
 #> [1] 8
 
 dir <- tempfile("cache")
-slow_cube <- disk_cache(dir) %@% function(x) {
+slow_cube := disk_cache(dir) %@% function(x) {
   Sys.sleep(0.1)
   x^3
 }

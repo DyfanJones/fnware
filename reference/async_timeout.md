@@ -97,7 +97,7 @@ slow_request <- function(delay) {
   })
 }
 
-f <- async_timeout(0.1) %@% slow_request
+f := async_timeout(0.1) %@% slow_request
 promises::then(
   f(1),
   onFulfilled = function(value) cat("got", value, "\n"),
@@ -106,7 +106,7 @@ promises::then(
 while (!later::loop_empty()) later::run_now(0.1)
 
 # Cap each attempt of an async_retry()
-fetch <- async_retry(stop = stop_after_attempt(3), wait = wait_exp()) %@%
+fetch := async_retry(stop = stop_after_attempt(3), wait = wait_exp()) %@%
   async_timeout(5) %@%
   function(url) slow_request(1)
 } # }
