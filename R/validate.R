@@ -28,16 +28,16 @@ NULL
 #' @param validator For `validate_return()`, a validator for the returned value.
 #' @return A decorator.
 #' @examples
-#' f <- validate_args(x = is.numeric, n = ~ .x > 0) %@% function(x, n = 1) x * n
+#' f := validate_args(x = is.numeric, n = ~ .x > 0) %@% function(x, n = 1) x * n
 #' f(2, 3)
 #' try(f("a", -1))
 #'
 #' # check_*() style validators return a message on failure
 #' check_string <- function(x) if (is.character(x) && length(x) == 1) TRUE else "must be a string"
-#' g <- validate_args(name = check_string) %@% function(name) name
+#' g := validate_args(name = check_string) %@% function(name) name
 #' try(g(1))
 #'
-#' h <- validate_return(is.character) %@% function() 1
+#' h := validate_return(is.character) %@% function() 1
 #' try(h())
 #' @export
 validate_args <- function(...) {

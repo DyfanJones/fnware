@@ -29,7 +29,7 @@ NULL
 #'   if (n < 3) stop("not yet")
 #'   n
 #' }
-#' f <- async_retry(stop = stop_after_attempt(5), wait = wait_fixed(0.05)) %@%
+#' f := async_retry(stop = stop_after_attempt(5), wait = wait_fixed(0.05)) %@%
 #'   flaky
 #' promises::then(f(), function(value) cat("worked on attempt", value, "\n"))
 #'

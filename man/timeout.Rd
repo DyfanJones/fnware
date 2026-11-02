@@ -66,12 +66,12 @@ slow <- function() {
   for (i in 1:100) Sys.sleep(0.05)
   "done"
 }
-f <- timeout(0.2) \%@\% slow
+f := timeout(0.2) \%@\% slow
 try(f())
 
 # Each attempt is capped, and a timeout is retried
 attempts <- 0
-flaky <- retry(stop = stop_after_attempt(3)) \%@\%
+flaky := retry(stop = stop_after_attempt(3)) \%@\%
   timeout(0.2) \%@\%
   function() {
     attempts <<- attempts + 1
@@ -80,6 +80,6 @@ flaky <- retry(stop = stop_after_attempt(3)) \%@\%
 flaky()
 
 # Pass the remaining budget on
-budget <- timeout(10) \%@\% function() timeout_remaining()
+budget := timeout(10) \%@\% function() timeout_remaining()
 budget()
 }

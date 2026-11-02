@@ -43,7 +43,7 @@ loop.
 \examples{
 \dontrun{
 down <- function() promises::promise_reject(simpleError("service down"))
-f <- async_circuit_breaker(failures = 2, reset_after = 60) \%@\% down
+f := async_circuit_breaker(failures = 2, reset_after = 60) \%@\% down
 
 # Failures are counted when a promise settles, so let each call settle
 try_once <- function() {
@@ -54,7 +54,7 @@ try_once() # simpleError
 try_once() # simpleError, and the circuit opens
 try_once() # garnish_circuit_open, down() was not called
 
-fetch <- async_circuit_breaker(failures = 3, reset_after = 30) \%@\%
+fetch := async_circuit_breaker(failures = 3, reset_after = 30) \%@\%
   async_retry(stop = stop_after_attempt(3)) \%@\%
   function(url) down()
 }

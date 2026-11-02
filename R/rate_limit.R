@@ -21,12 +21,12 @@ NULL
 #' @param period Length of the window in seconds. Defaults to 1.
 #' @return A decorator.
 #' @examples
-#' f <- rate_limit(calls = 3, period = 1) %@% function(x) x
+#' f := rate_limit(calls = 3, period = 1) %@% function(x) x
 #' vapply(1:3, f, numeric(1)) # immediate
 #' system.time(f(4)) # waits for the window to clear
 #'
 #' # Throttle every attempt, retries included
-#' fetch <- retry(stop = stop_after_attempt(3)) %@%
+#' fetch := retry(stop = stop_after_attempt(3)) %@%
 #'   rate_limit(calls = 5, period = 1) %@%
 #'   function(url) url
 #' @rdname rate_limit

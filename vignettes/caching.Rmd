@@ -36,7 +36,7 @@ slow_square <- function(x) {
 ## In memory
 
 ```{r lru}
-square <- lru_cache() %@% slow_square
+square := lru_cache() %@% slow_square
 square(4)
 square(4)
 square(5)
@@ -46,7 +46,7 @@ The second call printed nothing, because the function did not run. `cache` is
 the same but has no size limit, and takes no parameters, so apply it directly:
 
 ```{r cache}
-square <- cache %@% slow_square
+square := cache %@% slow_square
 square(4)
 square(4)
 ```
@@ -60,7 +60,7 @@ The key is the *matched* arguments including defaults, so spelling a call
 differently does not miss the cache:
 
 ```{r same-key}
-area <- lru_cache() %@% function(w, h = 2) {
+area := lru_cache() %@% function(w, h = 2) {
   cat("  computing\n")
   w * h
 }
@@ -85,7 +85,7 @@ area(3, 5)
 
 ```{r errors}
 attempts <- 0
-f <- lru_cache() %@% function() {
+f := lru_cache() %@% function() {
   attempts <<- attempts + 1
   if (attempts < 2) stop("first call fails")
   "ok"
@@ -103,7 +103,7 @@ number of entries as in Python. When the cache is over that, the entry used
 least recently goes first.
 
 ```{r maxsize}
-g <- lru_cache(maxsize = 7000) %@% function(i) {
+g := lru_cache(maxsize = 7000) %@% function(i) {
   cat("  computing", i, "\n")
   numeric(200) + i # roughly 2 KB per entry, so three fit
 }
@@ -121,7 +121,7 @@ directory would disappear with the session and defeat the point.
 
 ```{r disk}
 dir <- tempfile("garnish-cache")
-square <- disk_cache(dir) %@% slow_square
+square := disk_cache(dir) %@% slow_square
 square(7)
 square(7)
 length(list.files(dir))
@@ -131,7 +131,7 @@ A second decoration of the same function, such as in a new session, reuses the
 files:
 
 ```{r disk-again}
-square_again <- disk_cache(dir) %@% slow_square
+square_again := disk_cache(dir) %@% slow_square
 square_again(7)
 ```
 
@@ -142,8 +142,8 @@ cache for that function. Entries from the old version stay in `dir` until they
 are evicted:
 
 ```{r invalidate}
-v1 <- disk_cache(dir) %@% function(x) x + 1
-v2 <- disk_cache(dir) %@% function(x) x + 2
+v1 := disk_cache(dir) %@% function(x) x + 1
+v2 := disk_cache(dir) %@% function(x) x + 2
 c(v1(1), v2(1))
 ```
 
@@ -160,7 +160,7 @@ seven times faster to write and three and a half times faster to read back on
 one machine, so measure your own data.
 
 ```{r qs2, eval = requireNamespace("qs2", quietly = TRUE)}
-fast <- disk_cache(tempfile("garnish-cache"), format = "qs2") %@% slow_square
+fast := disk_cache(tempfile("garnish-cache"), format = "qs2") %@% slow_square
 fast(3)
 fast(3)
 ```
@@ -183,7 +183,7 @@ a promise. Three things differ:
 
 ```{r async, eval = requireNamespace("promises", quietly = TRUE) && requireNamespace("later", quietly = TRUE)}
 requests <- 0
-lookup <- async_lru_cache() %@% function(id) {
+lookup := async_lru_cache() %@% function(id) {
   requests <<- requests + 1
   promises::promise(function(resolve, reject) {
     later::later(function() resolve(id * 2), 0.05)

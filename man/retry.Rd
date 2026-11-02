@@ -57,6 +57,6 @@ flaky <- function() {
 retry(stop = stop_after_attempt(5))(flaky)()
 
 # Back off exponentially between attempts
-f <- retry(stop = stop_after_attempt(3), wait = wait_exp(min = 0.1)) \%@\% function() 1
+f := retry(stop = stop_after_attempt(3), wait = wait_exp(min = 0.1)) \%@\% function() 1
 f()
 }

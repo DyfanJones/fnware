@@ -58,7 +58,7 @@ memoised_async <- function(f, fn, cache) {
 #' @examples
 #' \dontrun{
 #' calls <- 0
-#' request <- async_lru_cache() %@% function(id) {
+#' request := async_lru_cache() %@% function(id) {
 #'   calls <<- calls + 1
 #'   promises::promise(function(resolve, reject) {
 #'     later::later(function() resolve(id * 2), 0.05)
@@ -70,7 +70,7 @@ memoised_async <- function(f, fn, cache) {
 #' calls
 #'
 #' # Results survive the session on disk
-#' f <- async_disk_cache(tempfile()) %@% function(x) x^2
+#' f := async_disk_cache(tempfile()) %@% function(x) x^2
 #' }
 #' @rdname async_lru_cache
 #' @usage async_lru_cache(f, maxsize = 1024 * 1024^2, TTL = Inf)

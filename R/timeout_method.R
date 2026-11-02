@@ -40,7 +40,7 @@ NULL
 #'   call()
 #' }
 #'
-#' f <- timeout(3, method = timeout_log()) %@% function() "ok"
+#' f := timeout(3, method = timeout_log()) %@% function() "ok"
 #' f()
 #' @name extending_timeout
 #' @aliases timeout_base timeout_fn

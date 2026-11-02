@@ -58,7 +58,7 @@ memoised <- function(f, fn, cache) {
 #'   needed. There is no default, so persistence is always a choice.
 #' @return A decorator.
 #' @examples
-#' slow_square <- lru_cache() %@% function(x) {
+#' slow_square := lru_cache() %@% function(x) {
 #'   Sys.sleep(0.1)
 #'   x^2
 #' }
@@ -66,9 +66,9 @@ memoised <- function(f, fn, cache) {
 #' slow_square(4) # cached
 #'
 #' # Entries expire after 60 seconds
-#' fresh_square <- lru_cache(TTL = 60) %@% function(x) x^2
+#' fresh_square := lru_cache(TTL = 60) %@% function(x) x^2
 #'
-#' slow_cube <- cache %@% function(x) {
+#' slow_cube := cache %@% function(x) {
 #'   Sys.sleep(0.1)
 #'   x^3
 #' }
@@ -76,7 +76,7 @@ memoised <- function(f, fn, cache) {
 #' slow_cube(2) # cached
 #'
 #' dir <- tempfile("cache")
-#' slow_cube <- disk_cache(dir) %@% function(x) {
+#' slow_cube := disk_cache(dir) %@% function(x) {
 #'   Sys.sleep(0.1)
 #'   x^3
 #' }

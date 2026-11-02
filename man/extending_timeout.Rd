@@ -56,6 +56,6 @@ method(timeout_fn, timeout_log) <- function(class, call, seconds, ...) {
   call()
 }
 
-f <- timeout(3, method = timeout_log()) \%@\% function() "ok"
+f := timeout(3, method = timeout_log()) \%@\% function() "ok"
 f()
 }

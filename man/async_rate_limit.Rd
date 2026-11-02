@@ -33,7 +33,7 @@ Needs the promises and later packages, and an event loop.
 }
 \examples{
 \dontrun{
-f <- async_rate_limit(calls = 2, period = 0.2) \%@\% function(i) i
+f := async_rate_limit(calls = 2, period = 0.2) \%@\% function(i) i
 start <- Sys.time()
 for (i in 1:4) {
   local({
