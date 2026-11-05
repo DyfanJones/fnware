@@ -6,7 +6,7 @@ NULL
 #' Retry a function when it fails
 #'
 #' Decorator that calls a function again until it succeeds or a [stop condition][stop_never]
-#' condition is met, sleeping between attempts. Port of Python's tenacity.
+#' is met, sleeping between attempts. Port of Python's tenacity.
 #'
 #' Call `retry(stop, wait, retry, before_sleep, after_sleep, reraise,
 #' retry_error_callback)` to build a decorator, then apply it with `%@%` or by
@@ -19,12 +19,12 @@ NULL
 #' @param before_sleep,after_sleep Hooks run before and after each sleep, see
 #'   [before_sleep_log()] and [after_sleep_log()].
 #' @param reraise If `TRUE`, re-throw the last error when `stop` fires instead of
-#'   throwing a `retry_error`.
+#'   throwing a `fnware_retry_error`.
 #' @param retry_error_callback Optional function called with the final state when
 #'   `stop` fires. Its return value is returned instead of throwing. The state is a list
 #'   with `attempt`, `wait`, `elapsed`, `error` and `value`.
 #' @return A decorator. The decorated function returns the first acceptable result,
-#'   or signals a `retry_error` condition (with `$attempt`, `$error` and `$value`)
+#'   or signals a `fnware_retry_error` condition (with `$attempt`, `$error` and `$value`)
 #'   once `stop` fires.
 #' @examples
 #' n <- 0

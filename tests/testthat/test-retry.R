@@ -155,26 +155,26 @@ test_that("retry_if_error_message matches exactly or by regex", {
   expect_error(retry_if_error_message("a", "b"), "Exactly one")
 })
 
-test_that("stop signals a retry_error unless reraise is set", {
+test_that("stop signals a fnware_retry_error unless reraise is set", {
   f <- function() base::stop("always")
   g <- retry(stop = stop_after_attempt(2))(f)
-  cnd <- tryCatch(g(), retry_error = identity)
-  expect_s3_class(cnd, "retry_error")
+  cnd <- tryCatch(g(), fnware_retry_error = identity)
+  expect_s3_class(cnd, "fnware_retry_error")
   expect_equal(cnd$attempt, 2L)
   expect_match(conditionMessage(cnd$error), "always")
 
   h <- retry(stop = stop_after_attempt(2), reraise = TRUE)(f)
   cnd <- tryCatch(h(), error = identity)
-  expect_false(inherits(cnd, "retry_error"))
+  expect_false(inherits(cnd, "fnware_retry_error"))
   expect_equal(conditionMessage(cnd), "always")
 })
 
-test_that("a rejected final result signals retry_error with the value", {
+test_that("a rejected final result signals fnware_retry_error with the value", {
   g <- retry(
     retry = retry_if_result(\(x) TRUE),
     stop = stop_after_attempt(2)
   )(function() 42)
-  cnd <- tryCatch(g(), retry_error = identity)
+  cnd <- tryCatch(g(), fnware_retry_error = identity)
   expect_equal(cnd$value, 42)
   expect_null(cnd$error)
   expect_match(conditionMessage(cnd), "unacceptable result")

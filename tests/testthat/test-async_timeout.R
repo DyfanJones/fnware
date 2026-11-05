@@ -99,7 +99,7 @@ test_that("async_retry() gives up after repeated timeouts", {
       delayed("late", 1)
     }
   res <- settle_promise(f())
-  expect_s3_class(res$error, "retry_error")
+  expect_s3_class(res$error, "fnware_retry_error")
   expect_s3_class(res$error$error, "fnware_timeout_error")
   expect_equal(n, 2L)
 })

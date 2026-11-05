@@ -19,7 +19,7 @@ NULL
 #'
 #' A method that runs `call()` in another process cannot be checked for this,
 #' and [timeout_remaining()] does not see the parent's deadline there. Set the
-#' environment variable `GARNISH_TIMEOUT_DEADLINE` in the child to
+#' environment variable `FNWARE_TIMEOUT_DEADLINE` in the child to
 #' `as.numeric(Sys.time()) + seconds` to pass it on. The retry vignette shows a
 #' callr method that does. Packages that register methods need
 #' [S7::methods_register()] in `.onLoad()`.

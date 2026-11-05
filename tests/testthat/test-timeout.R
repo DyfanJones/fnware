@@ -149,7 +149,7 @@ test_that("retry() gives up after repeated timeouts", {
       slow_loop()
     }
   err <- tryCatch(f(), error = identity)
-  expect_s3_class(err, "retry_error")
+  expect_s3_class(err, "fnware_retry_error")
   expect_s3_class(err$error, "fnware_timeout_error")
   expect_equal(n, 2L)
 })
@@ -165,7 +165,7 @@ test_that("retry_if_error() can target timeouts", {
       n <<- n + 1L
       slow_loop()
     }
-  expect_error(f(), class = "retry_error")
+  expect_error(f(), class = "fnware_retry_error")
   expect_equal(n, 3L)
 })
 
@@ -230,7 +230,7 @@ test_that("timeout_r() is a timeout method", {
 
 test_that("timeout_remaining() reads a deadline passed in from a parent process", {
   withr::local_envvar(
-    GARNISH_TIMEOUT_DEADLINE = format(as.numeric(Sys.time()) + 5, digits = 17)
+    FNWARE_TIMEOUT_DEADLINE = format(as.numeric(Sys.time()) + 5, digits = 17)
   )
   r <- timeout_remaining()
   expect_lte(r, 5)
@@ -239,14 +239,14 @@ test_that("timeout_remaining() reads a deadline passed in from a parent process"
   f <- timeout(60) %@% function() timeout_remaining()
   expect_lte(f(), 5)
   # A passed deadline reports zero rather than a negative number.
-  withr::local_envvar(GARNISH_TIMEOUT_DEADLINE = "1")
+  withr::local_envvar(FNWARE_TIMEOUT_DEADLINE = "1")
   expect_equal(timeout_remaining(), 0)
 })
 
 test_that("an unset or invalid inherited deadline is ignored", {
-  withr::local_envvar(GARNISH_TIMEOUT_DEADLINE = NA)
+  withr::local_envvar(FNWARE_TIMEOUT_DEADLINE = NA)
   expect_equal(timeout_remaining(), Inf)
-  withr::local_envvar(GARNISH_TIMEOUT_DEADLINE = "soon")
+  withr::local_envvar(FNWARE_TIMEOUT_DEADLINE = "soon")
   expect_equal(timeout_remaining(), Inf)
 })
 
@@ -267,7 +267,7 @@ test_that("a callr-based method kills the process and passes the deadline on", {
   timeout_callr <- S7::new_class("timeout_callr", parent = timeout_base)
   S7::method(timeout_fn, timeout_callr) <- function(class, call, seconds, ...) {
     deadline <- format(as.numeric(Sys.time()) + seconds, digits = 17)
-    env <- c(callr::rcmd_safe_env(), GARNISH_TIMEOUT_DEADLINE = deadline)
+    env <- c(callr::rcmd_safe_env(), FNWARE_TIMEOUT_DEADLINE = deadline)
     tryCatch(
       callr::r(
         function(call) call(),
@@ -288,7 +288,7 @@ test_that("a callr-based method kills the process and passes the deadline on", {
   fast <- timeout(10, method = timeout_callr()) %@% function(x) x + 1
   deadline <- timeout(10, method = timeout_callr()) %@%
     function() {
-      as.numeric(Sys.getenv("GARNISH_TIMEOUT_DEADLINE")) -
+      as.numeric(Sys.getenv("FNWARE_TIMEOUT_DEADLINE")) -
         as.numeric(Sys.time())
     }
   expect_error(hang(), class = "fnware_timeout_error")

@@ -28,7 +28,7 @@ async_retry(
 \code{\link[=before_sleep_log]{before_sleep_log()}} and \code{\link[=after_sleep_log]{after_sleep_log()}}.}
 
 \item{reraise}{If \code{TRUE}, re-throw the last error when \code{stop} fires instead of
-throwing a \code{retry_error}.}
+throwing a \code{fnware_retry_error}.}
 
 \item{retry_error_callback}{Optional function called with the final state when
 \code{stop} fires. Its return value is returned instead of throwing. The state is a list
@@ -45,7 +45,7 @@ session is free between attempts.
 }
 \details{
 The decorated function returns a promise. It resolves with the first
-acceptable result, and rejects with the last error, or a \code{retry_error} once
+acceptable result, and rejects with the last error, or a \code{fnware_retry_error} once
 \code{stop} fires. The wrapped function may return a promise or a plain value, and
 a rejection or a thrown error counts as a failure.
 

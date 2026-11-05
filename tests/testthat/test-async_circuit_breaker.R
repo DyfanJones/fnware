@@ -177,7 +177,7 @@ test_that("it works outside async_retry()", {
       delayed_error("down")
     }
   res <- settle_promise(f())
-  expect_s3_class(res$error, "retry_error")
+  expect_s3_class(res$error, "fnware_retry_error")
   expect_equal(n, 2L)
   # The circuit opened on the retry's final rejection, so the next call is shut out.
   res <- settle_promise(f())

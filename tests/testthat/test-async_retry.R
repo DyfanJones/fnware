@@ -24,11 +24,11 @@ test_that("retries errors until one succeeds", {
   expect_equal(settle_promise(f())$value, 3L)
 })
 
-test_that("rejects with a retry_error once stop fires", {
+test_that("rejects with a fnware_retry_error once stop fires", {
   g <- make_flaky(Inf)
   f <- async_retry(stop = stop_after_attempt(3)) %@% g
   res <- settle_promise(f())
-  expect_s3_class(res$error, "retry_error")
+  expect_s3_class(res$error, "fnware_retry_error")
   expect_equal(res$error$attempt, 3L)
   expect_match(conditionMessage(res$error$error), "not yet")
 })
@@ -37,7 +37,7 @@ test_that("reraise rejects with the last error", {
   f <- async_retry(stop = stop_after_attempt(2), reraise = TRUE) %@%
     make_flaky(Inf)
   res <- settle_promise(f())
-  expect_false(inherits(res$error, "retry_error"))
+  expect_false(inherits(res$error, "fnware_retry_error"))
   expect_match(conditionMessage(res$error), "not yet")
 })
 

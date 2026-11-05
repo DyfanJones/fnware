@@ -37,7 +37,7 @@ validator_stop_combinator <- function(value) {
 }
 
 # Human readable reason for a failed attempt, used by the logging hooks and
-# the `retry_error` condition. `state$error` is NULL when the attempt returned
+# the `fnware_retry_error` condition. `state$error` is NULL when the attempt returned
 # a value that `retry_if_result()` rejected.
 describe_failure <- function(state) {
   if (is.null(state$error)) {
@@ -49,11 +49,11 @@ describe_failure <- function(state) {
 
 # Condition signalled once `stop` fires and the caller asked neither to
 # `reraise` nor supplied a `retry_error_callback`. Mirrors tenacity's
-# `RetryError`: catch it with `tryCatch(..., retry_error = )`; the final
+# `RetryError`: catch it with `tryCatch(..., fnware_retry_error = )`; the final
 # attempt is available as `$error` / `$value`.
-retry_error <- function(state) {
+fnware_retry_error <- function(state) {
   structure(
-    class = c("retry_error", "error", "condition"),
+    class = c("fnware_retry_error", "error", "condition"),
     list(
       message = sprintf(
         "Retry failed after %d attempt(s): %s",
@@ -96,7 +96,7 @@ retry_decide <- function(outcome, attempt, prev_wait, start, cfg) {
     if (cfg$reraise && !is.null(state$error)) {
       return(list(action = "signal", error = state$error))
     }
-    return(list(action = "signal", error = retry_error(state)))
+    return(list(action = "signal", error = fnware_retry_error(state)))
   }
   list(action = "sleep", wait = wait_time, state = state)
 }

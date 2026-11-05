@@ -10,7 +10,7 @@ NULL
 #' session is free between attempts.
 #'
 #' The decorated function returns a promise. It resolves with the first
-#' acceptable result, and rejects with the last error, or a `retry_error` once
+#' acceptable result, and rejects with the last error, or a `fnware_retry_error` once
 #' `stop` fires. The wrapped function may return a promise or a plain value, and
 #' a rejection or a thrown error counts as a failure.
 #'

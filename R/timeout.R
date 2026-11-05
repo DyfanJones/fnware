@@ -21,11 +21,11 @@ restore_time_limit <- function(deadlines) {
 }
 
 # Seconds left before a deadline passed in by a parent process through the
-# `GARNISH_TIMEOUT_DEADLINE` environment variable (seconds since the epoch), or
+# `FNWARE_TIMEOUT_DEADLINE` environment variable (seconds since the epoch), or
 # `Inf` if there is none.
 inherited_remaining <- function() {
   deadline <- suppressWarnings(
-    as.numeric(Sys.getenv("GARNISH_TIMEOUT_DEADLINE", NA_character_))
+    as.numeric(Sys.getenv("FNWARE_TIMEOUT_DEADLINE", NA_character_))
   )
   if (is.na(deadline)) {
     return(Inf)
