@@ -12,6 +12,9 @@ NULL
 #' and, once finished, the time taken. Arguments are evaluated before the start
 #' is logged.
 #'
+#' For a function that returns a promise, use [async_log_call()]. Here the finish
+#' would be logged when the promise is returned, not when it settles.
+#'
 #' @param f The function to decorate. Usually supplied by `%@%` rather than directly.
 #' @param logger A [logger][logger_base], such as [logger_message()]. See
 #'   [extending_log] to use a logging package.

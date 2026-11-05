@@ -18,6 +18,10 @@ that result on every call after it, ignoring later arguments. An error stores
 nothing, so the next call tries again. Unlike \link{cache}, it keeps one result
 whatever the arguments.
 }
+\details{
+For a function that returns a promise, use \code{\link[=async_once]{async_once()}}, which also does
+not store a rejection.
+}
 \examples{
 setup := once \%@\% function() {
   cat("setting up\n")

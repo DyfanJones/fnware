@@ -36,9 +36,14 @@ If a validator signals an error, that error propagates unchanged, so
 
 \code{validate_args()} checks the effective value of each named argument, so
 defaults are validated too. Checking forces the argument, so a validated
-argument is evaluated at call time rather than lazily. All failures are reported in one error of
-class \code{fnware_validation_error}. Validator names are checked against the
-function's formals when it is decorated, so a typo fails early.
+argument is evaluated at call time rather than lazily. All failures are
+reported in one error of class \code{fnware_validation_error}. Validator names are
+checked against the function's formals when it is decorated, so a typo fails
+early.
+
+\code{validate_return()} checks the value the function returns. For a function
+that returns a promise, use \code{\link[=async_validate_return]{async_validate_return()}}, which checks the
+resolved value.
 }
 \examples{
 f := validate_args(x = is.numeric, n = ~ .x > 0) \%@\% function(x, n = 1) x * n

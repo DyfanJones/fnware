@@ -8,6 +8,9 @@ NULL
 #' nothing, so the next call tries again. Unlike [cache], it keeps one result
 #' whatever the arguments.
 #'
+#' For a function that returns a promise, use [async_once()], which also does
+#' not store a rejection.
+#'
 #' @param f The function to decorate. Usually supplied by `%@%` rather than directly.
 #' @return A decorator.
 #' @examples

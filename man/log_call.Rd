@@ -38,6 +38,9 @@ signalled again unchanged.
 The message holds the function's name, its arguments matched to the formals
 and, once finished, the time taken. Arguments are evaluated before the start
 is logged.
+
+For a function that returns a promise, use \code{\link[=async_log_call]{async_log_call()}}. Here the finish
+would be logged when the promise is returned, not when it settles.
 }
 \examples{
 fn := log_call(logger = logger_message()) \%@\% function(a, b, c) a + b + c
