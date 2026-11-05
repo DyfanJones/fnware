@@ -93,6 +93,6 @@ logger_message()
 f := log_call(logger = logger_message()) %@% function(x) x
 f(1)
 #> [INFO] Started f(x=1)
-#> [DEBUG] Finished f(x=1) Elapsed=00:00:00.000
+#> [INFO] Finished f(x=1) Elapsed=00:00:00.001
 #> [1] 1
 ```

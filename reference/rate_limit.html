@@ -26,6 +26,8 @@ uses up its slot, as it does for an API."></head><body>
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
     <li><a class="dropdown-item" href="../articles/circuitbreaker.html">Failing fast with a circuit breaker</a></li>
+    <li><a class="dropdown-item" href="../articles/fallback.html">Fallbacks and running once</a></li>
+    <li><a class="dropdown-item" href="../articles/logging.html">Logging calls</a></li>
     <li><a class="dropdown-item" href="../articles/caching.html">Caching results</a></li>
     <li><a class="dropdown-item" href="../articles/contextmanager.html">Context managers</a></li>
     <li><a class="dropdown-item" href="../articles/validation.html">Validating arguments and results</a></li>
@@ -101,7 +103,7 @@ could still exceed the limit.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 2 3</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu">f</span><span class="op">(</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span> <span class="co"># waits for the window to clear</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.000   0.000   0.859 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.001   0.000   0.846 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Throttle every attempt, retries included</span></span></span>
 <span class="r-in"><span><span class="va">fetch</span> <span class="op">:=</span> <span class="fu"><a href="retry.html">retry</a></span><span class="op">(</span>stop <span class="op">=</span> <span class="fu"><a href="stop_conditions.html">stop_after_attempt</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span></span></span>

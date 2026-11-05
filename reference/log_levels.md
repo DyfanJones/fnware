@@ -7,7 +7,7 @@ logs
 ## Usage
 
 ``` r
-log_levels(start = "info", finish = "debug", error = "error")
+log_levels(start = "info", finish = "info", error = "error")
 ```
 
 ## Arguments

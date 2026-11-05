@@ -8,7 +8,13 @@ A failure is logged then signalled again unchanged.
 ## Usage
 
 ``` r
-log_call(f, logger = logger_base(), level = log_levels(), elapsed = TRUE)
+log_call(
+  f,
+  logger = logger_base(),
+  level = log_levels(),
+  elapsed = TRUE,
+  trace = FALSE
+)
 ```
 
 ## Arguments
@@ -30,12 +36,17 @@ log_call(f, logger = logger_base(), level = log_levels(), elapsed = TRUE)
 - level:
 
   A
-  [`log_levels()`](https://daroczig.github.io/logger/reference/log_levels.html)
+  [`log_levels()`](https://dyfanjones.github.io/fnware/reference/log_levels.md)
   giving the level of the start, finish and error events.
 
 - elapsed:
 
   Include the time taken in the finish and error messages?
+
+- trace:
+
+  Include the calls leading to an error in the error message? Only the
+  calls from `f` down to the failure are shown.
 
 ## Value
 
@@ -53,7 +64,7 @@ before the start is logged.
 fn := log_call(logger = logger_message()) %@% function(a, b, c) a + b + c
 fn(1, 2, 3)
 #> [INFO] Started fn(a=1,b=2,c=3)
-#> [DEBUG] Finished fn(a=1,b=2,c=3) Elapsed=00:00:00.001
+#> [INFO] Finished fn(a=1,b=2,c=3) Elapsed=00:00:00.001
 #> [1] 6
 
 # Log failures as warnings
@@ -63,5 +74,7 @@ g := log_call(
 ) %@% function(x) stop("boom")
 try(g(1), silent = TRUE)
 #> [INFO] Started g(x=1)
-#> [WARN] Failed g(x=1) Elapsed=00:00:00.000 Error=boom
+#> [WARN] Failed g(x=1) Elapsed=00:00:00.000 
+#> Error in `g(x = x)`:
+#> boom
 ```
