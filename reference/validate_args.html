@@ -24,13 +24,15 @@ packages like checkmate all work, with no dependency on any of them."></head><bo
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/decorators.html">Choosing and stacking decorators</a></li>
+    <li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
     <li><a class="dropdown-item" href="../articles/circuitbreaker.html">Failing fast with a circuit breaker</a></li>
     <li><a class="dropdown-item" href="../articles/fallback.html">Fallbacks and running once</a></li>
     <li><a class="dropdown-item" href="../articles/logging.html">Logging calls</a></li>
     <li><a class="dropdown-item" href="../articles/caching.html">Caching results</a></li>
     <li><a class="dropdown-item" href="../articles/contextmanager.html">Context managers</a></li>
     <li><a class="dropdown-item" href="../articles/validation.html">Validating arguments and results</a></li>
+    <li><a class="dropdown-item" href="../articles/async.html">Asynchronous decorators</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -93,9 +95,13 @@ anything else:</p><ul><li><p>a string, which becomes the failure message (the <c
 <code>assert_*()</code> style functions work too.</p>
 <p><code>validate_args()</code> checks the effective value of each named argument, so
 defaults are validated too. Checking forces the argument, so a validated
-argument is evaluated at call time rather than lazily. All failures are reported in one error of
-class <code>fnware_validation_error</code>. Validator names are checked against the
-function's formals when it is decorated, so a typo fails early.</p>
+argument is evaluated at call time rather than lazily. All failures are
+reported in one error of class <code>fnware_validation_error</code>. Validator names are
+checked against the function's formals when it is decorated, so a typo fails
+early.</p>
+<p><code>validate_return()</code> checks the value the function returns. For a function
+that returns a promise, use <code><a href="async_validate_return.html">async_validate_return()</a></code>, which checks the
+resolved value.</p>
     </div>
 
     <div class="section level2">

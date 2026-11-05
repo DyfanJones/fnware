@@ -2,7 +2,7 @@
 
 Decorator that calls a function again until it succeeds or a [stop
 condition](https://dyfanjones.github.io/fnware/reference/stop_conditions.md)
-condition is met, sleeping between attempts. Port of Python's tenacity.
+is met, sleeping between attempts. Port of Python's tenacity.
 
 ## Usage
 
@@ -54,7 +54,7 @@ retry(
 - reraise:
 
   If `TRUE`, re-throw the last error when `stop` fires instead of
-  throwing a `retry_error`.
+  throwing a `fnware_retry_error`.
 
 - retry_error_callback:
 
@@ -65,8 +65,8 @@ retry(
 ## Value
 
 A decorator. The decorated function returns the first acceptable result,
-or signals a `retry_error` condition (with `$attempt`, `$error` and
-`$value`) once `stop` fires.
+or signals a `fnware_retry_error` condition (with `$attempt`, `$error`
+and `$value`) once `stop` fires.
 
 ## Details
 

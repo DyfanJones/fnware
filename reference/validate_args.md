@@ -49,6 +49,11 @@ reported in one error of class `fnware_validation_error`. Validator
 names are checked against the function's formals when it is decorated,
 so a typo fails early.
 
+`validate_return()` checks the value the function returns. For a
+function that returns a promise, use
+[`async_validate_return()`](https://dyfanjones.github.io/fnware/reference/async_validate_return.md),
+which checks the resolved value.
+
 ## Examples
 
 ``` r

@@ -35,13 +35,15 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/retry.html">Retrying failing calls</a></li>
+<li><a class="dropdown-item" href="articles/decorators.html">Choosing and stacking decorators</a></li>
+    <li><a class="dropdown-item" href="articles/retry.html">Retrying failing calls</a></li>
     <li><a class="dropdown-item" href="articles/circuitbreaker.html">Failing fast with a circuit breaker</a></li>
     <li><a class="dropdown-item" href="articles/fallback.html">Fallbacks and running once</a></li>
     <li><a class="dropdown-item" href="articles/logging.html">Logging calls</a></li>
     <li><a class="dropdown-item" href="articles/caching.html">Caching results</a></li>
     <li><a class="dropdown-item" href="articles/contextmanager.html">Context managers</a></li>
     <li><a class="dropdown-item" href="articles/validation.html">Validating arguments and results</a></li>
+    <li><a class="dropdown-item" href="articles/async.html">Asynchronous decorators</a></li>
   </ul>
 </li>
       </ul>
@@ -133,6 +135,11 @@
 <td><a href="https://docs.pydantic.dev/latest/concepts/validation_decorator/" class="external-link">pydantic <code>validate_call</code></a></td>
 </tr>
 <tr>
+<td><code><a href="reference/async_validate_return.html">async_validate_return()</a></code></td>
+<td>Like <code><a href="reference/validate_args.html">validate_return()</a></code>, checking the value a promise resolves to</td>
+<td></td>
+</tr>
+<tr>
 <td><code><a href="reference/circuit_breaker.html">circuit_breaker()</a></code></td>
 <td>Stops calling a function after repeated failures, then retries after a cooldown</td>
 <td><a href="https://github.com/danielfm/pybreaker" class="external-link">pybreaker</a></td>
@@ -167,13 +174,23 @@
 <td></td>
 </tr>
 <tr>
-<td><code><a href="reference/once.html">once()</a></code></td>
+<td><code>once</code></td>
 <td>Runs a function the first time and reuses the result</td>
+<td></td>
+</tr>
+<tr>
+<td><code>async_once</code></td>
+<td>Like <code>once</code>, for functions that return a promise</td>
 <td></td>
 </tr>
 <tr>
 <td><code><a href="reference/log_call.html">log_call()</a></code></td>
 <td>Logs when a call starts, finishes or fails, with its arguments. Writes with <code><a href="https://rdrr.io/r/base/message.html" class="external-link">message()</a></code> or any logging package via a <code><a href="reference/loggers.html">logger_fn()</a></code> method</td>
+<td></td>
+</tr>
+<tr>
+<td><code><a href="reference/async_log_call.html">async_log_call()</a></code></td>
+<td>Like <code><a href="reference/log_call.html">log_call()</a></code>, logging the finish when the promise settles</td>
 <td></td>
 </tr>
 <tr>
@@ -219,7 +236,7 @@
 <span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">url</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># ...</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>When <code>stop</code> fires, a <code>retry_error</code> condition is signalled. Set <code>reraise = TRUE</code> to re-throw the last error instead, or give <code>retry_error_callback</code> a function to return a fallback value:</p>
+<p>When <code>stop</code> fires, a <code>fnware_retry_error</code> condition is signalled. Set <code>reraise = TRUE</code> to re-throw the last error instead, or give <code>retry_error_callback</code> a function to return a fallback value:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">poll</span> <span class="op">:=</span> <span class="fu"><a href="reference/retry.html">retry</a></span><span class="op">(</span></span>
 <span>  stop <span class="op">=</span> <span class="fu"><a href="reference/stop_conditions.html">stop_after_attempt</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>,</span>
@@ -345,9 +362,24 @@
 </div>
 </div>
 <div class="section level2">
+<h2 id="stacking-decorators">Stacking decorators<a class="anchor" aria-label="anchor" href="#stacking-decorators"></a>
+</h2>
+<p>Decorators stack, and in <code>a %@% b %@% f</code>, <code>a</code> is outermost. From outside to inside, the order that works for the common cases is <code><a href="reference/validate_args.html">validate_args()</a></code>, <code><a href="reference/fallback.html">fallback()</a></code>, <code><a href="reference/circuit_breaker.html">circuit_breaker()</a></code>, a cache, <code><a href="reference/retry.html">retry()</a></code>, then <code><a href="reference/rate_limit.html">rate_limit()</a></code> and <code><a href="reference/timeout.html">timeout()</a></code>, so each attempt is throttled and capped. <code><a href="articles/decorators.html">vignette("decorators")</a></code> has a table of which decorator fits which problem, and the reasons for the order.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fetch</span> <span class="op">:=</span> <span class="fu"><a href="reference/validate_args.html">validate_args</a></span><span class="op">(</span>url <span class="op">=</span> <span class="va">is.character</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span></span>
+<span>  <span class="fu"><a href="reference/fallback.html">fallback</a></span><span class="op">(</span>value <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span></span>
+<span>  <span class="fu"><a href="reference/circuit_breaker.html">circuit_breaker</a></span><span class="op">(</span>failures <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span></span>
+<span>  <span class="fu"><a href="reference/retry.html">retry</a></span><span class="op">(</span>stop <span class="op">=</span> <span class="fu"><a href="reference/stop_conditions.html">stop_after_attempt</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span></span>
+<span>  <span class="fu"><a href="reference/rate_limit.html">rate_limit</a></span><span class="op">(</span>calls <span class="op">=</span> <span class="fl">5</span>, period <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span></span>
+<span>  <span class="fu"><a href="reference/timeout.html">timeout</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span></span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">url</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># ...</span></span>
+<span>  <span class="op">}</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="learn-more">Learn more<a class="anchor" aria-label="anchor" href="#learn-more"></a>
 </h2>
-<p>Vignettes: <code><a href="articles/retry.html">vignette("retry")</a></code>, <code><a href="articles/caching.html">vignette("caching")</a></code> and <code><a href="articles/contextmanager.html">vignette("contextmanager")</a></code> and <code><a href="articles/validation.html">vignette("validation")</a></code>. The help pages are <code><a href="reference/retry.html">?retry</a></code>, <code><a href="reference/lru_cache.html">?lru_cache</a></code> (which also covers <code>cache</code> and <code>disk_cache</code>), <code><a href="reference/contextmanager.html">?contextmanager</a></code> and <code><a href="reference/validate_args.html">?validate_args</a></code>. See the adorn <a href="https://dyfanjones.github.io/adorn/" class="external-link">documentation</a> for how decorators are applied, stacked and removed.</p>
+<p>Vignettes: <code><a href="articles/decorators.html">vignette("decorators")</a></code>, <code><a href="articles/retry.html">vignette("retry")</a></code>, <code><a href="articles/circuitbreaker.html">vignette("circuitbreaker")</a></code>, <code><a href="articles/fallback.html">vignette("fallback")</a></code>, <code><a href="articles/caching.html">vignette("caching")</a></code>, <code><a href="articles/logging.html">vignette("logging")</a></code>, <code><a href="articles/validation.html">vignette("validation")</a></code>, <code><a href="articles/contextmanager.html">vignette("contextmanager")</a></code> and <code><a href="articles/async.html">vignette("async")</a></code>. The help pages are <code><a href="reference/retry.html">?retry</a></code>, <code><a href="reference/lru_cache.html">?lru_cache</a></code> (which also covers <code>cache</code> and <code>disk_cache</code>), <code><a href="reference/contextmanager.html">?contextmanager</a></code> and <code><a href="reference/validate_args.html">?validate_args</a></code>. See the adorn <a href="https://dyfanjones.github.io/adorn/" class="external-link">documentation</a> for how decorators are applied, stacked and removed.</p>
 </div>
 </div>
 

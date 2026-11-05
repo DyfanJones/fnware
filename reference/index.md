@@ -121,10 +121,13 @@ Return a default instead of failing.
 
 ## Observability
 
-Log calls and run a function once.
+Log calls.
 
 - [`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md)
   : Log the calls to a function
+
+- [`async_log_call()`](https://dyfanjones.github.io/fnware/reference/async_log_call.md)
+  : Log the calls to an asynchronous function
 
 - [`log_levels()`](https://dyfanjones.github.io/fnware/reference/log_levels.md)
   :
@@ -144,8 +147,14 @@ Log calls and run a function once.
   Use a logging package with
   [`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md)
 
+## Running once
+
+Do setup a single time.
+
 - [`once()`](https://dyfanjones.github.io/fnware/reference/once.md) :
   Run a function only once
+- [`async_once()`](https://dyfanjones.github.io/fnware/reference/async_once.md)
+  : Run an asynchronous function only once
 
 ## Validation
 
@@ -154,6 +163,8 @@ Check arguments and return values.
 - [`validate_args()`](https://dyfanjones.github.io/fnware/reference/validate_args.md)
   [`validate_return()`](https://dyfanjones.github.io/fnware/reference/validate_args.md)
   : Validate arguments and return values
+- [`async_validate_return()`](https://dyfanjones.github.io/fnware/reference/async_validate_return.md)
+  : Validate the value an asynchronous function resolves to
 
 ## Context managers
 

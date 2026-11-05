@@ -58,6 +58,11 @@ The message holds the function's name, its arguments matched to the
 formals and, once finished, the time taken. Arguments are evaluated
 before the start is logged.
 
+For a function that returns a promise, use
+[`async_log_call()`](https://dyfanjones.github.io/fnware/reference/async_log_call.md).
+Here the finish would be logged when the promise is returned, not when
+it settles.
+
 ## Examples
 
 ``` r
@@ -74,7 +79,7 @@ g := log_call(
 ) %@% function(x) stop("boom")
 try(g(1), silent = TRUE)
 #> [INFO] Started g(x=1)
-#> [WARN] Failed g(x=1) Elapsed=00:00:00.000 
+#> [WARN] Failed g(x=1) Elapsed=00:00:00.001 
 #> Error in `g(x = x)`:
 #> boom
 ```

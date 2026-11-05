@@ -2,6 +2,8 @@
 
 ### Guides
 
+- [Choosing and stacking
+  decorators](https://dyfanjones.github.io/fnware/articles/decorators.md):
 - [Retrying failing
   calls](https://dyfanjones.github.io/fnware/articles/retry.md):
 - [Failing fast with a circuit
@@ -16,3 +18,5 @@
   managers](https://dyfanjones.github.io/fnware/articles/contextmanager.md):
 - [Validating arguments and
   results](https://dyfanjones.github.io/fnware/articles/validation.md):
+- [Asynchronous
+  decorators](https://dyfanjones.github.io/fnware/articles/async.md):

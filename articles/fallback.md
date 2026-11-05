@@ -121,3 +121,14 @@ An error stores nothing, so the next call tries again. Unlike
 which keeps a result per set of arguments,
 [`once()`](https://dyfanjones.github.io/fnware/reference/once.md) keeps
 one result whatever the arguments.
+
+`async_once` is the version for functions that return a promise. It
+keeps the resolved value, makes calls that arrive while the first is
+running share its promise, and stores nothing on a rejection, so the
+next call tries again.
+
+``` r
+
+setup := async_once %@% function() promises::promise_resolve(42)
+promises::then(setup(), print)
+```

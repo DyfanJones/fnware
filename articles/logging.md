@@ -17,8 +17,8 @@ add := log_call() %@% function(a, b) a + b
 add(1, b = 2)
 ```
 
-    ## INFO [2026-11-05T14:36:53.671Z]: Started add(a=1,b=2)
-    ## INFO [2026-11-05T14:36:53.671Z]: Finished add(a=1,b=2) Elapsed=00:00:00.002
+    ## INFO [2026-11-05T19:25:46.609Z]: Started add(a=1,b=2)
+    ## INFO [2026-11-05T19:25:46.610Z]: Finished add(a=1,b=2) Elapsed=00:00:00.001
 
     ## [1] 3
 
@@ -32,8 +32,8 @@ boom := log_call() %@% function(x) stop("boom")
 boom(1)
 ```
 
-    ## INFO [2026-11-05T14:36:53.758Z]: Started boom(x=1)
-    ## ERROR [2026-11-05T14:36:53.759Z]: Failed boom(x=1) Elapsed=00:00:00.000 
+    ## INFO [2026-11-05T19:25:46.698Z]: Started boom(x=1)
+    ## ERROR [2026-11-05T19:25:46.698Z]: Failed boom(x=1) Elapsed=00:00:00.000 
     ## Error in `boom(x = x)`:
     ## boom
 
@@ -57,7 +57,7 @@ try(quiet(1), silent = TRUE)
 
     ## [DEBUG] Started quiet(x=1)
 
-    ## [WARN] Failed quiet(x=1) Elapsed=00:00:00.000 
+    ## [WARN] Failed quiet(x=1) Elapsed=00:00:00.001 
     ## Error in `quiet(x = x)`:
     ## boom
 
@@ -81,7 +81,7 @@ hello()
 
     ## [INFO] Started hello()
 
-    ## [INFO] Finished hello() Elapsed=00:00:00.000
+    ## [INFO] Finished hello() Elapsed=00:00:00.001
 
     ## [1] "hi"
 
@@ -157,3 +157,21 @@ f()
     ## 20 Finished f() Elapsed=00:00:00.000
 
     ## [1] 1
+
+## Promises
+
+[`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md)
+logs the finish as soon as the function returns, which for a function
+that returns a promise is before the work is done. Use
+[`async_log_call()`](https://dyfanjones.github.io/fnware/reference/async_log_call.md)
+instead. It logs the start when the function is called, and the finish
+or the failure when the promise settles. A rejection is logged then
+passed on unchanged. There is no `trace` argument, because the calls
+that led to a rejection are gone by the time it settles.
+
+``` r
+
+f := async_log_call(logger = logger_message()) %@%
+  function(x) promises::promise_resolve(x)
+promises::then(f(1), print)
+```

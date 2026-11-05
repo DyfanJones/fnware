@@ -18,13 +18,15 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/decorators.html">Choosing and stacking decorators</a></li>
+    <li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
     <li><a class="dropdown-item" href="../articles/circuitbreaker.html">Failing fast with a circuit breaker</a></li>
     <li><a class="dropdown-item" href="../articles/fallback.html">Fallbacks and running once</a></li>
     <li><a class="dropdown-item" href="../articles/logging.html">Logging calls</a></li>
     <li><a class="dropdown-item" href="../articles/caching.html">Caching results</a></li>
     <li><a class="dropdown-item" href="../articles/contextmanager.html">Context managers</a></li>
     <li><a class="dropdown-item" href="../articles/validation.html">Validating arguments and results</a></li>
+    <li><a class="dropdown-item" href="../articles/async.html">Asynchronous decorators</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -236,7 +238,7 @@
       </dl></div><div class="section level2">
       <h2 id="observability">Observability<a class="anchor" aria-label="anchor" href="#observability"></a></h2>
 
-      <div class="section-desc"><p>Log calls and run a function once.</p></div>
+      <div class="section-desc"><p>Log calls.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -249,6 +251,13 @@
 
         </dt>
         <dd>Log the calls to a function</dd>
+
+        <dt>
+
+          <code><a href="async_log_call.html">async_log_call()</a></code>
+
+        </dt>
+        <dd>Log the calls to an asynchronous function</dd>
 
         <dt>
 
@@ -270,13 +279,29 @@
 
         </dt>
         <dd>Use a logging package with <code><a href="../reference/log_call.html">log_call()</a></code></dd>
+      </dl></div><div class="section level2">
+      <h2 id="running-once">Running once<a class="anchor" aria-label="anchor" href="#running-once"></a></h2>
 
-        <dt>
+      <div class="section-desc"><p>Do setup a single time.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="once.html">once()</a></code>
 
         </dt>
         <dd>Run a function only once</dd>
+
+        <dt>
+
+          <code><a href="async_once.html">async_once()</a></code>
+
+        </dt>
+        <dd>Run an asynchronous function only once</dd>
       </dl></div><div class="section level2">
       <h2 id="validation">Validation<a class="anchor" aria-label="anchor" href="#validation"></a></h2>
 
@@ -293,6 +318,13 @@
 
         </dt>
         <dd>Validate arguments and return values</dd>
+
+        <dt>
+
+          <code><a href="async_validate_return.html">async_validate_return()</a></code>
+
+        </dt>
+        <dd>Validate the value an asynchronous function resolves to</dd>
       </dl></div><div class="section level2">
       <h2 id="context-managers">Context managers<a class="anchor" aria-label="anchor" href="#context-managers"></a></h2>
 

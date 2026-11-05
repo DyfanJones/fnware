@@ -14,14 +14,17 @@ Popular Python decorators ported to R with the
 | [`disk_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md) | Caches results as files, so they outlive the session | [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/stable/generated/joblib.Memory.html#joblib.Memory) |
 | [`async_lru_cache()`](https://dyfanjones.github.io/fnware/reference/async_lru_cache.md), `async_cache`, [`async_disk_cache()`](https://dyfanjones.github.io/fnware/reference/async_lru_cache.md) | Like the caches above, for functions that return a promise |  |
 | [`validate_args()`](https://dyfanjones.github.io/fnware/reference/validate_args.md), [`validate_return()`](https://dyfanjones.github.io/fnware/reference/validate_args.md) | Checks arguments and return values with any validator function | [pydantic `validate_call`](https://docs.pydantic.dev/latest/concepts/validation_decorator/) |
+| [`async_validate_return()`](https://dyfanjones.github.io/fnware/reference/async_validate_return.md) | Like [`validate_return()`](https://dyfanjones.github.io/fnware/reference/validate_args.md), checking the value a promise resolves to |  |
 | [`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md) | Stops calling a function after repeated failures, then retries after a cooldown | [pybreaker](https://github.com/danielfm/pybreaker) |
 | [`async_circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/async_circuit_breaker.md) | Like [`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md), for functions that return a promise | [pybreaker](https://github.com/danielfm/pybreaker) (async) |
 | [`rate_limit()`](https://dyfanjones.github.io/fnware/reference/rate_limit.md) | Limits how often a function can be called in a time window | [`ratelimit`](https://pypi.org/project/ratelimit/) |
 | [`async_rate_limit()`](https://dyfanjones.github.io/fnware/reference/async_rate_limit.md) | Like [`rate_limit()`](https://dyfanjones.github.io/fnware/reference/rate_limit.md), but queues calls instead of blocking | [`ratelimit`](https://pypi.org/project/ratelimit/) (async) |
 | [`fallback()`](https://dyfanjones.github.io/fnware/reference/fallback.md) | Returns a default value, or a handler’s result, when a function fails | [tenacity](https://github.com/jd/tenacity) `retry_error_callback` |
 | [`async_fallback()`](https://dyfanjones.github.io/fnware/reference/async_fallback.md) | Like [`fallback()`](https://dyfanjones.github.io/fnware/reference/fallback.md), for functions that return a promise |  |
-| [`once()`](https://dyfanjones.github.io/fnware/reference/once.md) | Runs a function the first time and reuses the result |  |
+| `once` | Runs a function the first time and reuses the result |  |
+| `async_once` | Like `once`, for functions that return a promise |  |
 | [`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md) | Logs when a call starts, finishes or fails, with its arguments. Writes with [`message()`](https://rdrr.io/r/base/message.html) or any logging package via a [`logger_fn()`](https://dyfanjones.github.io/fnware/reference/loggers.md) method |  |
+| [`async_log_call()`](https://dyfanjones.github.io/fnware/reference/async_log_call.md) | Like [`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md), logging the finish when the promise settles |  |
 | `contextmanager` | Writes setup and teardown once, as `local_`, `with_` and decorator forms | [`contextlib.contextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager) |
 
 ## Installation
@@ -70,7 +73,7 @@ fetch := retry(
 }
 ```
 
-When `stop` fires, a `retry_error` condition is signalled. Set
+When `stop` fires, a `fnware_retry_error` condition is signalled. Set
 `reraise = TRUE` to re-throw the last error instead, or give
 `retry_error_callback` a function to return a fallback value:
 
@@ -228,15 +231,50 @@ scale_by("a", -1)
 All failures are reported together as a `fnware_validation_error`.
 Defaults are validated too.
 
+## Stacking decorators
+
+Decorators stack, and in `a %@% b %@% f`, `a` is outermost. From outside
+to inside, the order that works for the common cases is
+[`validate_args()`](https://dyfanjones.github.io/fnware/reference/validate_args.md),
+[`fallback()`](https://dyfanjones.github.io/fnware/reference/fallback.md),
+[`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md),
+a cache,
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md),
+then
+[`rate_limit()`](https://dyfanjones.github.io/fnware/reference/rate_limit.md)
+and
+[`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md),
+so each attempt is throttled and capped.
+[`vignette("decorators")`](https://dyfanjones.github.io/fnware/articles/decorators.md)
+has a table of which decorator fits which problem, and the reasons for
+the order.
+
+``` r
+
+fetch := validate_args(url = is.character) %@%
+  fallback(value = NULL) %@%
+  circuit_breaker(failures = 3) %@%
+  retry(stop = stop_after_attempt(3)) %@%
+  rate_limit(calls = 5, period = 1) %@%
+  timeout(10) %@%
+  function(url) {
+    # ...
+  }
+```
+
 ## Learn more
 
 Vignettes:
+[`vignette("decorators")`](https://dyfanjones.github.io/fnware/articles/decorators.md),
 [`vignette("retry")`](https://dyfanjones.github.io/fnware/articles/retry.md),
-[`vignette("caching")`](https://dyfanjones.github.io/fnware/articles/caching.md)
-and
+[`vignette("circuitbreaker")`](https://dyfanjones.github.io/fnware/articles/circuitbreaker.md),
+[`vignette("fallback")`](https://dyfanjones.github.io/fnware/articles/fallback.md),
+[`vignette("caching")`](https://dyfanjones.github.io/fnware/articles/caching.md),
+[`vignette("logging")`](https://dyfanjones.github.io/fnware/articles/logging.md),
+[`vignette("validation")`](https://dyfanjones.github.io/fnware/articles/validation.md),
 [`vignette("contextmanager")`](https://dyfanjones.github.io/fnware/articles/contextmanager.md)
 and
-[`vignette("validation")`](https://dyfanjones.github.io/fnware/articles/validation.md).
+[`vignette("async")`](https://dyfanjones.github.io/fnware/articles/async.md).
 The help pages are
 [`?retry`](https://dyfanjones.github.io/fnware/reference/retry.md),
 [`?lru_cache`](https://dyfanjones.github.io/fnware/reference/lru_cache.md)

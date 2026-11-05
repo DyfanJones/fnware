@@ -33,13 +33,15 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
+<li><a class="dropdown-item" href="../articles/decorators.html">Choosing and stacking decorators</a></li>
+    <li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
     <li><a class="dropdown-item" href="../articles/circuitbreaker.html">Failing fast with a circuit breaker</a></li>
     <li><a class="dropdown-item" href="../articles/fallback.html">Fallbacks and running once</a></li>
     <li><a class="dropdown-item" href="../articles/logging.html">Logging calls</a></li>
     <li><a class="dropdown-item" href="../articles/caching.html">Caching results</a></li>
     <li><a class="dropdown-item" href="../articles/contextmanager.html">Context managers</a></li>
     <li><a class="dropdown-item" href="../articles/validation.html">Validating arguments and results</a></li>
+    <li><a class="dropdown-item" href="../articles/async.html">Asynchronous decorators</a></li>
   </ul>
 </li>
       </ul>
@@ -123,7 +125,7 @@ the function:</p>
 <h2 id="deciding-when-to-stop">Deciding when to stop<a class="anchor" aria-label="anchor" href="#deciding-when-to-stop"></a>
 </h2>
 <p><code>stop_after_attempt(n)</code> makes at most <code>n</code>
-attempts. When it fires, a <code>retry_error</code> condition is
+attempts. When it fires, a <code>fnware_retry_error</code> condition is
 signalled:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">never_works</span> <span class="op">:=</span> <span class="fu"><a href="../reference/retry.html">retry</a></span><span class="op">(</span>stop <span class="op">=</span> <span class="fu"><a href="../reference/stop_conditions.html">stop_after_attempt</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="fu">make_flaky</span><span class="op">(</span><span class="cn">Inf</span><span class="op">)</span></span>
@@ -134,7 +136,7 @@ signalled:</p>
 look:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fresh</span> <span class="op">:=</span> <span class="fu"><a href="../reference/retry.html">retry</a></span><span class="op">(</span>stop <span class="op">=</span> <span class="fu"><a href="../reference/stop_conditions.html">stop_after_attempt</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="fu">make_flaky</span><span class="op">(</span><span class="cn">Inf</span><span class="op">)</span></span>
-<span><span class="va">err</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="fu">fresh</span><span class="op">(</span><span class="op">)</span>, retry_error <span class="op">=</span> <span class="va">identity</span><span class="op">)</span></span>
+<span><span class="va">err</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="fu">fresh</span><span class="op">(</span><span class="op">)</span>, fnware_retry_error <span class="op">=</span> <span class="va">identity</span><span class="op">)</span></span>
 <span><span class="va">err</span><span class="op">$</span><span class="va">attempt</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 3</span></span></code></pre>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -146,7 +148,7 @@ look:</p>
 <code class="sourceCode R"><span><span class="va">loud</span> <span class="op">:=</span> <span class="fu"><a href="../reference/retry.html">retry</a></span><span class="op">(</span>stop <span class="op">=</span> <span class="fu"><a href="../reference/stop_conditions.html">stop_after_attempt</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>, reraise <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="fu">make_flaky</span><span class="op">(</span><span class="cn">Inf</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span>
 <span>  <span class="fu">loud</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  retry_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="st">"retry_error"</span>,</span>
+<span>  fnware_retry_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="st">"fnware_retry_error"</span>,</span>
 <span>  error <span class="op">=</span> <span class="va">conditionMessage</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "not yet (call 2)"</span></span></code></pre>
@@ -455,7 +457,7 @@ limit to the message. See <code><a href="../reference/extending_timeout.html">?e
 details.</p>
 <p>This one uses the callr package to run the call in a separate R
 process, which is killed when the time is up, even if it is stuck in
-compiled code. It also sets <code>GARNISH_TIMEOUT_DEADLINE</code> in the
+compiled code. It also sets <code>FNWARE_TIMEOUT_DEADLINE</code> in the
 child, so <code><a href="../reference/timeout.html">timeout_remaining()</a></code> works there too:</p>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rconsortium.github.io/S7/" class="external-link">S7</a></span><span class="op">)</span></span>
@@ -464,7 +466,7 @@ child, so <code><a href="../reference/timeout.html">timeout_remaining()</a></cod
 <span></span>
 <span><span class="fu"><a href="https://rconsortium.github.io/S7/reference/method.html" class="external-link">method</a></span><span class="op">(</span><span class="va">timeout_fn</span>, <span class="va">timeout_callr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">class</span>, <span class="va">call</span>, <span class="va">seconds</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">deadline</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="va">seconds</span>, digits <span class="op">=</span> <span class="fl">17</span><span class="op">)</span></span>
-<span>  <span class="va">env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">callr</span><span class="fu">::</span><span class="fu"><a href="https://callr.r-lib.org/reference/rcmd_safe_env.html" class="external-link">rcmd_safe_env</a></span><span class="op">(</span><span class="op">)</span>, GARNISH_TIMEOUT_DEADLINE <span class="op">=</span> <span class="va">deadline</span><span class="op">)</span></span>
+<span>  <span class="va">env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">callr</span><span class="fu">::</span><span class="fu"><a href="https://callr.r-lib.org/reference/rcmd_safe_env.html" class="external-link">rcmd_safe_env</a></span><span class="op">(</span><span class="op">)</span>, FNWARE_TIMEOUT_DEADLINE <span class="op">=</span> <span class="va">deadline</span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span>
 <span>    <span class="fu">callr</span><span class="fu">::</span><span class="fu"><a href="https://callr.r-lib.org/reference/r.html" class="external-link">r</a></span><span class="op">(</span></span>
 <span>      <span class="kw">function</span><span class="op">(</span><span class="va">call</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/call.html" class="external-link">call</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -521,7 +523,8 @@ and returns a promise.</p>
 rejected promise counts as a failure, so a <code>mirai</code> task or an
 <code>httr2</code> async request is retried the same way. When
 <code>stop</code> fires, the promise rejects with the same
-<code>retry_error</code> that <code><a href="../reference/retry.html">retry()</a></code> would signal.</p>
+<code>fnware_retry_error</code> that <code><a href="../reference/retry.html">retry()</a></code> would
+signal.</p>
 <p><code><a href="../reference/async_retry.html">async_retry()</a></code> needs the promises and later packages. Put
 it outermost: a decorator inside it that calls the function
 synchronously, such as <code><a href="../reference/timeout.html">timeout()</a></code>, cannot wait for or bound

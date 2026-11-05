@@ -58,7 +58,7 @@ async_retry(
 - reraise:
 
   If `TRUE`, re-throw the last error when `stop` fires instead of
-  throwing a `retry_error`.
+  throwing a `fnware_retry_error`.
 
 - retry_error_callback:
 
@@ -73,9 +73,10 @@ A decorator. The decorated function returns a promise.
 ## Details
 
 The decorated function returns a promise. It resolves with the first
-acceptable result, and rejects with the last error, or a `retry_error`
-once `stop` fires. The wrapped function may return a promise or a plain
-value, and a rejection or a thrown error counts as a failure.
+acceptable result, and rejects with the last error, or a
+`fnware_retry_error` once `stop` fires. The wrapped function may return
+a promise or a plain value, and a rejection or a thrown error counts as
+a failure.
 
 Use it as the outermost decorator.
 [`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md)

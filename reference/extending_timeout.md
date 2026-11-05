@@ -57,7 +57,7 @@ A method that runs [`call()`](https://rdrr.io/r/base/call.html) in
 another process cannot be checked for this, and
 [`timeout_remaining()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
 does not see the parent's deadline there. Set the environment variable
-`GARNISH_TIMEOUT_DEADLINE` in the child to
+`FNWARE_TIMEOUT_DEADLINE` in the child to
 `as.numeric(Sys.time()) + seconds` to pass it on. The retry vignette
 shows a callr method that does. Packages that register methods need
 [`S7::methods_register()`](https://rconsortium.github.io/S7/reference/S7_on_load.html)

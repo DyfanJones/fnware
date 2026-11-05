@@ -195,3 +195,21 @@ Putting it outside
 [`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
 matters for the same reason: a validation error is the caller’s mistake,
 and retrying it only repeats the mistake.
+
+## Promises
+
+[`validate_args()`](https://dyfanjones.github.io/fnware/reference/validate_args.md)
+works as it is for a function that returns a promise, as the arguments
+are known when it is called.
+[`validate_return()`](https://dyfanjones.github.io/fnware/reference/validate_args.md)
+would check the promise itself, so use
+[`async_validate_return()`](https://dyfanjones.github.io/fnware/reference/async_validate_return.md),
+which checks the resolved value. If it fails, the promise rejects with a
+`fnware_validation_error`.
+
+``` r
+
+f := async_validate_return(is.character) %@%
+  function() promises::promise_resolve(1)
+promises::catch(f(), function(err) cat(conditionMessage(err), "\n"))
+```

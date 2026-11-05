@@ -23,6 +23,12 @@ once(f)
 
 A decorator.
 
+## Details
+
+For a function that returns a promise, use
+[`async_once()`](https://dyfanjones.github.io/fnware/reference/async_once.md),
+which also does not store a rejection.
+
 ## Examples
 
 ``` r

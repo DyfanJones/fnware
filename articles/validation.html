@@ -33,13 +33,15 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
+<li><a class="dropdown-item" href="../articles/decorators.html">Choosing and stacking decorators</a></li>
+    <li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
     <li><a class="dropdown-item" href="../articles/circuitbreaker.html">Failing fast with a circuit breaker</a></li>
     <li><a class="dropdown-item" href="../articles/fallback.html">Fallbacks and running once</a></li>
     <li><a class="dropdown-item" href="../articles/logging.html">Logging calls</a></li>
     <li><a class="dropdown-item" href="../articles/caching.html">Caching results</a></li>
     <li><a class="dropdown-item" href="../articles/contextmanager.html">Context managers</a></li>
     <li><a class="dropdown-item" href="../articles/validation.html">Validating arguments and results</a></li>
+    <li><a class="dropdown-item" href="../articles/async.html">Asynchronous decorators</a></li>
   </ul>
 </li>
       </ul>
@@ -241,6 +243,20 @@ outermost so bad input is rejected before any work is done:</p>
 <p>Putting it outside <code><a href="../reference/retry.html">retry()</a></code> matters for the same reason:
 a validation error is the caller’s mistake, and retrying it only repeats
 the mistake.</p>
+</div>
+<div class="section level2">
+<h2 id="promises">Promises<a class="anchor" aria-label="anchor" href="#promises"></a>
+</h2>
+<p><code><a href="../reference/validate_args.html">validate_args()</a></code> works as it is for a function that
+returns a promise, as the arguments are known when it is called.
+<code><a href="../reference/validate_args.html">validate_return()</a></code> would check the promise itself, so use
+<code><a href="../reference/async_validate_return.html">async_validate_return()</a></code>, which checks the resolved value.
+If it fails, the promise rejects with a
+<code>fnware_validation_error</code>.</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">f</span> <span class="op">:=</span> <span class="fu"><a href="../reference/async_validate_return.html">async_validate_return</a></span><span class="op">(</span><span class="va">is.character</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span></span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu">promises</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/promises/reference/promise_resolve.html" class="external-link">promise_resolve</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu">promises</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/promises/reference/then.html" class="external-link">catch</a></span><span class="op">(</span><span class="fu">f</span><span class="op">(</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">err</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">conditionMessage</a></span><span class="op">(</span><span class="va">err</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -54,7 +54,7 @@ flaky()
 ## Deciding when to stop
 
 `stop_after_attempt(n)` makes at most `n` attempts. When it fires, a
-`retry_error` condition is signalled:
+`fnware_retry_error` condition is signalled:
 
 ``` r
 
@@ -70,7 +70,7 @@ The condition records what happened, so you can catch it and look:
 ``` r
 
 fresh := retry(stop = stop_after_attempt(3)) %@% make_flaky(Inf)
-err <- tryCatch(fresh(), retry_error = identity)
+err <- tryCatch(fresh(), fnware_retry_error = identity)
 err$attempt
 ```
 
@@ -90,7 +90,7 @@ If you would rather see the original error, set `reraise = TRUE`:
 loud := retry(stop = stop_after_attempt(2), reraise = TRUE) %@% make_flaky(Inf)
 tryCatch(
   loud(),
-  retry_error = function(e) "retry_error",
+  fnware_retry_error = function(e) "fnware_retry_error",
   error = conditionMessage
 )
 ```
@@ -420,7 +420,7 @@ for the details.
 
 This one uses the callr package to run the call in a separate R process,
 which is killed when the time is up, even if it is stuck in compiled
-code. It also sets `GARNISH_TIMEOUT_DEADLINE` in the child, so
+code. It also sets `FNWARE_TIMEOUT_DEADLINE` in the child, so
 [`timeout_remaining()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
 works there too:
 
@@ -432,7 +432,7 @@ timeout_callr := new_class(parent = timeout_base)
 
 method(timeout_fn, timeout_callr) <- function(class, call, seconds, ...) {
   deadline <- format(as.numeric(Sys.time()) + seconds, digits = 17)
-  env <- c(callr::rcmd_safe_env(), GARNISH_TIMEOUT_DEADLINE = deadline)
+  env <- c(callr::rcmd_safe_env(), FNWARE_TIMEOUT_DEADLINE = deadline)
   tryCatch(
     callr::r(
       function(call) call(),
@@ -496,7 +496,7 @@ while (!later::loop_empty()) {
 The function can return a plain value, as above, or a promise. A
 rejected promise counts as a failure, so a `mirai` task or an `httr2`
 async request is retried the same way. When `stop` fires, the promise
-rejects with the same `retry_error` that
+rejects with the same `fnware_retry_error` that
 [`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
 would signal.
 

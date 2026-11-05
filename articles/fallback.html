@@ -33,13 +33,15 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
+<li><a class="dropdown-item" href="../articles/decorators.html">Choosing and stacking decorators</a></li>
+    <li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
     <li><a class="dropdown-item" href="../articles/circuitbreaker.html">Failing fast with a circuit breaker</a></li>
     <li><a class="dropdown-item" href="../articles/fallback.html">Fallbacks and running once</a></li>
     <li><a class="dropdown-item" href="../articles/logging.html">Logging calls</a></li>
     <li><a class="dropdown-item" href="../articles/caching.html">Caching results</a></li>
     <li><a class="dropdown-item" href="../articles/contextmanager.html">Context managers</a></li>
     <li><a class="dropdown-item" href="../articles/validation.html">Validating arguments and results</a></li>
+    <li><a class="dropdown-item" href="../articles/async.html">Asynchronous decorators</a></li>
   </ul>
 </li>
       </ul>
@@ -158,6 +160,13 @@ setup that should happen a single time.</p>
 <p>An error stores nothing, so the next call tries again. Unlike
 <code><a href="../reference/lru_cache.html">cache()</a></code>, which keeps a result per set of arguments,
 <code><a href="../reference/once.html">once()</a></code> keeps one result whatever the arguments.</p>
+<p><code>async_once</code> is the version for functions that return a
+promise. It keeps the resolved value, makes calls that arrive while the
+first is running share its promise, and stores nothing on a rejection,
+so the next call tries again.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">setup</span> <span class="op">:=</span> <span class="va">async_once</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu">promises</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/promises/reference/promise_resolve.html" class="external-link">promise_resolve</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
+<span><span class="fu">promises</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/promises/reference/then.html" class="external-link">then</a></span><span class="op">(</span><span class="fu">setup</span><span class="op">(</span><span class="op">)</span>, <span class="va">print</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

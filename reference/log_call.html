@@ -22,13 +22,15 @@ signalled again unchanged."></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/decorators.html">Choosing and stacking decorators</a></li>
+    <li><a class="dropdown-item" href="../articles/retry.html">Retrying failing calls</a></li>
     <li><a class="dropdown-item" href="../articles/circuitbreaker.html">Failing fast with a circuit breaker</a></li>
     <li><a class="dropdown-item" href="../articles/fallback.html">Fallbacks and running once</a></li>
     <li><a class="dropdown-item" href="../articles/logging.html">Logging calls</a></li>
     <li><a class="dropdown-item" href="../articles/caching.html">Caching results</a></li>
     <li><a class="dropdown-item" href="../articles/contextmanager.html">Context managers</a></li>
     <li><a class="dropdown-item" href="../articles/validation.html">Validating arguments and results</a></li>
+    <li><a class="dropdown-item" href="../articles/async.html">Asynchronous decorators</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -105,6 +107,8 @@ Only the calls from <code>f</code> down to the failure are shown.</p></dd>
     <p>The message holds the function's name, its arguments matched to the formals
 and, once finished, the time taken. Arguments are evaluated before the start
 is logged.</p>
+<p>For a function that returns a promise, use <code><a href="async_log_call.html">async_log_call()</a></code>. Here the finish
+would be logged when the promise is returned, not when it settles.</p>
     </div>
 
     <div class="section level2">
@@ -122,7 +126,7 @@ is logged.</p>
 <span class="r-in"><span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"boom"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu">g</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [INFO] Started g(x=1)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [WARN] Failed g(x=1) Elapsed=00:00:00.000 </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [WARN] Failed g(x=1) Elapsed=00:00:00.001 </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Error in `g(x = x)`:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> boom</span>
 </code></pre></div>
