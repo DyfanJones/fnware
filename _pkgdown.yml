@@ -8,6 +8,7 @@ articles:
   - title: Guides
     navbar: ~
     contents:
+      - decorators
       - retry
       - circuitbreaker
       - fallback
@@ -15,6 +16,7 @@ articles:
       - caching
       - contextmanager
       - validation
+      - async
 
 reference:
   - title: Retrying
@@ -61,18 +63,25 @@ reference:
       - async_fallback
 
   - title: Observability
-    desc: Log calls and run a function once.
+    desc: Log calls.
     contents:
       - log_call
+      - async_log_call
       - log_levels
       - logger_base
       - extending_log
+
+  - title: Running once
+    desc: Do setup a single time.
+    contents:
       - once
+      - async_once
 
   - title: Validation
     desc: Check arguments and return values.
     contents:
       - validate_args
+      - async_validate_return
 
   - title: Context managers
     desc: Write setup and teardown once.

@@ -20,14 +20,17 @@ Popular Python decorators ported to R with the
 | `disk_cache()` | Caches results as files, so they outlive the session | [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/stable/generated/joblib.Memory.html#joblib.Memory) |
 | `async_lru_cache()`, `async_cache`, `async_disk_cache()` | Like the caches above, for functions that return a promise | |
 | `validate_args()`, `validate_return()` | Checks arguments and return values with any validator function | [pydantic `validate_call`](https://docs.pydantic.dev/latest/concepts/validation_decorator/) |
+| `async_validate_return()` | Like `validate_return()`, checking the value a promise resolves to | |
 | `circuit_breaker()` | Stops calling a function after repeated failures, then retries after a cooldown | [pybreaker](https://github.com/danielfm/pybreaker) |
 | `async_circuit_breaker()` | Like `circuit_breaker()`, for functions that return a promise | [pybreaker](https://github.com/danielfm/pybreaker) (async) |
 | `rate_limit()` | Limits how often a function can be called in a time window | [`ratelimit`](https://pypi.org/project/ratelimit/) |
 | `async_rate_limit()` | Like `rate_limit()`, but queues calls instead of blocking | [`ratelimit`](https://pypi.org/project/ratelimit/) (async) |
 | `fallback()` | Returns a default value, or a handler's result, when a function fails | [tenacity](https://github.com/jd/tenacity) `retry_error_callback` |
 | `async_fallback()` | Like `fallback()`, for functions that return a promise | |
-| `once()` | Runs a function the first time and reuses the result | |
+| `once` | Runs a function the first time and reuses the result | |
+| `async_once` | Like `once`, for functions that return a promise | |
 | `log_call()` | Logs when a call starts, finishes or fails, with its arguments. Writes with `message()` or any logging package via a `logger_fn()` method | |
+| `async_log_call()` | Like `log_call()`, logging the finish when the promise settles | |
 | `contextmanager` | Writes setup and teardown once, as `local_`, `with_` and decorator forms | [`contextlib.contextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager) |
 
 ## Installation
@@ -71,7 +74,7 @@ fetch := retry(
 }
 ```
 
-When `stop` fires, a `retry_error` condition is signalled. Set `reraise = TRUE`
+When `stop` fires, a `fnware_retry_error` condition is signalled. Set `reraise = TRUE`
 to re-throw the last error instead, or give `retry_error_callback` a function
 to return a fallback value:
 
@@ -209,10 +212,32 @@ scale_by("a", -1)
 All failures are reported together as a `fnware_validation_error`. Defaults are
 validated too.
 
+## Stacking decorators
+
+Decorators stack, and in `a %@% b %@% f`, `a` is outermost. From outside to
+inside, the order that works for the common cases is `validate_args()`,
+`fallback()`, `circuit_breaker()`, a cache, `retry()`, then `rate_limit()` and
+`timeout()`, so each attempt is throttled and capped. `vignette("decorators")`
+has a table of which decorator fits which problem, and the reasons for the order.
+
+``` r
+fetch := validate_args(url = is.character) %@%
+  fallback(value = NULL) %@%
+  circuit_breaker(failures = 3) %@%
+  retry(stop = stop_after_attempt(3)) %@%
+  rate_limit(calls = 5, period = 1) %@%
+  timeout(10) %@%
+  function(url) {
+    # ...
+  }
+```
+
 ## Learn more
 
-Vignettes: `vignette("retry")`, `vignette("caching")` and
-`vignette("contextmanager")` and `vignette("validation")`. The help pages are
+Vignettes: `vignette("decorators")`, `vignette("retry")`,
+`vignette("circuitbreaker")`, `vignette("fallback")`, `vignette("caching")`,
+`vignette("logging")`, `vignette("validation")`, `vignette("contextmanager")`
+and `vignette("async")`. The help pages are
 `?retry`, `?lru_cache` (which also covers `cache` and `disk_cache`),
 `?contextmanager` and `?validate_args`. See the adorn
 [documentation](https://dyfanjones.github.io/adorn/) for how decorators are

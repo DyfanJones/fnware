@@ -116,3 +116,18 @@ method(logger_fn, logger_num) <- function(class, level, msg, ...) {
 f := log_call(logger = logger_num()) %@% function() 1
 f()
 ```
+
+## Promises
+
+`log_call()` logs the finish as soon as the function returns, which for a
+function that returns a promise is before the work is done. Use
+`async_log_call()` instead. It logs the start when the function is called, and
+the finish or the failure when the promise settles. A rejection is logged then
+passed on unchanged. There is no `trace` argument, because the calls that led to
+a rejection are gone by the time it settles.
+
+```{r async, eval = FALSE}
+f := async_log_call(logger = logger_message()) %@%
+  function(x) promises::promise_resolve(x)
+promises::then(f(1), print)
+```
