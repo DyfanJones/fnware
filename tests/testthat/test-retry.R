@@ -216,7 +216,7 @@ test_that("wait_chain walks the strategies then repeats the last", {
 
 test_that("wait_combine and + sum strategies", {
   w <- wait_fixed(1) + wait_exp(min = 0)
-  expect_s3_class(w, "garnish::wait_combine")
+  expect_s3_class(w, "fnware::wait_combine")
   expect_equal(wait_fn(w, 3), 1 + 4)
   w3 <- wait_fixed(1) + wait_fixed(2) + wait_fixed(3)
   expect_equal(wait_fn(w3, 1), 6)

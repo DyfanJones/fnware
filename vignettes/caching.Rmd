@@ -8,11 +8,11 @@ vignette: >
 ---
 
 ```{r setup}
-library(garnish)
+library(fnware)
 ```
 
 A cache remembers what a function returned for a given set of arguments, so the
-second call is a lookup instead of the work. garnish has three caching
+second call is a lookup instead of the work. fnware has three caching
 decorators, and the difference between them is what happens to old entries:
 
 | Decorator | Keeps results | When full |
@@ -120,7 +120,7 @@ the results are still there. There is no default for `dir`: a temporary
 directory would disappear with the session and defeat the point.
 
 ```{r disk}
-dir <- tempfile("garnish-cache")
+dir <- tempfile("fnware-cache")
 square := disk_cache(dir) %@% slow_square
 square(7)
 square(7)
@@ -160,7 +160,7 @@ seven times faster to write and three and a half times faster to read back on
 one machine, so measure your own data.
 
 ```{r qs2, eval = requireNamespace("qs2", quietly = TRUE)}
-fast := disk_cache(tempfile("garnish-cache"), format = "qs2") %@% slow_square
+fast := disk_cache(tempfile("fnware-cache"), format = "qs2") %@% slow_square
 fast(3)
 fast(3)
 ```

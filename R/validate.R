@@ -21,7 +21,7 @@ NULL
 #' `validate_args()` checks the effective value of each named argument, so
 #' defaults are validated too. Checking forces the argument, so a validated
 #' argument is evaluated at call time rather than lazily. All failures are reported in one error of
-#' class `garnish_validation_error`. Validator names are checked against the
+#' class `fnware_validation_error`. Validator names are checked against the
 #' function's formals when it is decorated, so a typo fails early.
 #'
 #' @param ... For `validate_args()`, named validators, one per argument.
@@ -79,7 +79,7 @@ validate_args <- function(...) {
               "Invalid arguments.",
               stats::setNames(failures, rep("x", length(failures)))
             ),
-            class = "garnish_validation_error",
+            class = "fnware_validation_error",
             call = NULL
           )
         }
@@ -102,7 +102,7 @@ validate_return <- function(validator) {
         if (!is.null(msg)) {
           abort(
             c("Invalid return value.", x = msg),
-            class = "garnish_validation_error",
+            class = "fnware_validation_error",
             call = NULL
           )
         }

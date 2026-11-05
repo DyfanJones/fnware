@@ -22,7 +22,7 @@ A decorator. The decorated function returns a promise.
 Asynchronous version of \code{\link[=circuit_breaker]{circuit_breaker()}}, for functions that return a
 \link[promises:promise]{promise}. It has the same states and arguments. A call
 fails when its promise rejects, or the function throws. Once the circuit is
-open, calls return a promise already rejected with \code{garnish_circuit_open},
+open, calls return a promise already rejected with \code{fnware_circuit_open},
 without running the function.
 }
 \details{
@@ -52,7 +52,7 @@ try_once <- function() {
 }
 try_once() # simpleError
 try_once() # simpleError, and the circuit opens
-try_once() # garnish_circuit_open, down() was not called
+try_once() # fnware_circuit_open, down() was not called
 
 fetch := async_circuit_breaker(failures = 3, reset_after = 30) \%@\%
   async_retry(stop = stop_after_attempt(3)) \%@\%

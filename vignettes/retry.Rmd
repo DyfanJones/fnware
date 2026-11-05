@@ -8,7 +8,7 @@ vignette: >
 ---
 
 ```{r setup}
-library(garnish)
+library(fnware)
 ```
 
 Some failures are temporary: a network blip, a rate limit, a lock held by
@@ -207,7 +207,7 @@ whatever logging package you use.
 
 `stop_after_delay()` only checks the clock *between* attempts. If one attempt
 hangs, it never gets the chance. `timeout()` bounds a single call: when the
-time is up it signals a `garnish_timeout_error`, which is an ordinary error, so
+time is up it signals a `fnware_timeout_error`, which is an ordinary error, so
 `retry()` treats it like any other failure.
 
 Stack it inside `retry()` so every attempt is capped and a timeout is retried:
@@ -281,7 +281,7 @@ runs the work in another process and kills it.
 A method is an S7 class that inherits from `timeout_base`, with a method for
 the `timeout_fn(class, call, seconds)` generic. `call()` runs the decorated
 function and `seconds` is the time left. It must return the value of `call()`
-unchanged, or signal a `garnish_timeout_error`. `timeout()` handles built-in
+unchanged, or signal a `fnware_timeout_error`. `timeout()` handles built-in
 and your own methods the same way, adding the function name and limit to the
 message. See `?extending_timeout` for the details.
 
@@ -306,7 +306,7 @@ method(timeout_fn, timeout_callr) <- function(class, call, seconds, ...) {
       env = env
     ),
     callr_timeout_error = function(e) {
-      rlang::abort("Timed out.", class = "garnish_timeout_error")
+      rlang::abort("Timed out.", class = "fnware_timeout_error")
     }
   )
 }
@@ -321,7 +321,7 @@ tryCatch(hang(), error = function(e) conditionMessage(e))
 
 The function runs in a fresh process, so it cannot change variables in your
 session, and its arguments and result must be serialisable. callr is only
-suggested by garnish, so install it first if you want to use this.
+suggested by fnware, so install it first if you want to use this.
 
 ## Retrying without blocking
 
@@ -362,7 +362,7 @@ decorator inside it that calls the function synchronously, such as
 
 `async_timeout()` is the promise version of `timeout()`. If the promise has not
 settled after the limit, the promise it returns rejects with the same
-`garnish_timeout_error`, which `async_retry()` retries:
+`fnware_timeout_error`, which `async_retry()` retries:
 
 ```{r async-timeout, eval = requireNamespace("promises", quietly = TRUE) && requireNamespace("later", quietly = TRUE)}
 # A stand-in for a request: resolves with `value` after `delay` seconds

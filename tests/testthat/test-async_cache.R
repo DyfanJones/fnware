@@ -120,14 +120,16 @@ test_that("NULL results are cached", {
 
 test_that("editing the function invalidates the entry", {
   counter <- new_counter()
-  g1 <- async_cache %@% function(x) {
-    counter$n <- counter$n + 1L
-    delayed(x, 0.01)
-  }
-  g2 <- async_cache %@% function(x) {
-    counter$n <- counter$n + 10L
-    delayed(x, 0.01)
-  }
+  g1 <- async_cache %@%
+    function(x) {
+      counter$n <- counter$n + 1L
+      delayed(x, 0.01)
+    }
+  g2 <- async_cache %@%
+    function(x) {
+      counter$n <- counter$n + 10L
+      delayed(x, 0.01)
+    }
   settle_promise(g1(1))
   settle_promise(g2(1))
   expect_equal(counter$n, 11L)
@@ -149,10 +151,11 @@ test_that("async_disk_cache() persists between decorators", {
   c1 <- new_counter()
   c2 <- new_counter()
   make <- function(counter) {
-    async_disk_cache(dir) %@% function(x) {
-      counter$n <- counter$n + 1L
-      delayed(x * 3, 0.01)
-    }
+    async_disk_cache(dir) %@%
+      function(x) {
+        counter$n <- counter$n + 1L
+        delayed(x * 3, 0.01)
+      }
   }
   expect_equal(settle_promise(make(c1)(2))$value, 6)
   expect_equal(settle_promise(make(c2)(2))$value, 6)
@@ -166,16 +169,18 @@ test_that("async_disk_cache() and disk_cache() read each other's files", {
   c2 <- new_counter()
   # The function bodies must match, as the cache key includes the body.
   make_sync <- function(counter) {
-    disk_cache(dir) %@% function(x) {
-      counter$n <- counter$n + 1L
-      x * 3
-    }
+    disk_cache(dir) %@%
+      function(x) {
+        counter$n <- counter$n + 1L
+        x * 3
+      }
   }
   make_async <- function(counter) {
-    async_disk_cache(dir) %@% function(x) {
-      counter$n <- counter$n + 1L
-      x * 3
-    }
+    async_disk_cache(dir) %@%
+      function(x) {
+        counter$n <- counter$n + 1L
+        x * 3
+      }
   }
   expect_equal(make_sync(c1)(2), 6)
   expect_equal(settle_promise(make_async(c2)(2))$value, 6)

@@ -12,9 +12,9 @@ NULL
 #' `timeout_fn(class, call, seconds)` gets `call`, a function of no arguments
 #' that runs the decorated function, and `seconds`, the time left before the
 #' effective deadline. It must return the value of `call()` unchanged, or signal
-#' a `garnish_timeout_error` when `seconds` run out. [timeout()] adds the
+#' a `fnware_timeout_error` when `seconds` run out. [timeout()] adds the
 #' function name and limit to the message, and signals a
-#' `garnish_timeout_method_error` if `call()` ran but the method returned
+#' `fnware_timeout_method_error` if `call()` ran but the method returned
 #' something else or swallowed its error. Other errors should propagate.
 #'
 #' A method that runs `call()` in another process cannot be checked for this,
@@ -69,7 +69,7 @@ method(timeout_fn, timeout_r) <- function(class, call, seconds, ...) {
       if (is_time_limit_error(err)) {
         rlang::abort(
           "Reached the time limit.",
-          class = "garnish_timeout_error",
+          class = "fnware_timeout_error",
           call = NULL
         )
       }

@@ -8,7 +8,7 @@ NULL
 #' Asynchronous version of [circuit_breaker()], for functions that return a
 #' [promise][promises::promise]. It has the same states and arguments. A call
 #' fails when its promise rejects, or the function throws. Once the circuit is
-#' open, calls return a promise already rejected with `garnish_circuit_open`,
+#' open, calls return a promise already rejected with `fnware_circuit_open`,
 #' without running the function.
 #'
 #' Calls overlap, so a failure is counted when its promise rejects, and calls
@@ -38,7 +38,7 @@ NULL
 #' }
 #' try_once() # simpleError
 #' try_once() # simpleError, and the circuit opens
-#' try_once() # garnish_circuit_open, down() was not called
+#' try_once() # fnware_circuit_open, down() was not called
 #'
 #' fetch := async_circuit_breaker(failures = 3, reset_after = 30) %@%
 #'   async_retry(stop = stop_after_attempt(3)) %@%

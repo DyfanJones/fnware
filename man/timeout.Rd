@@ -26,7 +26,7 @@ timeout_remaining()
 }
 \description{
 Decorator that stops a single call after \code{seconds} and signals a
-\code{garnish_timeout_error}. Unlike \code{\link[=stop_after_delay]{stop_after_delay()}}, which only checks between
+\code{fnware_timeout_error}. Unlike \code{\link[=stop_after_delay]{stop_after_delay()}}, which only checks between
 attempts, it bounds the call itself.
 }
 \details{

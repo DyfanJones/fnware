@@ -2,7 +2,7 @@
 
 circuit_open_cnd <- function() {
   rlang::error_cnd(
-    "garnish_circuit_open",
+    "fnware_circuit_open",
     message = paste(
       "Circuit is open: the function failed repeatedly and is not being",
       "called."

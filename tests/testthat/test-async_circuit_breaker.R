@@ -26,7 +26,7 @@ test_that("opens after consecutive failures and stops calling the function", {
   res <- settle_promise(f())
   expect_match(conditionMessage(res$error), "down")
   res <- settle_promise(f())
-  expect_s3_class(res$error, "garnish_circuit_open")
+  expect_s3_class(res$error, "fnware_circuit_open")
   expect_s3_class(res$error, "error")
   expect_equal(n, 2L)
 })
@@ -41,7 +41,7 @@ test_that("a thrown error counts as a failure", {
   res <- settle_promise(f())
   expect_match(conditionMessage(res$error), "thrown")
   res <- settle_promise(f())
-  expect_s3_class(res$error, "garnish_circuit_open")
+  expect_s3_class(res$error, "fnware_circuit_open")
   expect_equal(n, 1L)
 })
 
@@ -53,7 +53,7 @@ test_that("an open circuit rejects without waiting", {
   p <- f()
   expect_lt(proc.time()[["elapsed"]] - t0, 0.1)
   res <- settle_promise(p)
-  expect_s3_class(res$error, "garnish_circuit_open")
+  expect_s3_class(res$error, "fnware_circuit_open")
 })
 
 test_that("a success resets the failure count", {
@@ -81,7 +81,7 @@ test_that("a trial call after the cooldown closes the circuit on success", {
     }
   settle_promise(f())
   res <- settle_promise(f())
-  expect_s3_class(res$error, "garnish_circuit_open")
+  expect_s3_class(res$error, "fnware_circuit_open")
   Sys.sleep(0.3)
   expect_equal(settle_promise(f())$value, "recovered")
   expect_equal(settle_promise(f())$value, "recovered")
@@ -99,7 +99,7 @@ test_that("a failed trial opens the circuit again", {
   res <- settle_promise(f())
   expect_match(conditionMessage(res$error), "still down")
   res <- settle_promise(f())
-  expect_s3_class(res$error, "garnish_circuit_open")
+  expect_s3_class(res$error, "fnware_circuit_open")
   expect_equal(n, 2L)
 })
 
@@ -115,7 +115,7 @@ test_that("only one trial runs while half-open", {
   trial <- f()
   other <- f()
   res <- settle_promise(other)
-  expect_s3_class(res$error, "garnish_circuit_open")
+  expect_s3_class(res$error, "fnware_circuit_open")
   expect_equal(settle_promise(trial)$value, "recovered")
   expect_equal(n, 2L)
 })
@@ -137,7 +137,7 @@ test_that("a trial that never settles is abandoned after the cooldown", {
   Sys.sleep(0.3)
   f() # the trial, which hangs
   res <- settle_promise(f())
-  expect_s3_class(res$error, "garnish_circuit_open")
+  expect_s3_class(res$error, "fnware_circuit_open")
   Sys.sleep(0.3)
   expect_equal(settle_promise(f())$value, "recovered")
 })
@@ -154,7 +154,7 @@ test_that("a call that started before the circuit opened cannot close it", {
   expect_equal(settle_promise(slow)$value, "slow success")
   # The late success must not have closed the circuit.
   res <- settle_promise(f())
-  expect_s3_class(res$error, "garnish_circuit_open")
+  expect_s3_class(res$error, "fnware_circuit_open")
 })
 
 test_that("separately decorated functions have separate state", {
@@ -164,7 +164,7 @@ test_that("separately decorated functions have separate state", {
     function() delayed("ok", 0.01)
   settle_promise(bad())
   res <- settle_promise(bad())
-  expect_s3_class(res$error, "garnish_circuit_open")
+  expect_s3_class(res$error, "fnware_circuit_open")
   expect_equal(settle_promise(good())$value, "ok")
 })
 
@@ -181,7 +181,7 @@ test_that("it works outside async_retry()", {
   expect_equal(n, 2L)
   # The circuit opened on the retry's final rejection, so the next call is shut out.
   res <- settle_promise(f())
-  expect_s3_class(res$error, "garnish_circuit_open")
+  expect_s3_class(res$error, "fnware_circuit_open")
   expect_equal(n, 2L)
 })
 

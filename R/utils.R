@@ -82,3 +82,40 @@ check_s7 <- function(
   }
   invisible(x)
 }
+
+# `x` must be a character vector of at least one non-missing string.
+check_classes <- function(x, arg = caller_arg(x), call = caller_env()) {
+  if (!(is.character(x) && length(x) >= 1L && !anyNA(x))) {
+    abort(
+      sprintf("`%s` must be a character vector of condition classes.", arg),
+      call = call
+    )
+  }
+  invisible(x)
+}
+
+# Whether `call` was written with a function name, as in `f(1)` or `pkg::f(1)`,
+# rather than a function object.
+is_named_call <- function(call) {
+  if (!is.call(call)) {
+    return(FALSE)
+  }
+  head <- call[[1L]]
+  is.symbol(head) ||
+    (is.call(head) &&
+      is.symbol(head[[1L]]) &&
+      as.character(head[[1L]]) %in% c("::", ":::"))
+}
+
+
+firstup <- function(x) {
+  substr(x, 1, 1) <- toupper(substr(x, 1, 1))
+  return(x)
+}
+
+fmt_duration <- function(secs) {
+  h <- secs %/% 3600
+  m <- (secs %% 3600) %/% 60
+  s <- secs %% 60
+  sprintf("%02d:%02d:%06.3f", h, m, s)
+}

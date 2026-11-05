@@ -10,6 +10,7 @@ export(as_decorator)
 export(async_cache)
 export(async_circuit_breaker)
 export(async_disk_cache)
+export(async_fallback)
 export(async_lru_cache)
 export(async_rate_limit)
 export(async_retry)
@@ -25,7 +26,14 @@ export(cache)
 export(circuit_breaker)
 export(contextmanager)
 export(disk_cache)
+export(fallback)
+export(log_call)
+export(log_levels)
+export(logger_base)
+export(logger_fn)
+export(logger_message)
 export(lru_cache)
+export(once)
 export(rate_limit)
 export(retry)
 export(retry_all)
@@ -64,6 +72,7 @@ export(with_context)
 importFrom(S7,
   ":=",
   "method<-",
+  "prop<-",
   S7_dispatch,
   S7_inherits,
   S7_on_build,
@@ -77,7 +86,8 @@ importFrom(S7,
   new_class,
   new_generic,
   new_object,
-  new_property
+  new_property,
+  prop
 )
 importFrom(adorn,
   "%@%",
@@ -95,7 +105,8 @@ importFrom(rlang,
   caller_arg,
   caller_env,
   cnd_signal,
-  hash
+  hash,
+  try_fetch
 )
 importFrom(stats,runif)
 importFrom(withr,defer)

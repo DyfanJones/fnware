@@ -38,7 +38,7 @@ a promise. \code{async_timeout_later()} returns a method, and
 Asynchronous version of \code{\link[=timeout]{timeout()}}, for functions that return a
 \link[promises:promise]{promise}. If the promise has not settled after \code{seconds},
 the promise returned by the decorated function rejects with a
-\code{garnish_timeout_error}, so \code{\link[=async_retry]{async_retry()}} retries it.
+\code{fnware_timeout_error}, so \code{\link[=async_retry]{async_retry()}} retries it.
 }
 \details{
 The wrapped function may return a promise or a plain value. A thrown error
@@ -61,9 +61,9 @@ built-in, races the promise against a \code{\link[later:later]{later::later()}} 
 own, make an S7 class inheriting from \code{async_timeout_base} and register a
 method for \code{async_timeout_fn(class, call, seconds)}. \code{call()} starts the work
 and returns a promise. The method must return a promise that settles with
-its result, or rejects with a \code{garnish_timeout_error} once \code{seconds} pass.
+its result, or rejects with a \code{fnware_timeout_error} once \code{seconds} pass.
 \code{async_timeout()} adds the function name and limit, and signals a
-\code{garnish_timeout_method_error} if the method does not return a promise.
+\code{fnware_timeout_method_error} if the method does not return a promise.
 }
 
 \examples{

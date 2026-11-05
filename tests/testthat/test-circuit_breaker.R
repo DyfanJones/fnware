@@ -13,7 +13,7 @@ test_that("opens after consecutive failures and stops calling the function", {
   f <- circuit_breaker(failures = 2, reset_after = 60) %@% g
   expect_error(f(), "down")
   expect_error(f(), "down")
-  expect_error(f(), class = "garnish_circuit_open")
+  expect_error(f(), class = "fnware_circuit_open")
   expect_equal(n, 2L)
 })
 
@@ -39,7 +39,7 @@ test_that("a trial call after the cooldown closes the circuit on success", {
   }
   f <- circuit_breaker(failures = 1, reset_after = 0.2) %@% g
   expect_error(f(), "fail")
-  expect_error(f(), class = "garnish_circuit_open")
+  expect_error(f(), class = "fnware_circuit_open")
   Sys.sleep(0.3)
   expect_equal(f(), "recovered")
   expect_equal(f(), "recovered")
@@ -55,7 +55,7 @@ test_that("a failed trial call reopens the circuit", {
   expect_error(f(), "still down")
   Sys.sleep(0.3)
   expect_error(f(), "still down")
-  expect_error(f(), class = "garnish_circuit_open")
+  expect_error(f(), class = "fnware_circuit_open")
   expect_equal(n, 2L)
 })
 
@@ -71,7 +71,7 @@ test_that("separately decorated functions have separate state", {
     function() stop("x")
   good <- circuit_breaker(failures = 1, reset_after = 60) %@% function() "ok"
   expect_error(bad(), "x")
-  expect_error(bad(), class = "garnish_circuit_open")
+  expect_error(bad(), class = "fnware_circuit_open")
   expect_equal(good(), "ok")
 })
 

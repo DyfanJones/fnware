@@ -5,7 +5,9 @@ make_flaky <- function(fail_times) {
   calls <- 0L
   function() {
     calls <<- calls + 1L
-    if (calls <= fail_times) stop("not yet (", calls, ")")
+    if (calls <= fail_times) {
+      stop("not yet (", calls, ")")
+    }
     calls
   }
 }
@@ -124,7 +126,12 @@ test_that("custom strategies work as they do in retry()", {
     parent = wait_base,
     constructor = function() S7::new_object(wait_base())
   )
-  S7::method(wait_fn, wait_const) <- function(class, attempt, prev_wait = NULL, ...) {
+  S7::method(wait_fn, wait_const) <- function(
+    class,
+    attempt,
+    prev_wait = NULL,
+    ...
+  ) {
     0
   }
   f <- async_retry(stop = stop_after_attempt(4), wait = wait_const()) %@%

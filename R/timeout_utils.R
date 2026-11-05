@@ -13,11 +13,11 @@ timeout_message <- function(name, limit, enclosing = FALSE) {
   msg
 }
 
-# The finished `garnish_timeout_error`, marked so an enclosing `timeout()` passes
+# The finished `fnware_timeout_error`, marked so an enclosing `timeout()` passes
 # it on unchanged instead of rebuilding it.
 timeout_cnd <- function(name, limit, enclosing = FALSE) {
   rlang::error_cnd(
-    "garnish_timeout_error",
+    "fnware_timeout_error",
     message = timeout_message(name, limit, enclosing),
     limit = limit,
     fn = name,

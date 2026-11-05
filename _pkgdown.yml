@@ -1,4 +1,4 @@
-url: https://dyfanjones.github.io/garnish/
+url: https://dyfanjones.github.io/fnware/
 
 template:
   bootstrap: 5
@@ -51,6 +51,21 @@ reference:
     contents:
       - rate_limit
       - async_rate_limit
+
+  - title: Fallbacks
+    desc: Return a default instead of failing.
+    contents:
+      - fallback
+      - async_fallback
+
+  - title: Observability
+    desc: Log calls and run a function once.
+    contents:
+      - log_call
+      - log_levels
+      - logger_base
+      - extending_log
+      - once
 
   - title: Validation
     desc: Check arguments and return values.

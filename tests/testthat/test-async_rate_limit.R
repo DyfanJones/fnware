@@ -45,7 +45,10 @@ test_that("queued calls keep their order and respect every window", {
   expect_equal(order(times), 1:6)
   # No window of `period` seconds ever holds more than `calls` starts.
   for (i in seq_along(times)) {
-    expect_lte(sum(times >= times[[i]] - 1e-6 & times < times[[i]] + 0.2 - 0.03), 2)
+    expect_lte(
+      sum(times >= times[[i]] - 1e-6 & times < times[[i]] + 0.2 - 0.03),
+      2
+    )
   }
   expect_gte(times[[5]], 0.35)
 })
@@ -61,7 +64,8 @@ test_that("a call after the window has passed is not delayed", {
 })
 
 test_that("it follows a promise returned by the function", {
-  f <- async_rate_limit(calls = 1, period = 0.1) %@% function(x) delayed(x, 0.05)
+  f <- async_rate_limit(calls = 1, period = 0.1) %@%
+    function(x) delayed(x, 0.05)
   expect_equal(settle_promise(f(1))$value, 1)
   expect_equal(settle_promise(f(2))$value, 2)
 })

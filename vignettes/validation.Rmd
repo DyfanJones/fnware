@@ -8,7 +8,7 @@ vignette: >
 ---
 
 ```{r setup}
-library(garnish)
+library(fnware)
 ```
 
 Checking inputs is the same few lines at the top of every function: test the
@@ -32,7 +32,7 @@ pass instead of one failure at a time.
 
 ## What counts as a validator
 
-A validator is any function that takes the value. garnish does not know about
+A validator is any function that takes the value. fnware does not know about
 any particular checking package, so base predicates, your own functions and
 packages like checkmate all go in the same way. A validator passes only when it
 returns exactly `TRUE`. Anything else fails:
@@ -109,13 +109,13 @@ Visibility is preserved, so an `invisible()` result stays invisible.
 
 ## Handling failures
 
-Failures have class `garnish_validation_error`, so callers can handle them apart
+Failures have class `fnware_validation_error`, so callers can handle them apart
 from other errors:
 
 ```{r handle}
 tryCatch(
   scale_by("a"),
-  garnish_validation_error = function(e) "bad input"
+  fnware_validation_error = function(e) "bad input"
 )
 ```
 

@@ -13,11 +13,11 @@ test_that("a plain value resolves at once", {
   expect_equal(settle_promise(f(1))$value, 2)
 })
 
-test_that("a slow promise rejects with a garnish_timeout_error", {
+test_that("a slow promise rejects with a fnware_timeout_error", {
   slow := async_timeout(0.1) %@% function() delayed("late", 1)
   t0 <- proc.time()[["elapsed"]]
   res <- settle_promise(slow())
-  expect_s3_class(res$error, "garnish_timeout_error")
+  expect_s3_class(res$error, "fnware_timeout_error")
   expect_s3_class(res$error, "error")
   expect_equal(res$error$limit, 0.1)
   expect_equal(res$error$fn, "slow")
@@ -50,7 +50,7 @@ test_that("rejections and thrown errors pass through unchanged", {
   throws <- async_timeout(5) %@% function() stop("thrown")
   r1 <- settle_promise(rejects())
   r2 <- settle_promise(throws())
-  expect_false(inherits(r1$error, "garnish_timeout_error"))
+  expect_false(inherits(r1$error, "fnware_timeout_error"))
   expect_match(conditionMessage(r1$error), "rejected")
   expect_match(conditionMessage(r2$error), "thrown")
 })
@@ -58,7 +58,7 @@ test_that("rejections and thrown errors pass through unchanged", {
 test_that("a non-condition rejection is not mistaken for a timeout", {
   f <- async_timeout(5) %@% function() promises::promise_reject("plain")
   err <- settle_promise(f())$error
-  expect_false(inherits(err, "garnish_timeout_error"))
+  expect_false(inherits(err, "fnware_timeout_error"))
   expect_match(conditionMessage(err), "plain")
 })
 
@@ -66,7 +66,7 @@ test_that("nested timeouts: the soonest rejects, naming that decorator", {
   inner := async_timeout(5) %@% function() delayed(1, 1)
   outer := async_timeout(0.1) %@% function() inner()
   res <- settle_promise(outer())
-  expect_s3_class(res$error, "garnish_timeout_error")
+  expect_s3_class(res$error, "fnware_timeout_error")
   expect_equal(res$error$limit, 0.1)
   expect_equal(res$error$fn, "outer")
 })
@@ -100,7 +100,7 @@ test_that("async_retry() gives up after repeated timeouts", {
     }
   res <- settle_promise(f())
   expect_s3_class(res$error, "retry_error")
-  expect_s3_class(res$error$error, "garnish_timeout_error")
+  expect_s3_class(res$error$error, "fnware_timeout_error")
   expect_equal(n, 2L)
 })
 
@@ -126,15 +126,15 @@ test_that("a custom method is used and given the limit", {
   expect_equal(seen, 3)
 })
 
-test_that("a custom method can reject with a garnish_timeout_error", {
+test_that("a custom method can reject with a fnware_timeout_error", {
   m <- make_async_method(function(call, seconds) {
     promises::promise_reject(
-      rlang::error_cnd("garnish_timeout_error", message = "too slow")
+      rlang::error_cnd("fnware_timeout_error", message = "too slow")
     )
   })
   g := async_timeout(3, method = m) %@% function() 1
   res <- settle_promise(g())
-  expect_s3_class(res$error, "garnish_timeout_error")
+  expect_s3_class(res$error, "fnware_timeout_error")
   expect_equal(res$error$fn, "g")
   expect_equal(res$error$limit, 3)
 })
@@ -142,14 +142,17 @@ test_that("a custom method can reject with a garnish_timeout_error", {
 test_that("a method that does not return a promise errors clearly", {
   m <- make_async_method(function(call, seconds) "not a promise")
   f <- async_timeout(3, method = m) %@% function() 1
-  expect_error(f(), class = "garnish_timeout_method_error")
+  expect_error(f(), class = "fnware_timeout_method_error")
 })
 
 test_that("arguments are validated", {
   expect_error(async_timeout(0) %@% function() 1, "seconds")
   expect_error(async_timeout("a") %@% function() 1, "seconds")
   expect_error(async_timeout(1, method = "x") %@% function() 1, "method")
-  expect_error(async_timeout(1, method = timeout_r()) %@% function() 1, "method")
+  expect_error(
+    async_timeout(1, method = timeout_r()) %@% function() 1,
+    "method"
+  )
 })
 
 test_that("a mirai task that runs too long is rejected", {
@@ -161,7 +164,7 @@ test_that("a mirai task that runs too long is rejected", {
   quick <- async_timeout(10) %@% function() mirai::mirai(1 + 1)
   expect_s3_class(
     settle_promise(hang(), timeout = 15)$error,
-    "garnish_timeout_error"
+    "fnware_timeout_error"
   )
   expect_equal(settle_promise(quick(), timeout = 15)$value, 2)
 })

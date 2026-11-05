@@ -42,7 +42,7 @@ method(before_sleep_fn, hook_recorder) <- function(class, state, ...) {
 }
 
 test_that("the extension classes and generics are exported", {
-  exports <- getNamespaceExports("garnish")
+  exports <- getNamespaceExports("fnware")
   for (kind in c("stop", "wait", "retry", "before_sleep", "after_sleep")) {
     expect_true(paste0(kind, "_base") %in% exports, info = kind)
     expect_true(paste0(kind, "_fn") %in% exports, info = kind)

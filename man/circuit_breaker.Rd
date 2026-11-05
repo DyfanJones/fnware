@@ -26,7 +26,7 @@ fail fast instead of waiting on something that is down. It has three states:
 \itemize{
 \item \strong{closed}: calls go through. Consecutive errors are counted.
 \item \strong{open}: after \code{failures} consecutive errors, calls fail immediately with
-a \code{garnish_circuit_open} error, without running the function, for
+a \code{fnware_circuit_open} error, without running the function, for
 \code{reset_after} seconds.
 \item \strong{half-open}: once the cooldown has passed, the next call runs as a trial.
 If it succeeds the circuit closes. If it fails the circuit opens again for
@@ -37,12 +37,7 @@ Only errors count as failures. A call that returns normally, whatever its
 value, resets the count. Each decorated function keeps its own state.
 
 Stack it outside \code{\link[=retry]{retry()}} so an open circuit rejects a call before any
-retries happen:
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{fetch := circuit_breaker(failures = 3, reset_after = 30) \%@\%
-  retry(stop = stop_after_attempt(3)) \%@\%
-  function(url) \{ ... \}
-}\if{html}{\out{</div>}}
+retries happen.
 }
 \examples{
 n <- 0
@@ -55,4 +50,9 @@ try(f())
 try(f())
 try(f()) # rejected without calling flaky()
 n # still 2
+
+# Reject before any retries happen
+fetch := circuit_breaker(failures = 3, reset_after = 30) \%@\%
+  retry(stop = stop_after_attempt(3)) \%@\%
+  function(url) url
 }

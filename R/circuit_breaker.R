@@ -10,7 +10,7 @@ NULL
 #'
 #' * **closed**: calls go through. Consecutive errors are counted.
 #' * **open**: after `failures` consecutive errors, calls fail immediately with
-#'   a `garnish_circuit_open` error, without running the function, for
+#'   a `fnware_circuit_open` error, without running the function, for
 #'   `reset_after` seconds.
 #' * **half-open**: once the cooldown has passed, the next call runs as a trial.
 #'   If it succeeds the circuit closes. If it fails the circuit opens again for
@@ -20,13 +20,7 @@ NULL
 #' value, resets the count. Each decorated function keeps its own state.
 #'
 #' Stack it outside [retry()] so an open circuit rejects a call before any
-#' retries happen:
-#'
-#' ```r
-#' fetch := circuit_breaker(failures = 3, reset_after = 30) %@%
-#'   retry(stop = stop_after_attempt(3)) %@%
-#'   function(url) { ... }
-#' ```
+#' retries happen.
 #'
 #' @param f The function to decorate. Usually supplied by `%@%` rather than directly.
 #' @param failures Number of consecutive errors that open the circuit. A whole
@@ -45,6 +39,11 @@ NULL
 #' try(f())
 #' try(f()) # rejected without calling flaky()
 #' n # still 2
+#'
+#' # Reject before any retries happen
+#' fetch := circuit_breaker(failures = 3, reset_after = 30) %@%
+#'   retry(stop = stop_after_attempt(3)) %@%
+#'   function(url) url
 #' @rdname circuit_breaker
 #' @usage circuit_breaker(f, failures = 5, reset_after = 30)
 #' @export

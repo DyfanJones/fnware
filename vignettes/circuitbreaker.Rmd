@@ -8,7 +8,7 @@ vignette: >
 ---
 
 ```{r setup}
-library(garnish)
+library(fnware)
 ```
 
 `retry()` helps when a failure is brief. It does not help when a service is
@@ -113,7 +113,7 @@ guarded() # still closed: the errors were never consecutive
 
 ## Handling an open circuit
 
-A rejected call signals an error of class `garnish_circuit_open`. Catch it
+A rejected call signals an error of class `fnware_circuit_open`. Catch it
 separately from the function's own errors to fall back to something else, such
 as a cached value, instead of failing:
 
@@ -125,7 +125,7 @@ try(guarded(), silent = TRUE) # opens the circuit
 fetch_or_default <- function() {
   tryCatch(
     guarded(),
-    garnish_circuit_open = function(cnd) "default value"
+    fnware_circuit_open = function(cnd) "default value"
   )
 }
 fetch_or_default()
@@ -167,7 +167,7 @@ outside to inside is `circuit_breaker()`, `retry()`, `rate_limit()`.
 such as `httr2::req_perform_promise()` or a `mirai` task. It takes the same
 arguments and keeps the same three states, and a call fails when its promise
 rejects. An open circuit returns a promise that is already rejected with a
-`garnish_circuit_open` error, without calling the function.
+`fnware_circuit_open` error, without calling the function.
 
 ```{r async, eval = requireNamespace("promises", quietly = TRUE) && requireNamespace("later", quietly = TRUE)}
 down <- function() promises::promise_reject(simpleError("service down"))

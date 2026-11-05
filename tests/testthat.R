@@ -1,4 +1,4 @@
 library(testthat)
-library(garnish)
+library(fnware)
 
-test_check("garnish")
+test_check("fnware")

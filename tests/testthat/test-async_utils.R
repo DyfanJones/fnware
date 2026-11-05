@@ -33,14 +33,14 @@ test_that("check_async() passes when the packages are installed", {
 
 test_that("circuit_open_cnd() is a classed error", {
   cnd <- circuit_open_cnd()
-  expect_s3_class(cnd, "garnish_circuit_open")
+  expect_s3_class(cnd, "fnware_circuit_open")
   expect_s3_class(cnd, "error")
   expect_match(conditionMessage(cnd), "Circuit is open")
 })
 
 test_that("timeout_cnd() builds the finished timeout error", {
   cnd <- timeout_cnd("fetch", 2)
-  expect_s3_class(cnd, "garnish_timeout_error")
+  expect_s3_class(cnd, "fnware_timeout_error")
   expect_equal(cnd$fn, "fetch")
   expect_equal(cnd$limit, 2)
   expect_true(cnd$finalised)

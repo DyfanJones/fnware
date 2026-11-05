@@ -33,9 +33,9 @@ inherits from \code{timeout_base} and register a method for \code{timeout_fn()} 
 \code{timeout_fn(class, call, seconds)} gets \code{call}, a function of no arguments
 that runs the decorated function, and \code{seconds}, the time left before the
 effective deadline. It must return the value of \code{call()} unchanged, or signal
-a \code{garnish_timeout_error} when \code{seconds} run out. \code{\link[=timeout]{timeout()}} adds the
+a \code{fnware_timeout_error} when \code{seconds} run out. \code{\link[=timeout]{timeout()}} adds the
 function name and limit to the message, and signals a
-\code{garnish_timeout_method_error} if \code{call()} ran but the method returned
+\code{fnware_timeout_method_error} if \code{call()} ran but the method returned
 something else or swallowed its error. Other errors should propagate.
 
 A method that runs \code{call()} in another process cannot be checked for this,

@@ -46,3 +46,12 @@ delayed_error <- function(message, delay = 0) {
     later::later(function() reject(simpleError(message)), delay)
   })
 }
+
+# Settle `p` and return its value, or signal its rejection as an error.
+settle_value <- function(p) {
+  out <- settle_promise(p)
+  if (!is.null(out$error)) {
+    stop(out$error)
+  }
+  out$value
+}

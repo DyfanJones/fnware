@@ -1,10 +1,10 @@
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/DyfanJones/garnish/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DyfanJones/garnish/actions/workflows/R-CMD-check.yaml)
-[![Codecov test coverage](https://codecov.io/gh/DyfanJones/garnish/graph/badge.svg)](https://app.codecov.io/gh/DyfanJones/garnish)
-[![R-universe version](https://DyfanJones.r-universe.dev/garnish/badges/version)](https://DyfanJones.r-universe.dev/garnish)
+[![R-CMD-check](https://github.com/DyfanJones/fnware/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DyfanJones/fnware/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/DyfanJones/fnware/graph/badge.svg)](https://app.codecov.io/gh/DyfanJones/fnware)
+[![R-universe version](https://DyfanJones.r-universe.dev/fnware/badges/version)](https://DyfanJones.r-universe.dev/fnware)
 <!-- badges: end -->
 
-# garnish
+# fnware
 
 Popular Python decorators ported to R with the
 [adorn](https://dyfanjones.github.io/adorn/) framework.
@@ -24,13 +24,17 @@ Popular Python decorators ported to R with the
 | `async_circuit_breaker()` | Like `circuit_breaker()`, for functions that return a promise | [pybreaker](https://github.com/danielfm/pybreaker) (async) |
 | `rate_limit()` | Limits how often a function can be called in a time window | [`ratelimit`](https://pypi.org/project/ratelimit/) |
 | `async_rate_limit()` | Like `rate_limit()`, but queues calls instead of blocking | [`ratelimit`](https://pypi.org/project/ratelimit/) (async) |
+| `fallback()` | Returns a default value, or a handler's result, when a function fails | [tenacity](https://github.com/jd/tenacity) `retry_error_callback` |
+| `async_fallback()` | Like `fallback()`, for functions that return a promise | |
+| `once()` | Runs a function the first time and reuses the result | |
+| `log_call()` | Logs when a call starts, finishes or fails, with its arguments. Writes with `message()` or any logging package via a `logger_fn()` method | |
 | `contextmanager` | Writes setup and teardown once, as `local_`, `with_` and decorator forms | [`contextlib.contextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager) |
 
 ## Installation
 
 ``` r
 # install.packages("pak")
-pak::pak("DyfanJones/garnish")
+pak::pak("DyfanJones/fnware")
 ```
 
 ## Usage
@@ -41,7 +45,7 @@ with `%@%` or by calling it on the function.
 ### Retry
 
 ``` r
-library(garnish)
+library(fnware)
 
 n <- 0
 flaky <- function() {
@@ -185,7 +189,7 @@ the outer one.
 `validate_args()` takes one validator per argument and `validate_return()` takes
 one for the result. A validator is any function (or formula) that returns `TRUE`
 to pass. Returning a string fails with that string as the message, which is how
-checkmate's `check_*()` functions behave, so they work without garnish depending
+checkmate's `check_*()` functions behave, so they work without fnware depending
 on them:
 
 ``` r
@@ -202,7 +206,7 @@ scale_by("a", -1)
 #> ✖ `n`: failed validation.
 ```
 
-All failures are reported together as a `garnish_validation_error`. Defaults are
+All failures are reported together as a `fnware_validation_error`. Defaults are
 validated too.
 
 ## Learn more

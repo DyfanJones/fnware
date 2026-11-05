@@ -10,25 +10,25 @@ test_that("validate_args fails on FALSE with a generic message", {
   expect_error(
     f("a"),
     "`x`: failed validation",
-    class = "garnish_validation_error"
+    class = "fnware_validation_error"
   )
 })
 
 test_that("string results are used as the message", {
   chk <- function(x) if (is.character(x)) TRUE else "must be character"
   f <- validate_args(x = chk) %@% function(x) x
-  expect_error(f(1), "must be character", class = "garnish_validation_error")
+  expect_error(f(1), "must be character", class = "fnware_validation_error")
   expect_equal(f("a"), "a")
 })
 
 test_that("only TRUE passes", {
   f <- validate_args(x = function(x) 1) %@% function(x) x
-  expect_error(f(1), class = "garnish_validation_error")
+  expect_error(f(1), class = "fnware_validation_error")
 })
 
 test_that("all failures are reported together", {
   f <- validate_args(x = is.numeric, y = is.character) %@% function(x, y) NULL
-  err <- expect_error(f("a", 1), class = "garnish_validation_error")
+  err <- expect_error(f("a", 1), class = "fnware_validation_error")
   expect_match(conditionMessage(err), "`x`")
   expect_match(conditionMessage(err), "`y`")
 })
@@ -42,9 +42,9 @@ test_that("errors from validators propagate", {
 test_that("defaults are validated and positional matching works", {
   f <- validate_args(n = ~ .x > 0) %@% function(x, n = 1) n
   expect_equal(f(1), 1)
-  expect_error(f(1, -5), class = "garnish_validation_error")
+  expect_error(f(1, -5), class = "fnware_validation_error")
   g <- validate_args(n = ~ .x > 0) %@% function(x, n = -1) n
-  expect_error(g(1), class = "garnish_validation_error")
+  expect_error(g(1), class = "fnware_validation_error")
 })
 
 test_that("missing arguments without defaults are left to R", {
@@ -65,7 +65,7 @@ test_that("bad specs fail early", {
 test_that("validate_return checks the result and keeps visibility", {
   f <- validate_return(is.character) %@% function(x) x
   expect_equal(f("a"), "a")
-  expect_error(f(1), "Invalid return value", class = "garnish_validation_error")
+  expect_error(f(1), "Invalid return value", class = "fnware_validation_error")
   g <- validate_return(is.numeric) %@% function() invisible(1)
   expect_invisible(g())
 })

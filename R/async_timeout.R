@@ -8,7 +8,7 @@ NULL
 #' Asynchronous version of [timeout()], for functions that return a
 #' [promise][promises::promise]. If the promise has not settled after `seconds`,
 #' the promise returned by the decorated function rejects with a
-#' `garnish_timeout_error`, so [async_retry()] retries it.
+#' `fnware_timeout_error`, so [async_retry()] retries it.
 #'
 #' The wrapped function may return a promise or a plain value. A thrown error
 #' rejects the promise. Limits:
@@ -28,9 +28,9 @@ NULL
 #' own, make an S7 class inheriting from `async_timeout_base` and register a
 #' method for `async_timeout_fn(class, call, seconds)`. `call()` starts the work
 #' and returns a promise. The method must return a promise that settles with
-#' its result, or rejects with a `garnish_timeout_error` once `seconds` pass.
+#' its result, or rejects with a `fnware_timeout_error` once `seconds` pass.
 #' `async_timeout()` adds the function name and limit, and signals a
-#' `garnish_timeout_method_error` if the method does not return a promise.
+#' `fnware_timeout_method_error` if the method does not return a promise.
 #'
 #' @param f The function to decorate. Usually supplied by `%@%` rather than directly.
 #' @param seconds Time limit for one call, in seconds. A number greater than 0.
@@ -89,12 +89,12 @@ async_timeout := decorator(
             "The `method` of `async_timeout()` broke its contract.",
             i = "It must return a promise."
           ),
-          class = "garnish_timeout_method_error",
+          class = "fnware_timeout_method_error",
           call = NULL
         )
       }
       promises::catch(p, function(err) {
-        if (inherits(err, "garnish_timeout_error") && !isTRUE(err$finalised)) {
+        if (inherits(err, "fnware_timeout_error") && !isTRUE(err$finalised)) {
           err <- timeout_cnd(name, seconds)
         }
         promises::promise_reject(err)
@@ -127,7 +127,7 @@ method(async_timeout_fn, async_timeout_later) <- function(
     cancel <- later::later(
       function() {
         reject(rlang::error_cnd(
-          "garnish_timeout_error",
+          "fnware_timeout_error",
           message = "Reached the time limit.",
           call = NULL
         ))

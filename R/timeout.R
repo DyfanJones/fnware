@@ -40,7 +40,7 @@ is_time_limit_error <- function(cnd) {
 #' Bound how long a call can run
 #'
 #' Decorator that stops a single call after `seconds` and signals a
-#' `garnish_timeout_error`. Unlike [stop_after_delay()], which only checks between
+#' `fnware_timeout_error`. Unlike [stop_after_delay()], which only checks between
 #' attempts, it bounds the call itself.
 #'
 #' The condition inherits from `error`, so [retry_if_error()] retries it and
@@ -131,7 +131,7 @@ timeout := decorator(
       }
       outcome <- tryCatch(
         list(value = timeout_fn(method, call, remaining)),
-        garnish_timeout_error = function(err) list(timeout = err)
+        fnware_timeout_error = function(err) list(timeout = err)
       )
       if (!is.null(outcome$timeout)) {
         err <- outcome$timeout
@@ -147,10 +147,10 @@ timeout := decorator(
             "The `method` of `timeout()` broke its contract.",
             i = paste(
               "It must return the value of `call()` unchanged,",
-              "or signal a `garnish_timeout_error`."
+              "or signal a `fnware_timeout_error`."
             )
           ),
-          class = "garnish_timeout_method_error",
+          class = "fnware_timeout_method_error",
           call = NULL
         )
       }

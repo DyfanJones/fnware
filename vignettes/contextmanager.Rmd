@@ -8,7 +8,7 @@ vignette: >
 ---
 
 ```{r setup}
-library(garnish)
+library(fnware)
 ```
 
 Many resources come as a pair: something you acquire, and something you must

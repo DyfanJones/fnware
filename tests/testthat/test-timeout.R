@@ -18,10 +18,10 @@ test_that("visibility and arguments are preserved", {
   expect_equal(f(1, y = 3), 4)
 })
 
-test_that("a slow R loop times out with a garnish_timeout_error", {
+test_that("a slow R loop times out with a fnware_timeout_error", {
   f <- timeout(0.2) %@% slow_loop
   t0 <- proc.time()[["elapsed"]]
-  expect_error(f(), class = "garnish_timeout_error")
+  expect_error(f(), class = "fnware_timeout_error")
   expect_lt(proc.time()[["elapsed"]] - t0, 2)
 })
 
@@ -33,14 +33,14 @@ test_that("a busy loop times out", {
         x <- x + 1
       }
     }
-  expect_error(f(), class = "garnish_timeout_error")
+  expect_error(f(), class = "fnware_timeout_error")
 })
 
 test_that("the condition is an error with the limit and function name", {
   slow := timeout(0.2) %@% slow_loop
   err <- tryCatch(slow(), error = identity)
   expect_s3_class(err, "error")
-  expect_s3_class(err, "garnish_timeout_error")
+  expect_s3_class(err, "fnware_timeout_error")
   expect_equal(err$limit, 0.2)
   expect_equal(err$fn, "slow")
   expect_match(conditionMessage(err), "slow")
@@ -50,7 +50,7 @@ test_that("the condition is an error with the limit and function name", {
 test_that("other errors pass through and are not turned into timeouts", {
   f <- timeout(5) %@% function() stop("boom")
   err <- tryCatch(f(), error = identity)
-  expect_false(inherits(err, "garnish_timeout_error"))
+  expect_false(inherits(err, "fnware_timeout_error"))
   expect_match(conditionMessage(err), "boom")
 })
 
@@ -105,7 +105,7 @@ test_that("an inner timeout cannot outlast an outer one", {
   outer := timeout(0.3) %@% function() inner()
   t0 <- proc.time()[["elapsed"]]
   err <- tryCatch(outer(), error = identity)
-  expect_s3_class(err, "garnish_timeout_error")
+  expect_s3_class(err, "fnware_timeout_error")
   expect_lt(proc.time()[["elapsed"]] - t0, 2)
   expect_match(conditionMessage(err), "enclosing")
   expect_equal(timeout_remaining(), Inf)
@@ -118,7 +118,7 @@ test_that("the outer limit is restored after an inner timeout finishes", {
       inner()
       slow_loop()
     }
-  expect_error(outer(), class = "garnish_timeout_error")
+  expect_error(outer(), class = "fnware_timeout_error")
 })
 
 test_that("an inner timeout error is passed through the outer unchanged", {
@@ -150,7 +150,7 @@ test_that("retry() gives up after repeated timeouts", {
     }
   err <- tryCatch(f(), error = identity)
   expect_s3_class(err, "retry_error")
-  expect_s3_class(err$error, "garnish_timeout_error")
+  expect_s3_class(err$error, "fnware_timeout_error")
   expect_equal(n, 2L)
 })
 
@@ -177,9 +177,9 @@ test_that("circuit_breaker() counts timeouts as failures", {
       n <<- n + 1L
       slow_loop()
     }
-  expect_error(f(), class = "garnish_timeout_error")
-  expect_error(f(), class = "garnish_timeout_error")
-  expect_error(f(), class = "garnish_circuit_open")
+  expect_error(f(), class = "fnware_timeout_error")
+  expect_error(f(), class = "fnware_timeout_error")
+  expect_error(f(), class = "fnware_circuit_open")
   expect_equal(n, 2L)
 })
 
@@ -195,13 +195,13 @@ test_that("a custom method following the contract is used", {
   expect_gt(seen, 2)
 })
 
-test_that("a custom method can signal a garnish_timeout_error", {
+test_that("a custom method can signal a fnware_timeout_error", {
   m <- function(call, seconds) {
-    rlang::abort("too slow", class = "garnish_timeout_error")
+    rlang::abort("too slow", class = "fnware_timeout_error")
   }
   g := timeout(3, method = make_timeout_method(m)) %@% function() 1
   err <- tryCatch(g(), error = identity)
-  expect_s3_class(err, "garnish_timeout_error")
+  expect_s3_class(err, "fnware_timeout_error")
   expect_equal(err$fn, "g")
   expect_equal(err$limit, 3)
 })
@@ -212,7 +212,7 @@ test_that("a method that returns the wrong value errors clearly", {
     "something else"
   }
   f <- timeout(3, method = make_timeout_method(m)) %@% function() 1
-  expect_error(f(), class = "garnish_timeout_method_error")
+  expect_error(f(), class = "fnware_timeout_method_error")
   expect_error(f(), "contract")
 })
 
@@ -221,7 +221,7 @@ test_that("a method that swallows the error errors clearly", {
     tryCatch(call(), error = function(e) NULL)
   }
   f <- timeout(3, method = make_timeout_method(m)) %@% function() stop("boom")
-  expect_error(f(), class = "garnish_timeout_method_error")
+  expect_error(f(), class = "fnware_timeout_method_error")
 })
 
 test_that("timeout_r() is a timeout method", {
@@ -276,7 +276,7 @@ test_that("a callr-based method kills the process and passes the deadline on", {
         env = env
       ),
       callr_timeout_error = function(e) {
-        rlang::abort("Timed out.", class = "garnish_timeout_error")
+        rlang::abort("Timed out.", class = "fnware_timeout_error")
       }
     )
   }
@@ -291,7 +291,7 @@ test_that("a callr-based method kills the process and passes the deadline on", {
       as.numeric(Sys.getenv("GARNISH_TIMEOUT_DEADLINE")) -
         as.numeric(Sys.time())
     }
-  expect_error(hang(), class = "garnish_timeout_error")
+  expect_error(hang(), class = "fnware_timeout_error")
   expect_equal(fast(1), 2)
   expect_lte(deadline(), 10)
   expect_gt(deadline(), 8)
