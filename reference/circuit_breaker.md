@@ -36,7 +36,7 @@ A decorator.
 - **closed**: calls go through. Consecutive errors are counted.
 
 - **open**: after `failures` consecutive errors, calls fail immediately
-  with a `garnish_circuit_open` error, without running the function, for
+  with a `fnware_circuit_open` error, without running the function, for
   `reset_after` seconds.
 
 - **half-open**: once the cooldown has passed, the next call runs as a
@@ -48,12 +48,8 @@ its value, resets the count. Each decorated function keeps its own
 state.
 
 Stack it outside
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) so
-an open circuit rejects a call before any retries happen:
-
-    fetch := circuit_breaker(failures = 3, reset_after = 30) %@%
-      retry(stop = stop_after_attempt(3)) %@%
-      function(url) { ... }
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) so
+an open circuit rejects a call before any retries happen.
 
 ## Examples
 
@@ -72,4 +68,9 @@ try(f()) # rejected without calling flaky()
 #> Error : Circuit is open: the function failed repeatedly and is not being called.
 n # still 2
 #> [1] 2
+
+# Reject before any retries happen
+fetch := circuit_breaker(failures = 3, reset_after = 30) %@%
+  retry(stop = stop_after_attempt(3)) %@%
+  function(url) url
 ```

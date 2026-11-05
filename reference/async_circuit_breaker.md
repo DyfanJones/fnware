@@ -1,12 +1,12 @@
 # Stop calling an asynchronous function that keeps failing
 
 Asynchronous version of
-[`circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md),
+[`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md),
 for functions that return a
 [promise](https://rstudio.github.io/promises/reference/promise.html). It
 has the same states and arguments. A call fails when its promise
 rejects, or the function throws. Once the circuit is open, calls return
-a promise already rejected with `garnish_circuit_open`, without running
+a promise already rejected with `fnware_circuit_open`, without running
 the function.
 
 ## Usage
@@ -44,14 +44,14 @@ calls made before earlier ones settle all go through. Two more rules:
 - While half-open, only one trial call runs and others are rejected. A
   trial not settled after `reset_after` seconds is abandoned, so a
   promise that never settles cannot hold the circuit shut. Put
-  [`async_timeout()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md)
+  [`async_timeout()`](https://dyfanjones.github.io/fnware/reference/async_timeout.md)
   inside to bound it sooner.
 
 - A call that started before the circuit opened cannot close it, or be
   counted again, when it settles.
 
 Stack it outside
-[`async_retry()`](https://dyfanjones.github.io/garnish/reference/async_retry.md).
+[`async_retry()`](https://dyfanjones.github.io/fnware/reference/async_retry.md).
 Needs the promises package and an event loop.
 
 ## Examples
@@ -68,7 +68,7 @@ try_once <- function() {
 }
 try_once() # simpleError
 try_once() # simpleError, and the circuit opens
-try_once() # garnish_circuit_open, down() was not called
+try_once() # fnware_circuit_open, down() was not called
 
 fetch := async_circuit_breaker(failures = 3, reset_after = 30) %@%
   async_retry(stop = stop_after_attempt(3)) %@%

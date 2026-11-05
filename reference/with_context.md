@@ -1,7 +1,7 @@
 # Run code inside a context
 
 The scoped form of a
-[`contextmanager()`](https://dyfanjones.github.io/garnish/reference/contextmanager.md).
+[`contextmanager()`](https://dyfanjones.github.io/fnware/reference/contextmanager.md).
 Evaluates `ctx` with cleanup tied to this call, passes the value it
 returns to `code`, and cleans up when `code` finishes, even if it
 errors.

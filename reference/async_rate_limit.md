@@ -1,7 +1,7 @@
 # Limit how often an asynchronous function can be called
 
 Asynchronous version of
-[`rate_limit()`](https://dyfanjones.github.io/garnish/reference/rate_limit.md).
+[`rate_limit()`](https://dyfanjones.github.io/fnware/reference/rate_limit.md).
 It allows at most `calls` calls to start in any window of `period`
 seconds, but a call over the limit is scheduled with
 [`later::later()`](https://later.r-lib.org/reference/later.html) instead
@@ -38,10 +38,10 @@ A decorator. The decorated function returns a promise.
 
 Each call reserves its slot when it is made, so calls start in order and
 queued calls count toward the limit. As with
-[`rate_limit()`](https://dyfanjones.github.io/garnish/reference/rate_limit.md),
+[`rate_limit()`](https://dyfanjones.github.io/fnware/reference/rate_limit.md),
 an error still uses its slot. It limits when calls start, not how many
 run, so slow calls can overlap. Stack it inside
-[`async_retry()`](https://dyfanjones.github.io/garnish/reference/async_retry.md)
+[`async_retry()`](https://dyfanjones.github.io/fnware/reference/async_retry.md)
 to throttle every attempt.
 
 Needs the promises and later packages, and an event loop.

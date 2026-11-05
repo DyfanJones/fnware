@@ -7,15 +7,15 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/DyfanJones/garnish/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/DyfanJones/fnware/blob/main/DESCRIPTION)
 
-Jones D (2026). *garnish: Python-Style Decorators for R*. R package
-version 0.1.0, <https://dyfanjones.github.io/garnish/>.
+Jones D (2026). *fnware: Ready-Made Function Decorators*. R package
+version 0.1.0, <https://dyfanjones.github.io/fnware/>.
 
     @Manual{,
-      title = {garnish: Python-Style Decorators for R},
+      title = {fnware: Ready-Made Function Decorators},
       author = {Dyfan Jones},
       year = {2026},
       note = {R package version 0.1.0},
-      url = {https://dyfanjones.github.io/garnish/},
+      url = {https://dyfanjones.github.io/fnware/},
     }

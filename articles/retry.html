@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Retrying failing calls • garnish</title>
+<title>Retrying failing calls • fnware</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -18,7 +18,7 @@
 
     <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
-    <a class="navbar-brand me-2" href="../index.html">garnish</a>
+    <a class="navbar-brand me-2" href="../index.html">fnware</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
@@ -45,7 +45,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/DyfanJones/garnish/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/DyfanJones/fnware/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
@@ -70,14 +70,14 @@
       <h1>Retrying failing calls</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/DyfanJones/garnish/blob/main/vignettes/retry.Rmd" class="external-link"><code>vignettes/retry.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/DyfanJones/fnware/blob/main/vignettes/retry.Rmd" class="external-link"><code>vignettes/retry.Rmd</code></a></small>
       <div class="d-none name"><code>retry.Rmd</code></div>
     </div>
 
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dyfanjones.github.io/garnish/">garnish</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dyfanjones.github.io/fnware/">fnware</a></span><span class="op">)</span></span></code></pre></div>
 <p>Some failures are temporary: a network blip, a rate limit, a lock
 held by someone else. <code><a href="../reference/retry.html">retry()</a></code> calls the function again
 until it works or you tell it to give up. It is a port of Python’s <a href="https://github.com/jd/tenacity" class="external-link">tenacity</a>, and is built from
@@ -202,11 +202,11 @@ look:</p>
 seconds”:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/stop_conditions.html">stop_any</a></span><span class="op">(</span><span class="fu"><a href="../reference/stop_conditions.html">stop_after_attempt</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="../reference/stop_conditions.html">stop_after_delay</a></span><span class="op">(</span><span class="fl">30</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## &lt;garnish::stop_any&gt;</span></span>
-<span><span class="co">##  @ stops:List of 2</span></span>
-<span><span class="co">##  .. $ : &lt;garnish::stop_after_attempt&gt;</span></span>
+<pre><code><span><span class="co">## &lt;fnware::stop_any&gt;</span></span>
+<span><span class="co">##  @ stops: List of 2</span></span>
+<span><span class="co">##  .. $ : &lt;fnware::stop_after_attempt&gt;</span></span>
 <span><span class="co">##  ..  ..@ max_attempt_number: num 10</span></span>
-<span><span class="co">##  .. $ : &lt;garnish::stop_after_delay&gt;</span></span>
+<span><span class="co">##  .. $ : &lt;fnware::stop_after_delay&gt;</span></span>
 <span><span class="co">##  ..  ..@ max_delay: num 30</span></span></code></pre>
 </div>
 <div class="section level2">
@@ -231,14 +231,14 @@ together retry together. Adding randomness spreads them out, and
 <code>+</code> combines strategies:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/wait_strategies.html">wait_exp</a></span><span class="op">(</span>multiplier <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="../reference/wait_strategies.html">wait_rand</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## &lt;garnish::wait_combine&gt;</span></span>
-<span><span class="co">##  @ waits:List of 2</span></span>
-<span><span class="co">##  .. $ : &lt;garnish::wait_exp&gt;</span></span>
+<pre><code><span><span class="co">## &lt;fnware::wait_combine&gt;</span></span>
+<span><span class="co">##  @ waits: List of 2</span></span>
+<span><span class="co">##  .. $ : &lt;fnware::wait_exp&gt;</span></span>
 <span><span class="co">##  ..  ..@ multiplier: num 0.1</span></span>
 <span><span class="co">##  ..  ..@ min       : num 0</span></span>
 <span><span class="co">##  ..  ..@ max       : num 4.61e+18</span></span>
 <span><span class="co">##  ..  ..@ exp_base  : num 2</span></span>
-<span><span class="co">##  .. $ : &lt;garnish::wait_rand&gt;</span></span>
+<span><span class="co">##  .. $ : &lt;fnware::wait_rand&gt;</span></span>
 <span><span class="co">##  ..  ..@ min: num 0</span></span>
 <span><span class="co">##  ..  ..@ max: num 0.1</span></span></code></pre>
 <table class="table">
@@ -314,7 +314,7 @@ on the fifth attempt, so retry only what is temporary.</p>
 the text instead, either exactly or by regular expression:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/retry_conditions.html">retry_if_error_message</a></span><span class="op">(</span>match <span class="op">=</span> <span class="st">"timed? ?out"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## &lt;garnish::retry_if_error_message&gt;</span></span>
+<pre><code><span><span class="co">## &lt;fnware::retry_if_error_message&gt;</span></span>
 <span><span class="co">##  @ message: NULL</span></span>
 <span><span class="co">##  @ match  : chr "timed? ?out"</span></span></code></pre>
 <p>A function can also fail without erroring, by returning something
@@ -365,7 +365,7 @@ package you use.</p>
 <p><code><a href="../reference/stop_conditions.html">stop_after_delay()</a></code> only checks the clock
 <em>between</em> attempts. If one attempt hangs, it never gets the
 chance. <code><a href="../reference/timeout.html">timeout()</a></code> bounds a single call: when the time is up
-it signals a <code>garnish_timeout_error</code>, which is an ordinary
+it signals a <code>fnware_timeout_error</code>, which is an ordinary
 error, so <code><a href="../reference/retry.html">retry()</a></code> treats it like any other failure.</p>
 <p>Stack it inside <code><a href="../reference/retry.html">retry()</a></code> so every attempt is capped and a
 timeout is retried:</p>
@@ -396,7 +396,7 @@ finished in time. The error records the limit and the function name:</p>
 <code class="sourceCode R"><span><span class="va">slow_call</span> <span class="op">:=</span> <span class="fu"><a href="../reference/timeout.html">timeout</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_work</span></span>
 <span><span class="va">err</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="fu">slow_call</span><span class="op">(</span><span class="op">)</span>, error <span class="op">=</span> <span class="va">identity</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">err</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "garnish_timeout_error" "rlang_error"           "error"                </span></span>
+<pre><code><span><span class="co">## [1] "fnware_timeout_error" "rlang_error"          "error"               </span></span>
 <span><span class="co">## [4] "condition"</span></span></code></pre>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">conditionMessage</a></span><span class="op">(</span><span class="va">err</span><span class="op">)</span></span></code></pre></div>
@@ -447,7 +447,7 @@ with a method for the <code>timeout_fn(class, call, seconds)</code>
 generic. <code><a href="https://rdrr.io/r/base/call.html" class="external-link">call()</a></code> runs the decorated function and
 <code>seconds</code> is the time left. It must return the value of
 <code><a href="https://rdrr.io/r/base/call.html" class="external-link">call()</a></code> unchanged, or signal a
-<code>garnish_timeout_error</code>. <code><a href="../reference/timeout.html">timeout()</a></code> handles
+<code>fnware_timeout_error</code>. <code><a href="../reference/timeout.html">timeout()</a></code> handles
 built-in and your own methods the same way, adding the function name and
 limit to the message. See <code><a href="../reference/extending_timeout.html">?extending_timeout</a></code> for the
 details.</p>
@@ -471,7 +471,7 @@ child, so <code><a href="../reference/timeout.html">timeout_remaining()</a></cod
 <span>      env <span class="op">=</span> <span class="va">env</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    callr_timeout_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">{</span></span>
-<span>      <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/abort.html" class="external-link">abort</a></span><span class="op">(</span><span class="st">"Timed out."</span>, class <span class="op">=</span> <span class="st">"garnish_timeout_error"</span><span class="op">)</span></span>
+<span>      <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/abort.html" class="external-link">abort</a></span><span class="op">(</span><span class="st">"Timed out."</span>, class <span class="op">=</span> <span class="st">"fnware_timeout_error"</span><span class="op">)</span></span>
 <span>    <span class="op">}</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
@@ -485,7 +485,7 @@ child, so <code><a href="../reference/timeout.html">timeout_remaining()</a></cod
 <pre><code><span><span class="co">## [1] "`hang` timed out: it did not finish within 0.5 seconds."</span></span></code></pre>
 <p>The function runs in a fresh process, so it cannot change variables
 in your session, and its arguments and result must be serialisable.
-callr is only suggested by garnish, so install it first if you want to
+callr is only suggested by fnware, so install it first if you want to
 use this.</p>
 </div>
 </div>
@@ -530,7 +530,7 @@ a promise.</p>
 <p><code><a href="../reference/async_timeout.html">async_timeout()</a></code> is the promise version of
 <code><a href="../reference/timeout.html">timeout()</a></code>. If the promise has not settled after the limit,
 the promise it returns rejects with the same
-<code>garnish_timeout_error</code>, which <code><a href="../reference/async_retry.html">async_retry()</a></code>
+<code>fnware_timeout_error</code>, which <code><a href="../reference/async_retry.html">async_retry()</a></code>
 retries:</p>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># A stand-in for a request: resolves with `value` after `delay` seconds</span></span>

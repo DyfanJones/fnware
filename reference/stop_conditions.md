@@ -1,7 +1,7 @@
 # Stop conditions
 
 Decide when
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
 gives up. A condition is checked after each failed attempt.
 
 ## Usage
@@ -37,7 +37,7 @@ stop_all(...)
 ## Value
 
 A stop condition to pass to
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md).
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md).
 
 ## Details
 
@@ -57,20 +57,20 @@ A stop condition to pass to
   `stop_after_delay()` and `stop_before_delay()` only check the clock
   between attempts. They do not interrupt an attempt that is already
   running, so a call that hangs never gets back to them. Use
-  [`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+  [`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
   to bound a single attempt.
 
 ## Examples
 
 ``` r
 stop_after_attempt(3)
-#> <garnish::stop_after_attempt>
+#> <fnware::stop_after_attempt>
 #>  @ max_attempt_number: num 3
 stop_any(stop_after_attempt(5), stop_after_delay(10))
-#> <garnish::stop_any>
-#>  @ stops:List of 2
-#>  .. $ : <garnish::stop_after_attempt>
+#> <fnware::stop_any>
+#>  @ stops: List of 2
+#>  .. $ : <fnware::stop_after_attempt>
 #>  ..  ..@ max_attempt_number: num 5
-#>  .. $ : <garnish::stop_after_delay>
+#>  .. $ : <fnware::stop_after_delay>
 #>  ..  ..@ max_delay: num 10
 ```

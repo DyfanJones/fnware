@@ -7,7 +7,7 @@ articles:
   contextmanager: contextmanager.html
   retry: retry.html
   validation: validation.html
-last_built: 2026-11-02T12:51Z
+last_built: 2026-11-05T12:10Z
 urls:
-  reference: https://dyfanjones.github.io/garnish/reference
-  article: https://dyfanjones.github.io/garnish/articles
+  reference: https://dyfanjones.github.io/fnware/reference
+  article: https://dyfanjones.github.io/fnware/articles

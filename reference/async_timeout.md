@@ -1,12 +1,12 @@
 # Bound how long an asynchronous call can take
 
 Asynchronous version of
-[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md),
+[`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md),
 for functions that return a
 [promise](https://rstudio.github.io/promises/reference/promise.html). If
 the promise has not settled after `seconds`, the promise returned by the
-decorated function rejects with a `garnish_timeout_error`, so
-[`async_retry()`](https://dyfanjones.github.io/garnish/reference/async_retry.md)
+decorated function rejects with a `fnware_timeout_error`, so
+[`async_retry()`](https://dyfanjones.github.io/fnware/reference/async_retry.md)
 retries it.
 
 ## Usage
@@ -64,12 +64,12 @@ error rejects the promise. Limits:
 
 - It cannot bound a function that blocks the session before returning
   its promise, as the timer needs the event loop. Use
-  [`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+  [`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
   for that.
 
 - Nested `async_timeout()`s each run their own timer, so the soonest
   rejects first. There is no shared deadline like
-  [`timeout_remaining()`](https://dyfanjones.github.io/garnish/reference/timeout.md).
+  [`timeout_remaining()`](https://dyfanjones.github.io/fnware/reference/timeout.md).
 
 Needs the promises and later packages, and an event loop.
 
@@ -82,9 +82,9 @@ To write your own, make an S7 class inheriting from `async_timeout_base`
 and register a method for `async_timeout_fn(class, call, seconds)`.
 [`call()`](https://rdrr.io/r/base/call.html) starts the work and returns
 a promise. The method must return a promise that settles with its
-result, or rejects with a `garnish_timeout_error` once `seconds` pass.
+result, or rejects with a `fnware_timeout_error` once `seconds` pass.
 `async_timeout()` adds the function name and limit, and signals a
-`garnish_timeout_method_error` if the method does not return a promise.
+`fnware_timeout_method_error` if the method does not return a promise.
 
 ## Examples
 

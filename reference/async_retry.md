@@ -1,8 +1,8 @@
 # Retry a function without blocking
 
 Asynchronous version of
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md),
-for functions that return a
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md), for
+functions that return a
 [promise](https://rstudio.github.io/promises/reference/promise.html). It
 uses the same strategies and hooks, but schedules the next attempt with
 [`later::later()`](https://later.r-lib.org/reference/later.html) instead
@@ -33,27 +33,27 @@ async_retry(
 - stop:
 
   A stop condition, e.g.
-  [`stop_after_attempt()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md).
+  [`stop_after_attempt()`](https://dyfanjones.github.io/fnware/reference/stop_conditions.md).
   Defaults to never stopping.
 
 - wait:
 
   A [wait
-  strategy](https://dyfanjones.github.io/garnish/reference/wait_strategies.md).
+  strategy](https://dyfanjones.github.io/fnware/reference/wait_strategies.md).
   Defaults to no waiting.
 
 - retry:
 
   A [retry
-  condition](https://dyfanjones.github.io/garnish/reference/retry_conditions.md).
+  condition](https://dyfanjones.github.io/fnware/reference/retry_conditions.md).
   Defaults to retrying every error.
 
 - before_sleep, after_sleep:
 
   Hooks run before and after each sleep, see
-  [`before_sleep_log()`](https://dyfanjones.github.io/garnish/reference/before_sleep.md)
+  [`before_sleep_log()`](https://dyfanjones.github.io/fnware/reference/before_sleep.md)
   and
-  [`after_sleep_log()`](https://dyfanjones.github.io/garnish/reference/after_sleep.md).
+  [`after_sleep_log()`](https://dyfanjones.github.io/fnware/reference/after_sleep.md).
 
 - reraise:
 
@@ -78,9 +78,9 @@ once `stop` fires. The wrapped function may return a promise or a plain
 value, and a rejection or a thrown error counts as a failure.
 
 Use it as the outermost decorator.
-[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+[`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
 cannot bound a promise, so cap each attempt with
-[`async_timeout()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md).
+[`async_timeout()`](https://dyfanjones.github.io/fnware/reference/async_timeout.md).
 The hooks and `retry_error_callback` run in the event loop, so keep them
 quick. Needs the promises and later packages, and an event loop for the
 promise to settle.

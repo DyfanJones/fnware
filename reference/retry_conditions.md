@@ -1,7 +1,7 @@
 # Retry conditions
 
 Decide whether
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
 tries again after an attempt.
 
 ## Usage
@@ -39,7 +39,7 @@ retry_if_result(predicate = function() NULL)
 ## Value
 
 A retry condition to pass to
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md).
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md).
 
 ## Details
 
@@ -60,13 +60,13 @@ A retry condition to pass to
 
 ``` r
 retry_if_error("http_error")
-#> <garnish::retry_if_error>
+#> <fnware::retry_if_error>
 #>  @ classes: chr "http_error"
 retry_if_error_message(match = "timed? ?out")
-#> <garnish::retry_if_error_message>
+#> <fnware::retry_if_error_message>
 #>  @ message: NULL
 #>  @ match  : chr "timed? ?out"
 retry_if_result(is.null)
-#> <garnish::retry_if_result>
+#> <fnware::retry_if_result>
 #>  @ predicate: function (x)  
 ```

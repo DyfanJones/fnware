@@ -2,14 +2,14 @@
 
 ``` r
 
-library(garnish)
+library(fnware)
 ```
 
 Checking inputs is the same few lines at the top of every function: test
 the type, test the range, build an error message.
-[`validate_args()`](https://dyfanjones.github.io/garnish/reference/validate_args.md)
+[`validate_args()`](https://dyfanjones.github.io/fnware/reference/validate_args.md)
 moves those checks out of the body and into a decorator, and
-[`validate_return()`](https://dyfanjones.github.io/garnish/reference/validate_args.md)
+[`validate_return()`](https://dyfanjones.github.io/fnware/reference/validate_args.md)
 does the same for the value a function hands back.
 
 ``` r
@@ -37,7 +37,7 @@ in one pass instead of one failure at a time.
 
 ## What counts as a validator
 
-A validator is any function that takes the value. garnish does not know
+A validator is any function that takes the value. fnware does not know
 about any particular checking package, so base predicates, your own
 functions and packages like checkmate all go in the same way. A
 validator passes only when it returns exactly `TRUE`. Anything else
@@ -89,7 +89,7 @@ others: it stops validation and reaches the caller as it is.
 
 ## Which arguments are checked
 
-[`validate_args()`](https://dyfanjones.github.io/garnish/reference/validate_args.md)
+[`validate_args()`](https://dyfanjones.github.io/fnware/reference/validate_args.md)
 checks the value each named argument has when the function runs, so
 **defaults are validated too**. A default that breaks its own rule is
 caught on the first call:
@@ -121,7 +121,7 @@ validate_args(z = is.numeric) %@% function(x) x
 
 ## Validating the result
 
-[`validate_return()`](https://dyfanjones.github.io/garnish/reference/validate_args.md)
+[`validate_return()`](https://dyfanjones.github.io/fnware/reference/validate_args.md)
 takes one validator for the returned value. It is a post-condition: it
 catches a function that returns the wrong thing, which is a bug in the
 function rather than in the caller.
@@ -151,14 +151,14 @@ invisible.
 
 ## Handling failures
 
-Failures have class `garnish_validation_error`, so callers can handle
+Failures have class `fnware_validation_error`, so callers can handle
 them apart from other errors:
 
 ``` r
 
 tryCatch(
   scale_by("a"),
-  garnish_validation_error = function(e) "bad input"
+  fnware_validation_error = function(e) "bad input"
 )
 ```
 
@@ -192,6 +192,6 @@ lookup(1)
     ## [1] 2
 
 Putting it outside
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
 matters for the same reason: a validation error is the caller’s mistake,
 and retrying it only repeats the mistake.

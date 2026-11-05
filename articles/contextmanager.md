@@ -2,7 +2,7 @@
 
 ``` r
 
-library(garnish)
+library(fnware)
 ```
 
 Many resources come as a pair: something you acquire, and something you
@@ -75,7 +75,7 @@ If this is all you need, use withr. `contextmanager` is built on
 ## What `contextmanager` adds
 
 You write the setup once, calling
-[`teardown()`](https://dyfanjones.github.io/garnish/reference/contextmanager.md)
+[`teardown()`](https://dyfanjones.github.io/fnware/reference/contextmanager.md)
 straight after each acquire, and return the resource. R has no `yield`,
 so this is the closest equivalent:
 
@@ -105,7 +105,7 @@ dir.exists(d)
 
     ## [1] FALSE
 
-[`with_context()`](https://dyfanjones.github.io/garnish/reference/with_context.md)
+[`with_context()`](https://dyfanjones.github.io/fnware/reference/with_context.md)
 scopes it to a block and hands the value to a function:
 
 ``` r
@@ -115,7 +115,7 @@ with_context(local_tempdir(), function(d) list.files(d))
 
     ## character(0)
 
-[`as_decorator()`](https://dyfanjones.github.io/garnish/reference/as_decorator.md)
+[`as_decorator()`](https://dyfanjones.github.io/fnware/reference/as_decorator.md)
 runs a whole function inside the context:
 
 ``` r
@@ -261,7 +261,7 @@ What did the work:
   outer setup returns. You don’t pass `.local_envir` along.
 - **Setup and teardown are one function.** `con` is an ordinary local
   variable that
-  [`teardown()`](https://dyfanjones.github.io/garnish/reference/contextmanager.md)
+  [`teardown()`](https://dyfanjones.github.io/fnware/reference/contextmanager.md)
   can see. withr’s own generators,
   [`withr::with_()`](https://withr.r-lib.org/reference/with_.html) and
   [`withr::local_()`](https://withr.r-lib.org/reference/with_.html),
@@ -279,7 +279,7 @@ What did the work:
   depends on one fewer thing.
 - **You want the code to be lazy.** `withr::with_x(value, code)` takes
   the code itself.
-  [`with_context()`](https://dyfanjones.github.io/garnish/reference/with_context.md)
+  [`with_context()`](https://dyfanjones.github.io/fnware/reference/with_context.md)
   takes a function, which is a little clumsier.
 
 The best fit is a package with several acquire/release helpers, some
@@ -313,7 +313,7 @@ in the code that calls the context, with
 **Why not a generator?** `coro::generator()` has a real `yield`, which
 makes it tempting. But `coro` does not support `tryCatch(finally = )`
 around a `yield`, so a generator cannot guarantee its teardown runs.
-[`teardown()`](https://dyfanjones.github.io/garnish/reference/contextmanager.md)
+[`teardown()`](https://dyfanjones.github.io/fnware/reference/contextmanager.md)
 needs nothing but `defer()`.
 
 **Top level.** Calling a context at the console works. Cleanup is run by

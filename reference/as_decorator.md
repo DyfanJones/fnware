@@ -1,7 +1,7 @@
 # Use a context manager as a decorator
 
 Decorator form of a
-[`contextmanager()`](https://dyfanjones.github.io/garnish/reference/contextmanager.md):
+[`contextmanager()`](https://dyfanjones.github.io/fnware/reference/contextmanager.md):
 the decorated function runs inside the context, and cleanup runs when it
 returns or errors. As in Python's `ContextDecorator`, the context's
 value is not passed to the function.

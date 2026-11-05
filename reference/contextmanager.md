@@ -37,11 +37,11 @@ effect.
   function exits, like `withr::local_*()`.
 
 - a `with_` form:
-  [`with_context()`](https://dyfanjones.github.io/garnish/reference/with_context.md)
+  [`with_context()`](https://dyfanjones.github.io/fnware/reference/with_context.md)
   runs a block, then cleans up.
 
 - a decorator:
-  [`as_decorator()`](https://dyfanjones.github.io/garnish/reference/as_decorator.md)
+  [`as_decorator()`](https://dyfanjones.github.io/fnware/reference/as_decorator.md)
   runs a function inside the context.
 
 The decorated function takes `...`, passed on to the setup function, and
@@ -59,8 +59,8 @@ reading its `.local_envir`.
 
 ## See also
 
-[`with_context()`](https://dyfanjones.github.io/garnish/reference/with_context.md),
-[`as_decorator()`](https://dyfanjones.github.io/garnish/reference/as_decorator.md)
+[`with_context()`](https://dyfanjones.github.io/fnware/reference/with_context.md),
+[`as_decorator()`](https://dyfanjones.github.io/fnware/reference/as_decorator.md)
 
 ## Examples
 

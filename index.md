@@ -1,23 +1,27 @@
-# garnish
+# fnware
 
 Popular Python decorators ported to R with the
 [adorn](https://dyfanjones.github.io/adorn/) framework.
 
 | Decorator | What it does | Python equivalent |
 |----|----|----|
-| [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) | Calls a function again when it fails | [tenacity](https://github.com/jd/tenacity) |
-| [`async_retry()`](https://dyfanjones.github.io/garnish/reference/async_retry.md) | Like [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md), but waits without blocking and returns a promise | [tenacity](https://github.com/jd/tenacity) (async) |
-| [`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md) | Stops a single call that runs too long | [wrapt-timeout-decorator](https://github.com/bitranox/wrapt_timeout_decorator) |
-| [`async_timeout()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md) | Like [`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md), but for functions that return a promise | [`asyncio.timeout`](https://docs.python.org/3/library/asyncio-task.html#asyncio.timeout) |
-| [`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md) | Caches results, evicting the least recently used | [`functools.lru_cache`](https://docs.python.org/3/library/functools.html#functools.lru_cache) |
+| [`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) | Calls a function again when it fails | [tenacity](https://github.com/jd/tenacity) |
+| [`async_retry()`](https://dyfanjones.github.io/fnware/reference/async_retry.md) | Like [`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md), but waits without blocking and returns a promise | [tenacity](https://github.com/jd/tenacity) (async) |
+| [`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md) | Stops a single call that runs too long | [wrapt-timeout-decorator](https://github.com/bitranox/wrapt_timeout_decorator) |
+| [`async_timeout()`](https://dyfanjones.github.io/fnware/reference/async_timeout.md) | Like [`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md), but for functions that return a promise | [`asyncio.timeout`](https://docs.python.org/3/library/asyncio-task.html#asyncio.timeout) |
+| [`lru_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md) | Caches results, evicting the least recently used | [`functools.lru_cache`](https://docs.python.org/3/library/functools.html#functools.lru_cache) |
 | `cache` | Caches results, never evicting | [`functools.cache`](https://docs.python.org/3/library/functools.html#functools.cache) |
-| [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md) | Caches results as files, so they outlive the session | [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/stable/generated/joblib.Memory.html#joblib.Memory) |
-| [`async_lru_cache()`](https://dyfanjones.github.io/garnish/reference/async_lru_cache.md), `async_cache`, [`async_disk_cache()`](https://dyfanjones.github.io/garnish/reference/async_lru_cache.md) | Like the caches above, for functions that return a promise |  |
-| [`validate_args()`](https://dyfanjones.github.io/garnish/reference/validate_args.md), [`validate_return()`](https://dyfanjones.github.io/garnish/reference/validate_args.md) | Checks arguments and return values with any validator function | [pydantic `validate_call`](https://docs.pydantic.dev/latest/concepts/validation_decorator/) |
-| [`circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md) | Stops calling a function after repeated failures, then retries after a cooldown | [pybreaker](https://github.com/danielfm/pybreaker) |
-| [`async_circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/async_circuit_breaker.md) | Like [`circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md), for functions that return a promise | [pybreaker](https://github.com/danielfm/pybreaker) (async) |
-| [`rate_limit()`](https://dyfanjones.github.io/garnish/reference/rate_limit.md) | Limits how often a function can be called in a time window | [`ratelimit`](https://pypi.org/project/ratelimit/) |
-| [`async_rate_limit()`](https://dyfanjones.github.io/garnish/reference/async_rate_limit.md) | Like [`rate_limit()`](https://dyfanjones.github.io/garnish/reference/rate_limit.md), but queues calls instead of blocking | [`ratelimit`](https://pypi.org/project/ratelimit/) (async) |
+| [`disk_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md) | Caches results as files, so they outlive the session | [`joblib.Memory.cache`](https://joblib.readthedocs.io/en/stable/generated/joblib.Memory.html#joblib.Memory) |
+| [`async_lru_cache()`](https://dyfanjones.github.io/fnware/reference/async_lru_cache.md), `async_cache`, [`async_disk_cache()`](https://dyfanjones.github.io/fnware/reference/async_lru_cache.md) | Like the caches above, for functions that return a promise |  |
+| [`validate_args()`](https://dyfanjones.github.io/fnware/reference/validate_args.md), [`validate_return()`](https://dyfanjones.github.io/fnware/reference/validate_args.md) | Checks arguments and return values with any validator function | [pydantic `validate_call`](https://docs.pydantic.dev/latest/concepts/validation_decorator/) |
+| [`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md) | Stops calling a function after repeated failures, then retries after a cooldown | [pybreaker](https://github.com/danielfm/pybreaker) |
+| [`async_circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/async_circuit_breaker.md) | Like [`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md), for functions that return a promise | [pybreaker](https://github.com/danielfm/pybreaker) (async) |
+| [`rate_limit()`](https://dyfanjones.github.io/fnware/reference/rate_limit.md) | Limits how often a function can be called in a time window | [`ratelimit`](https://pypi.org/project/ratelimit/) |
+| [`async_rate_limit()`](https://dyfanjones.github.io/fnware/reference/async_rate_limit.md) | Like [`rate_limit()`](https://dyfanjones.github.io/fnware/reference/rate_limit.md), but queues calls instead of blocking | [`ratelimit`](https://pypi.org/project/ratelimit/) (async) |
+| [`fallback()`](https://dyfanjones.github.io/fnware/reference/fallback.md) | Returns a default value, or a handler’s result, when a function fails | [tenacity](https://github.com/jd/tenacity) `retry_error_callback` |
+| [`async_fallback()`](https://dyfanjones.github.io/fnware/reference/async_fallback.md) | Like [`fallback()`](https://dyfanjones.github.io/fnware/reference/fallback.md), for functions that return a promise |  |
+| [`once()`](https://dyfanjones.github.io/fnware/reference/once.md) | Runs a function the first time and reuses the result |  |
+| [`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md) | Logs when a call starts, finishes or fails, with its arguments. Writes with [`message()`](https://rdrr.io/r/base/message.html) or any logging package via a [`logger_fn()`](https://dyfanjones.github.io/fnware/reference/loggers.md) method |  |
 | `contextmanager` | Writes setup and teardown once, as `local_`, `with_` and decorator forms | [`contextlib.contextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager) |
 
 ## Installation
@@ -25,13 +29,13 @@ Popular Python decorators ported to R with the
 ``` r
 
 # install.packages("pak")
-pak::pak("DyfanJones/garnish")
+pak::pak("DyfanJones/fnware")
 ```
 
 ## Usage
 
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) and
-[`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) and
+[`lru_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md)
 build a decorator, which you apply to a function with `%@%` or by
 calling it on the function.
 
@@ -39,7 +43,7 @@ calling it on the function.
 
 ``` r
 
-library(garnish)
+library(fnware)
 
 n <- 0
 flaky <- function() {
@@ -84,10 +88,10 @@ poll()
 
 | Strategy | Functions |
 |----|----|
-| Stop (`stop`) | [`stop_never()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md), [`stop_after_attempt()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md), [`stop_after_delay()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md), [`stop_before_delay()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md), [`stop_any()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md), [`stop_all()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md) |
-| Wait (`wait`) | [`wait_none()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md), [`wait_fixed()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md), [`wait_rand()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md), [`wait_exp()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md), [`wait_exp_jitter()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md), [`wait_chain()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md), [`wait_combine()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md) or `a + b` |
-| Retry (`retry`) | [`retry_all()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md), [`retry_never()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md), [`retry_if_error()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md), [`retry_if_error_message()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md), [`retry_if_result()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md) |
-| Hooks | [`before_sleep_none()`](https://dyfanjones.github.io/garnish/reference/before_sleep.md), [`before_sleep_log()`](https://dyfanjones.github.io/garnish/reference/before_sleep.md), [`after_sleep_none()`](https://dyfanjones.github.io/garnish/reference/after_sleep.md), [`after_sleep_log()`](https://dyfanjones.github.io/garnish/reference/after_sleep.md) |
+| Stop (`stop`) | [`stop_never()`](https://dyfanjones.github.io/fnware/reference/stop_conditions.md), [`stop_after_attempt()`](https://dyfanjones.github.io/fnware/reference/stop_conditions.md), [`stop_after_delay()`](https://dyfanjones.github.io/fnware/reference/stop_conditions.md), [`stop_before_delay()`](https://dyfanjones.github.io/fnware/reference/stop_conditions.md), [`stop_any()`](https://dyfanjones.github.io/fnware/reference/stop_conditions.md), [`stop_all()`](https://dyfanjones.github.io/fnware/reference/stop_conditions.md) |
+| Wait (`wait`) | [`wait_none()`](https://dyfanjones.github.io/fnware/reference/wait_strategies.md), [`wait_fixed()`](https://dyfanjones.github.io/fnware/reference/wait_strategies.md), [`wait_rand()`](https://dyfanjones.github.io/fnware/reference/wait_strategies.md), [`wait_exp()`](https://dyfanjones.github.io/fnware/reference/wait_strategies.md), [`wait_exp_jitter()`](https://dyfanjones.github.io/fnware/reference/wait_strategies.md), [`wait_chain()`](https://dyfanjones.github.io/fnware/reference/wait_strategies.md), [`wait_combine()`](https://dyfanjones.github.io/fnware/reference/wait_strategies.md) or `a + b` |
+| Retry (`retry`) | [`retry_all()`](https://dyfanjones.github.io/fnware/reference/retry_conditions.md), [`retry_never()`](https://dyfanjones.github.io/fnware/reference/retry_conditions.md), [`retry_if_error()`](https://dyfanjones.github.io/fnware/reference/retry_conditions.md), [`retry_if_error_message()`](https://dyfanjones.github.io/fnware/reference/retry_conditions.md), [`retry_if_result()`](https://dyfanjones.github.io/fnware/reference/retry_conditions.md) |
+| Hooks | [`before_sleep_none()`](https://dyfanjones.github.io/fnware/reference/before_sleep.md), [`before_sleep_log()`](https://dyfanjones.github.io/fnware/reference/before_sleep.md), [`after_sleep_none()`](https://dyfanjones.github.io/fnware/reference/after_sleep.md), [`after_sleep_log()`](https://dyfanjones.github.io/fnware/reference/after_sleep.md) |
 
 ### LRU cache
 
@@ -113,7 +117,7 @@ slow_cube := cache %@% function(x) {
 }
 ```
 
-[`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+[`disk_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md)
 keeps results in files under `dir`, so they survive the session and can
 be shared between sessions. `dir` has no default, because a temporary
 directory would defeat the point:
@@ -140,10 +144,10 @@ external pointers do not round-trip.
 ### Context manager
 
 R has no `yield`, so a context manager calls
-[`teardown()`](https://dyfanjones.github.io/garnish/reference/contextmanager.md)
+[`teardown()`](https://dyfanjones.github.io/fnware/reference/contextmanager.md)
 right after acquiring each resource and returns the resource. Unlike
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) and
-[`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md),
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) and
+[`lru_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md),
 `contextmanager` takes no parameters, so it is applied without calling
 it first.
 
@@ -173,7 +177,7 @@ dir.exists(d)
 #> [1] FALSE
 ```
 
-[`with_context()`](https://dyfanjones.github.io/garnish/reference/with_context.md)
+[`with_context()`](https://dyfanjones.github.io/fnware/reference/with_context.md)
 scopes it to a block, passing the value to a function:
 
 ``` r
@@ -182,7 +186,7 @@ with_context(local_tempdir(), function(d) list.files(d))
 #> character(0)
 ```
 
-[`as_decorator()`](https://dyfanjones.github.io/garnish/reference/as_decorator.md)
+[`as_decorator()`](https://dyfanjones.github.io/fnware/reference/as_decorator.md)
 runs a function inside the context:
 
 ``` r
@@ -198,13 +202,13 @@ setup is cleaned up with the outer one.
 
 ### Validation
 
-[`validate_args()`](https://dyfanjones.github.io/garnish/reference/validate_args.md)
+[`validate_args()`](https://dyfanjones.github.io/fnware/reference/validate_args.md)
 takes one validator per argument and
-[`validate_return()`](https://dyfanjones.github.io/garnish/reference/validate_args.md)
+[`validate_return()`](https://dyfanjones.github.io/fnware/reference/validate_args.md)
 takes one for the result. A validator is any function (or formula) that
 returns `TRUE` to pass. Returning a string fails with that string as the
 message, which is how checkmate’s `check_*()` functions behave, so they
-work without garnish depending on them:
+work without fnware depending on them:
 
 ``` r
 
@@ -221,24 +225,24 @@ scale_by("a", -1)
 #> ✖ `n`: failed validation.
 ```
 
-All failures are reported together as a `garnish_validation_error`.
+All failures are reported together as a `fnware_validation_error`.
 Defaults are validated too.
 
 ## Learn more
 
 Vignettes:
-[`vignette("retry")`](https://dyfanjones.github.io/garnish/articles/retry.md),
-[`vignette("caching")`](https://dyfanjones.github.io/garnish/articles/caching.md)
+[`vignette("retry")`](https://dyfanjones.github.io/fnware/articles/retry.md),
+[`vignette("caching")`](https://dyfanjones.github.io/fnware/articles/caching.md)
 and
-[`vignette("contextmanager")`](https://dyfanjones.github.io/garnish/articles/contextmanager.md)
+[`vignette("contextmanager")`](https://dyfanjones.github.io/fnware/articles/contextmanager.md)
 and
-[`vignette("validation")`](https://dyfanjones.github.io/garnish/articles/validation.md).
+[`vignette("validation")`](https://dyfanjones.github.io/fnware/articles/validation.md).
 The help pages are
-[`?retry`](https://dyfanjones.github.io/garnish/reference/retry.md),
-[`?lru_cache`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+[`?retry`](https://dyfanjones.github.io/fnware/reference/retry.md),
+[`?lru_cache`](https://dyfanjones.github.io/fnware/reference/lru_cache.md)
 (which also covers `cache` and `disk_cache`),
-[`?contextmanager`](https://dyfanjones.github.io/garnish/reference/contextmanager.md)
+[`?contextmanager`](https://dyfanjones.github.io/fnware/reference/contextmanager.md)
 and
-[`?validate_args`](https://dyfanjones.github.io/garnish/reference/validate_args.md).
+[`?validate_args`](https://dyfanjones.github.io/fnware/reference/validate_args.md).
 See the adorn [documentation](https://dyfanjones.github.io/adorn/) for
 how decorators are applied, stacked and removed.

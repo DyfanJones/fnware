@@ -2,12 +2,12 @@
 
 ``` r
 
-library(garnish)
+library(fnware)
 ```
 
 Some failures are temporary: a network blip, a rate limit, a lock held
 by someone else.
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
 calls the function again until it works or you tell it to give up. It is
 a port of Python’s [tenacity](https://github.com/jd/tenacity), and is
 built from three questions:
@@ -17,7 +17,7 @@ built from three questions:
 - **Which outcomes count as a failure?** (`retry`)
 
 Each has a default, so
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) on
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) on
 its own retries any error, immediately, forever. That is rarely what you
 want, so you will usually set `stop`.
 
@@ -40,8 +40,8 @@ make_flaky <- function(fail_times) {
 ```
 
 Apply
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
-with `%@%`, or by calling it on the function:
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) with
+`%@%`, or by calling it on the function:
 
 ``` r
 
@@ -115,7 +115,7 @@ safe()
 
 | Stop condition | Gives up when |
 |----|----|
-| [`stop_never()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md) | never (the default) |
+| [`stop_never()`](https://dyfanjones.github.io/fnware/reference/stop_conditions.md) | never (the default) |
 | `stop_after_attempt(n)` | `n` attempts have been made |
 | `stop_after_delay(s)` | `s` seconds have passed since the first attempt |
 | `stop_before_delay(s)` | the next wait would pass `s` seconds in total |
@@ -130,20 +130,20 @@ seconds”:
 stop_any(stop_after_attempt(10), stop_after_delay(30))
 ```
 
-    ## <garnish::stop_any>
-    ##  @ stops:List of 2
-    ##  .. $ : <garnish::stop_after_attempt>
+    ## <fnware::stop_any>
+    ##  @ stops: List of 2
+    ##  .. $ : <fnware::stop_after_attempt>
     ##  ..  ..@ max_attempt_number: num 10
-    ##  .. $ : <garnish::stop_after_delay>
+    ##  .. $ : <fnware::stop_after_delay>
     ##  ..  ..@ max_delay: num 30
 
 ## Deciding how long to wait
 
 By default
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
-does not wait. For anything talking to a server you want a pause, and
-usually one that grows.
-[`wait_exp()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md)
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) does
+not wait. For anything talking to a server you want a pause, and usually
+one that grows.
+[`wait_exp()`](https://dyfanjones.github.io/fnware/reference/wait_strategies.md)
 doubles the wait each time:
 
 ``` r
@@ -174,24 +174,24 @@ strategies:
 wait_exp(multiplier = 0.1) + wait_rand(0, 0.1)
 ```
 
-    ## <garnish::wait_combine>
-    ##  @ waits:List of 2
-    ##  .. $ : <garnish::wait_exp>
+    ## <fnware::wait_combine>
+    ##  @ waits: List of 2
+    ##  .. $ : <fnware::wait_exp>
     ##  ..  ..@ multiplier: num 0.1
     ##  ..  ..@ min       : num 0
     ##  ..  ..@ max       : num 4.61e+18
     ##  ..  ..@ exp_base  : num 2
-    ##  .. $ : <garnish::wait_rand>
+    ##  .. $ : <fnware::wait_rand>
     ##  ..  ..@ min: num 0
     ##  ..  ..@ max: num 0.1
 
 | Wait strategy | Waits |
 |----|----|
-| [`wait_none()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md) | no time (the default) |
+| [`wait_none()`](https://dyfanjones.github.io/fnware/reference/wait_strategies.md) | no time (the default) |
 | `wait_fixed(s)` | `s` seconds |
 | `wait_rand(min, max)` | a random time between `min` and `max` |
-| [`wait_exp()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md) | `multiplier * exp_base^(attempt - 1)`, between `min` and `max` |
-| [`wait_exp_jitter()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md) | exponential, with `"full"`, `"equal"` or `"decorrelated"` jitter |
+| [`wait_exp()`](https://dyfanjones.github.io/fnware/reference/wait_strategies.md) | `multiplier * exp_base^(attempt - 1)`, between `min` and `max` |
+| [`wait_exp_jitter()`](https://dyfanjones.github.io/fnware/reference/wait_strategies.md) | exponential, with `"full"`, `"equal"` or `"decorrelated"` jitter |
 | `wait_chain(a, b, ...)` | the n-th strategy for the n-th attempt |
 | `wait_combine(a, b)` or `a + b` | the sum of the strategies |
 
@@ -200,7 +200,7 @@ wait_exp(multiplier = 0.1) + wait_rand(0, 0.1)
 By default every error is retried. A bad password will not fix itself on
 the fifth attempt, so retry only what is temporary.
 
-[`retry_if_error()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md)
+[`retry_if_error()`](https://dyfanjones.github.io/fnware/reference/retry_conditions.md)
 matches condition classes:
 
 ``` r
@@ -221,7 +221,7 @@ calls
     ## [1] 1
 
 It made one attempt, because `client_error` is not an `http_error`.
-[`retry_if_error_message()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md)
+[`retry_if_error_message()`](https://dyfanjones.github.io/fnware/reference/retry_conditions.md)
 matches the text instead, either exactly or by regular expression:
 
 ``` r
@@ -229,13 +229,13 @@ matches the text instead, either exactly or by regular expression:
 retry_if_error_message(match = "timed? ?out")
 ```
 
-    ## <garnish::retry_if_error_message>
+    ## <fnware::retry_if_error_message>
     ##  @ message: NULL
     ##  @ match  : chr "timed? ?out"
 
 A function can also fail without erroring, by returning something
 unusable.
-[`retry_if_result()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md)
+[`retry_if_result()`](https://dyfanjones.github.io/fnware/reference/retry_conditions.md)
 retries when a predicate on the value is `TRUE`:
 
 ``` r
@@ -254,7 +254,7 @@ poll()
 
     ## [1] "ready"
 
-[`retry_never()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md)
+[`retry_never()`](https://dyfanjones.github.io/fnware/reference/retry_conditions.md)
 turns retrying off, which is useful for switching it off from a setting
 without removing the decorator.
 
@@ -282,25 +282,25 @@ logged()
     ## [1] "worked on call 3"
 
 The defaults are
-[`before_sleep_none()`](https://dyfanjones.github.io/garnish/reference/before_sleep.md)
+[`before_sleep_none()`](https://dyfanjones.github.io/fnware/reference/before_sleep.md)
 and
-[`after_sleep_none()`](https://dyfanjones.github.io/garnish/reference/after_sleep.md).
+[`after_sleep_none()`](https://dyfanjones.github.io/fnware/reference/after_sleep.md).
 The loggers take any function that accepts one string, so you can send
 the message to whatever logging package you use.
 
 ## Bounding hung calls
 
-[`stop_after_delay()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md)
+[`stop_after_delay()`](https://dyfanjones.github.io/fnware/reference/stop_conditions.md)
 only checks the clock *between* attempts. If one attempt hangs, it never
 gets the chance.
-[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+[`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
 bounds a single call: when the time is up it signals a
-`garnish_timeout_error`, which is an ordinary error, so
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+`fnware_timeout_error`, which is an ordinary error, so
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
 treats it like any other failure.
 
 Stack it inside
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) so
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) so
 every attempt is capped and a timeout is retried:
 
 ``` r
@@ -342,7 +342,7 @@ err <- tryCatch(slow_call(), error = identity)
 class(err)
 ```
 
-    ## [1] "garnish_timeout_error" "rlang_error"           "error"                
+    ## [1] "fnware_timeout_error" "rlang_error"          "error"               
     ## [4] "condition"
 
 ``` r
@@ -353,20 +353,20 @@ conditionMessage(err)
     ## [1] "`slow_call` timed out: it did not finish within 0.2 seconds."
 
 Put
-[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+[`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
 *inside*
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md), as
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md), as
 above. Outside it,
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
 catches the time limit error and the limit is already spent, so later
 attempts would run without one.
 
 ### Passing the time on
 
 Some libraries have their own timeouts, which can clean up properly.
-[`timeout_remaining()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+[`timeout_remaining()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
 returns the seconds left before the current deadline (`Inf` outside any
-[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)),
+[`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md)),
 so you can hand them the budget:
 
 ``` r
@@ -387,7 +387,7 @@ Timeouts can nest. The soonest deadline always wins, so an inner
 ### What it cannot stop
 
 The default method,
-[`timeout_r()`](https://dyfanjones.github.io/garnish/reference/timeout.md),
+[`timeout_r()`](https://dyfanjones.github.io/fnware/reference/timeout.md),
 uses base R’s
 [`setTimeLimit()`](https://rdrr.io/r/base/setTimeLimit.html), which R
 only checks at interrupt checkpoints between R expressions. It cannot
@@ -400,7 +400,7 @@ interrupt:
   A loop of short sleeps is fine.
 
 For these, pass
-[`timeout_remaining()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+[`timeout_remaining()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
 to a native timeout, or use a method that runs the work in another
 process and kills it.
 
@@ -411,17 +411,17 @@ for the `timeout_fn(class, call, seconds)` generic.
 [`call()`](https://rdrr.io/r/base/call.html) runs the decorated function
 and `seconds` is the time left. It must return the value of
 [`call()`](https://rdrr.io/r/base/call.html) unchanged, or signal a
-`garnish_timeout_error`.
-[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+`fnware_timeout_error`.
+[`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
 handles built-in and your own methods the same way, adding the function
 name and limit to the message. See
-[`?extending_timeout`](https://dyfanjones.github.io/garnish/reference/extending_timeout.md)
+[`?extending_timeout`](https://dyfanjones.github.io/fnware/reference/extending_timeout.md)
 for the details.
 
 This one uses the callr package to run the call in a separate R process,
 which is killed when the time is up, even if it is stuck in compiled
 code. It also sets `GARNISH_TIMEOUT_DEADLINE` in the child, so
-[`timeout_remaining()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+[`timeout_remaining()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
 works there too:
 
 ``` r
@@ -441,7 +441,7 @@ method(timeout_fn, timeout_callr) <- function(class, call, seconds, ...) {
       env = env
     ),
     callr_timeout_error = function(e) {
-      rlang::abort("Timed out.", class = "garnish_timeout_error")
+      rlang::abort("Timed out.", class = "fnware_timeout_error")
     }
   )
 }
@@ -458,18 +458,18 @@ tryCatch(hang(), error = function(e) conditionMessage(e))
 
 The function runs in a fresh process, so it cannot change variables in
 your session, and its arguments and result must be serialisable. callr
-is only suggested by garnish, so install it first if you want to use
+is only suggested by fnware, so install it first if you want to use
 this.
 
 ## Retrying without blocking
 
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
 sleeps between attempts, so nothing else can run in your R session while
 it waits. When the function already works with
 [promises](https://rstudio.github.io/promises/), as in Shiny, plumber or
 [`httr2::req_perform_promise()`](https://httr2.r-lib.org/reference/req_perform_promise.html),
 use
-[`async_retry()`](https://dyfanjones.github.io/garnish/reference/async_retry.md).
+[`async_retry()`](https://dyfanjones.github.io/fnware/reference/async_retry.md).
 It takes the same arguments and the same stop, wait and retry
 strategies, including ones you wrote yourself, but schedules the next
 attempt with `later` instead of sleeping, and returns a promise.
@@ -497,23 +497,23 @@ The function can return a plain value, as above, or a promise. A
 rejected promise counts as a failure, so a `mirai` task or an `httr2`
 async request is retried the same way. When `stop` fires, the promise
 rejects with the same `retry_error` that
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
 would signal.
 
-[`async_retry()`](https://dyfanjones.github.io/garnish/reference/async_retry.md)
+[`async_retry()`](https://dyfanjones.github.io/fnware/reference/async_retry.md)
 needs the promises and later packages. Put it outermost: a decorator
 inside it that calls the function synchronously, such as
-[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md),
+[`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md),
 cannot wait for or bound a promise.
 
 ### Bounding a slow promise
 
-[`async_timeout()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md)
+[`async_timeout()`](https://dyfanjones.github.io/fnware/reference/async_timeout.md)
 is the promise version of
-[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md).
+[`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md).
 If the promise has not settled after the limit, the promise it returns
-rejects with the same `garnish_timeout_error`, which
-[`async_retry()`](https://dyfanjones.github.io/garnish/reference/async_retry.md)
+rejects with the same `fnware_timeout_error`, which
+[`async_retry()`](https://dyfanjones.github.io/fnware/reference/async_retry.md)
 retries:
 
 ``` r
@@ -552,12 +552,12 @@ It tells the caller to stop waiting but does not stop the work, so the
 first two requests above are still running when the third finishes. A
 method that also cancels the work, for example a `mirai` task, can be
 written with `async_timeout_base` and
-[`async_timeout_fn()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md),
+[`async_timeout_fn()`](https://dyfanjones.github.io/fnware/reference/async_timeout.md),
 the same way as for
-[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md).
+[`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md).
 It cannot bound a function that blocks the session before it returns a
 promise. Use
-[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+[`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
 for that.
 
 ## Writing your own strategies
@@ -568,7 +568,7 @@ S7, the idea is small: make a class that inherits from a base class,
 then say what it does by registering a method for a generic. The
 built-in strategies work the same way, and yours combine with them.
 
-| [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) argument | Inherit from | Method of | Return |
+| [`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) argument | Inherit from | Method of | Return |
 |----|----|----|----|
 | `stop` | `stop_base` | `stop_fn(class, state)` | `TRUE` to give up |
 | `wait` | `wait_base` | `wait_fn(class, attempt, prev_wait)` | seconds to sleep |
@@ -603,7 +603,7 @@ wait_fn(wait_linear(2), attempt = 3)
     ## [1] 6
 
 It composes like the built-in waits, with `+` and in
-[`wait_chain()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md):
+[`wait_chain()`](https://dyfanjones.github.io/fnware/reference/wait_strategies.md):
 
 ``` r
 
@@ -613,7 +613,7 @@ wait_fn(wait_linear(1) + wait_fixed(2), attempt = 3)
     ## [1] 5
 
 A stop condition gets the `state` list described in
-[`?extending_retry`](https://dyfanjones.github.io/garnish/reference/extending_retry.md),
+[`?extending_retry`](https://dyfanjones.github.io/fnware/reference/extending_retry.md),
 which has `attempt`, `wait`, `elapsed`, `error` and `value`. This one
 gives up once an attempt fails with a message matching a pattern:
 
@@ -645,7 +645,7 @@ attempts
 
 It stopped after one attempt, though `stop_after_attempt(5)` would have
 allowed five, because
-[`stop_any()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md)
+[`stop_any()`](https://dyfanjones.github.io/fnware/reference/stop_conditions.md)
 fires when either condition does.
 
 A retry condition gets `outcome`, a list with `value` and `error`, one
@@ -707,12 +707,12 @@ fetch := retry(
   logs, so a service that is down for an hour does not look like a slow
   one.
 - **Decorators stack.** In `a %@% b %@% f`, `a` is outermost. Put
-  [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+  [`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
   outside a timing decorator to time all attempts, or inside it to time
   each one.
 - **Retrying a service that is down is wasteful.** For a failure that
   lasts minutes rather than seconds, stack
-  [`circuit_breaker()`](https://dyfanjones.github.io/garnish/articles/circuitbreaker.md)
+  [`circuit_breaker()`](https://dyfanjones.github.io/fnware/articles/circuitbreaker.md)
   outside
-  [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
-  so callers fail fast once the service is clearly down.
+  [`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) so
+  callers fail fast once the service is clearly down.

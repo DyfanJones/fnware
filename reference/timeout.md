@@ -1,8 +1,8 @@
 # Bound how long a call can run
 
 Decorator that stops a single call after `seconds` and signals a
-`garnish_timeout_error`. Unlike
-[`stop_after_delay()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md),
+`fnware_timeout_error`. Unlike
+[`stop_after_delay()`](https://dyfanjones.github.io/fnware/reference/stop_conditions.md),
 which only checks between attempts, it bounds the call itself.
 
 ## Usage
@@ -29,7 +29,7 @@ timeout_remaining()
 - method:
 
   How to enforce the limit: a timeout method such as `timeout_r()`. See
-  [`timeout_fn()`](https://dyfanjones.github.io/garnish/reference/extending_timeout.md)
+  [`timeout_fn()`](https://dyfanjones.github.io/fnware/reference/extending_timeout.md)
   to write your own.
 
 ## Value
@@ -40,14 +40,14 @@ timeout_remaining()
 ## Details
 
 The condition inherits from `error`, so
-[`retry_if_error()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md)
+[`retry_if_error()`](https://dyfanjones.github.io/fnware/reference/retry_conditions.md)
 retries it and
-[`circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md)
+[`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md)
 counts it as a failure. It records the limit in `$limit` and the
 function name in `$fn`. Stack `timeout()` inside
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) so
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) so
 each attempt is capped. Outside
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) the
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) the
 limit is already spent when the error is caught, so later attempts run
 unbounded.
 
@@ -57,10 +57,10 @@ the seconds left before that deadline, or `Inf` outside any `timeout()`,
 so you can pass the budget to a library with its own timeout. It does
 not see deadlines in other R processes unless a method passes one on,
 see
-[`timeout_fn()`](https://dyfanjones.github.io/garnish/reference/extending_timeout.md).
+[`timeout_fn()`](https://dyfanjones.github.io/fnware/reference/extending_timeout.md).
 
 For functions that return a promise, use
-[`async_timeout()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md).
+[`async_timeout()`](https://dyfanjones.github.io/fnware/reference/async_timeout.md).
 
 ## Limitations
 
@@ -78,7 +78,7 @@ time limit error.
 
 `method` decides how the limit is enforced. `timeout_r()` is the only
 built-in method. To write your own, see
-[`timeout_fn()`](https://dyfanjones.github.io/garnish/reference/extending_timeout.md).
+[`timeout_fn()`](https://dyfanjones.github.io/fnware/reference/extending_timeout.md).
 
 ## Examples
 

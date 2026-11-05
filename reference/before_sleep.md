@@ -1,4 +1,4 @@
-# Run a hook before [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) sleeps
+# Run a hook before [`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) sleeps
 
 - `before_sleep_none()` does nothing.
 
@@ -23,12 +23,12 @@ before_sleep_log(logger = message)
 ## Value
 
 A hook to pass to
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md).
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md).
 
 ## Examples
 
 ``` r
 before_sleep_log(function(msg) cat(msg, "\n"))
-#> <garnish::before_sleep_log>
+#> <fnware::before_sleep_log>
 #>  @ logger: function (msg)  
 ```

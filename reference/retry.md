@@ -1,7 +1,7 @@
 # Retry a function when it fails
 
 Decorator that calls a function again until it succeeds or a [stop
-condition](https://dyfanjones.github.io/garnish/reference/stop_conditions.md)
+condition](https://dyfanjones.github.io/fnware/reference/stop_conditions.md)
 condition is met, sleeping between attempts. Port of Python's tenacity.
 
 ## Usage
@@ -29,27 +29,27 @@ retry(
 - stop:
 
   A stop condition, e.g.
-  [`stop_after_attempt()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md).
+  [`stop_after_attempt()`](https://dyfanjones.github.io/fnware/reference/stop_conditions.md).
   Defaults to never stopping.
 
 - wait:
 
   A [wait
-  strategy](https://dyfanjones.github.io/garnish/reference/wait_strategies.md).
+  strategy](https://dyfanjones.github.io/fnware/reference/wait_strategies.md).
   Defaults to no waiting.
 
 - retry:
 
   A [retry
-  condition](https://dyfanjones.github.io/garnish/reference/retry_conditions.md).
+  condition](https://dyfanjones.github.io/fnware/reference/retry_conditions.md).
   Defaults to retrying every error.
 
 - before_sleep, after_sleep:
 
   Hooks run before and after each sleep, see
-  [`before_sleep_log()`](https://dyfanjones.github.io/garnish/reference/before_sleep.md)
+  [`before_sleep_log()`](https://dyfanjones.github.io/fnware/reference/before_sleep.md)
   and
-  [`after_sleep_log()`](https://dyfanjones.github.io/garnish/reference/after_sleep.md).
+  [`after_sleep_log()`](https://dyfanjones.github.io/fnware/reference/after_sleep.md).
 
 - reraise:
 

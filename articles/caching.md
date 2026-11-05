@@ -2,24 +2,24 @@
 
 ``` r
 
-library(garnish)
+library(fnware)
 ```
 
 A cache remembers what a function returned for a given set of arguments,
-so the second call is a lookup instead of the work. garnish has three
+so the second call is a lookup instead of the work. fnware has three
 caching decorators, and the difference between them is what happens to
 old entries:
 
 | Decorator | Keeps results | When full |
 |----|----|----|
-| [`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md) | in memory | drops the least recently used entry |
+| [`lru_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md) | in memory | drops the least recently used entry |
 | `cache` | in memory | never drops anything |
-| [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md) | in files, so they outlive the session | drops the least recently used file |
+| [`disk_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md) | in files, so they outlive the session | drops the least recently used file |
 
-[`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+[`lru_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md)
 and `cache` are ports of Python’s `functools.lru_cache` and
 `functools.cache`.
-[`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+[`disk_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md)
 is closer to `joblib.Memory.cache`.
 
 The examples use a function that reports when it actually does the work:
@@ -82,7 +82,7 @@ square(4)
     ## [1] 16
 
 Use
-[`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+[`lru_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md)
 when the number of distinct inputs is unbounded and memory matters. Use
 `cache` when you know it is small.
 
@@ -176,7 +176,7 @@ attempts
 ### Limiting size
 
 For
-[`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md),
+[`lru_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md),
 `maxsize` is a size in **bytes** (default 1 GiB), not a number of
 entries as in Python. When the cache is over that, the entry used least
 recently goes first.
@@ -213,14 +213,14 @@ invisible(g(2)) # recomputed
 
 ## On disk
 
-[`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+[`disk_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md)
 stores each result as a file in `dir`. Close R, start again, and the
 results are still there. There is no default for `dir`: a temporary
 directory would disappear with the session and defeat the point.
 
 ``` r
 
-dir <- tempfile("garnish-cache")
+dir <- tempfile("fnware-cache")
 square := disk_cache(dir) %@% slow_square
 square(7)
 ```
@@ -285,7 +285,7 @@ to read back on one machine, so measure your own data.
 
 ``` r
 
-fast := disk_cache(tempfile("garnish-cache"), format = "qs2") %@% slow_square
+fast := disk_cache(tempfile("fnware-cache"), format = "qs2") %@% slow_square
 fast(3)
 ```
 
@@ -305,9 +305,9 @@ The two formats do not share files. Changing `format` for an existing
 
 ## With promises
 
-[`async_lru_cache()`](https://dyfanjones.github.io/garnish/reference/async_lru_cache.md),
+[`async_lru_cache()`](https://dyfanjones.github.io/fnware/reference/async_lru_cache.md),
 `async_cache` and
-[`async_disk_cache()`](https://dyfanjones.github.io/garnish/reference/async_lru_cache.md)
+[`async_disk_cache()`](https://dyfanjones.github.io/fnware/reference/async_lru_cache.md)
 are the versions for functions that return a promise. They take the same
 arguments and always return a promise. Three things differ:
 
@@ -316,9 +316,9 @@ arguments and always return a promise. Three things differ:
 - Identical calls made while one is still running share its promise, so
   a burst of the same request makes one call.
 - Because only values are stored,
-  [`async_disk_cache()`](https://dyfanjones.github.io/garnish/reference/async_lru_cache.md)
+  [`async_disk_cache()`](https://dyfanjones.github.io/fnware/reference/async_lru_cache.md)
   works, and it reads and writes the same files as
-  [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md).
+  [`disk_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md).
 
 ``` r
 
@@ -361,14 +361,14 @@ the function has no effects you need to happen every time.
   hashing a huge data frame can cost more than the function it saves.
 - **Objects that do not serialise.** Environments, external pointers and
   R6 objects do not round-trip through
-  [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md).
+  [`disk_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md).
 
 ## Choosing
 
 - Same session, small set of inputs: `cache`.
 - Same session, many inputs, memory matters:
-  [`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md).
+  [`lru_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md).
 - You want results to survive a restart, or share between sessions:
-  [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md).
+  [`disk_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md).
 - The function returns a promise: the `async_` version of whichever of
   these fits.

@@ -1,6 +1,6 @@
 # Write your own stop, wait, retry and hook strategies
 
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) is
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) is
 built from five kinds of strategy. Each has an abstract base class and a
 generic function, both exported, so you can add your own the same way
 the built-in ones are written with S7:
@@ -53,7 +53,7 @@ nothing useful.
 
 |  |  |  |  |
 |----|----|----|----|
-| [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md) argument | Base class | Generic | The method returns |
+| [`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) argument | Base class | Generic | The method returns |
 | `stop` | `stop_base` | `stop_fn(class, state)` | `TRUE` to give up |
 | `wait` | `wait_base` | `wait_fn(class, attempt, prev_wait)` | seconds to sleep |
 | `retry` | `retry_base` | `retry_fn(class, outcome)` | `TRUE` to try again |
@@ -73,11 +73,11 @@ and `method<-`.
 
 Strategies of the same kind compose with the built-in ones. A new wait
 works in
-[`wait_chain()`](https://dyfanjones.github.io/garnish/reference/wait_strategies.md)
+[`wait_chain()`](https://dyfanjones.github.io/fnware/reference/wait_strategies.md)
 and with `+`, and a new stop works in
-[`stop_any()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md)
+[`stop_any()`](https://dyfanjones.github.io/fnware/reference/stop_conditions.md)
 and
-[`stop_all()`](https://dyfanjones.github.io/garnish/reference/stop_conditions.md).
+[`stop_all()`](https://dyfanjones.github.io/fnware/reference/stop_conditions.md).
 
 If you register methods from another package, call
 [`S7::methods_register()`](https://rconsortium.github.io/S7/reference/S7_on_load.html)
@@ -88,10 +88,10 @@ in its `.onLoad()`.
 - `state`, for `stop_fn()`, `before_sleep_fn()` and `after_sleep_fn()`,
   is a list describing the attempt that just failed: `attempt`
   (1-based), `wait` (seconds
-  [`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
-  is about to sleep), `elapsed` (seconds since the first attempt),
-  `error` (the condition caught, or `NULL` if
-  [`retry_if_result()`](https://dyfanjones.github.io/garnish/reference/retry_conditions.md)
+  [`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md) is
+  about to sleep), `elapsed` (seconds since the first attempt), `error`
+  (the condition caught, or `NULL` if
+  [`retry_if_result()`](https://dyfanjones.github.io/fnware/reference/retry_conditions.md)
   rejected a returned value) and `value` (the value returned, or `NULL`
   if the call errored).
 

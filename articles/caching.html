@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Caching results • garnish</title>
+<title>Caching results • fnware</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -18,7 +18,7 @@
 
     <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
-    <a class="navbar-brand me-2" href="../index.html">garnish</a>
+    <a class="navbar-brand me-2" href="../index.html">fnware</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
@@ -45,7 +45,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/DyfanJones/garnish/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/DyfanJones/fnware/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
@@ -70,16 +70,16 @@
       <h1>Caching results</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/DyfanJones/garnish/blob/main/vignettes/caching.Rmd" class="external-link"><code>vignettes/caching.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/DyfanJones/fnware/blob/main/vignettes/caching.Rmd" class="external-link"><code>vignettes/caching.Rmd</code></a></small>
       <div class="d-none name"><code>caching.Rmd</code></div>
     </div>
 
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dyfanjones.github.io/garnish/">garnish</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dyfanjones.github.io/fnware/">fnware</a></span><span class="op">)</span></span></code></pre></div>
 <p>A cache remembers what a function returned for a given set of
-arguments, so the second call is a lookup instead of the work. garnish
+arguments, so the second call is a lookup instead of the work. fnware
 has three caching decorators, and the difference between them is what
 happens to old entries:</p>
 <table class="table">
@@ -240,7 +240,7 @@ first.</p>
 There is no default for <code>dir</code>: a temporary directory would
 disappear with the session and defeat the point.</p>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"garnish-cache"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"fnware-cache"</span><span class="op">)</span></span>
 <span><span class="va">square</span> <span class="op">:=</span> <span class="fu"><a href="../reference/lru_cache.html">disk_cache</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_square</span></span>
 <span><span class="fu">square</span><span class="op">(</span><span class="fl">7</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   computing 7</span></span></code></pre>
@@ -283,7 +283,7 @@ frame of one million rows, qs2 was about seven times faster to write and
 three and a half times faster to read back on one machine, so measure
 your own data.</p>
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fast</span> <span class="op">:=</span> <span class="fu"><a href="../reference/lru_cache.html">disk_cache</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"garnish-cache"</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"qs2"</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_square</span></span>
+<code class="sourceCode R"><span><span class="va">fast</span> <span class="op">:=</span> <span class="fu"><a href="../reference/lru_cache.html">disk_cache</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"fnware-cache"</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"qs2"</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="va">slow_square</span></span>
 <span><span class="fu">fast</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   computing 3</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 9</span></span></code></pre>

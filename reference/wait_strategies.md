@@ -1,7 +1,7 @@
 # Wait strategies
 
 Decide how many seconds
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
 sleeps after a failed attempt.
 
 ## Usage
@@ -55,7 +55,7 @@ wait_combine(...)
 ## Value
 
 A wait strategy to pass to
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md).
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md).
 
 ## Details
 
@@ -83,27 +83,27 @@ A wait strategy to pass to
 
 ``` r
 wait_fixed(2)
-#> <garnish::wait_fixed>
+#> <fnware::wait_fixed>
 #>  @ wait: num 2
 wait_exp(multiplier = 0.5, max = 30)
-#> <garnish::wait_exp>
+#> <fnware::wait_exp>
 #>  @ multiplier: num 0.5
 #>  @ min       : num 0
 #>  @ max       : num 30
 #>  @ exp_base  : num 2
 wait_chain(wait_fixed(1), wait_fixed(5))
-#> <garnish::wait_chain>
-#>  @ waits:List of 2
-#>  .. $ : <garnish::wait_fixed>
+#> <fnware::wait_chain>
+#>  @ waits: List of 2
+#>  .. $ : <fnware::wait_fixed>
 #>  ..  ..@ wait: num 1
-#>  .. $ : <garnish::wait_fixed>
+#>  .. $ : <fnware::wait_fixed>
 #>  ..  ..@ wait: num 5
 wait_fixed(1) + wait_rand(0, 2)
-#> <garnish::wait_combine>
-#>  @ waits:List of 2
-#>  .. $ : <garnish::wait_fixed>
+#> <fnware::wait_combine>
+#>  @ waits: List of 2
+#>  .. $ : <fnware::wait_fixed>
 #>  ..  ..@ wait: num 1
-#>  .. $ : <garnish::wait_rand>
+#>  .. $ : <fnware::wait_rand>
 #>  ..  ..@ min: num 0
 #>  ..  ..@ max: num 2
 ```

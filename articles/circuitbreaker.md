@@ -2,14 +2,14 @@
 
 ``` r
 
-library(garnish)
+library(fnware)
 ```
 
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
 helps when a failure is brief. It does not help when a service is down
 for minutes: every caller keeps waiting on it, retrying it, and adding
 load to something that is already struggling.
-[`circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md)
+[`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md)
 handles that case. After a run of failures it stops calling the function
 and fails immediately, then tries again after a cooldown. It is a port
 of Python’s [pybreaker](https://github.com/danielfm/pybreaker).
@@ -156,7 +156,7 @@ guarded() # still closed: the errors were never consecutive
 
 ## Handling an open circuit
 
-A rejected call signals an error of class `garnish_circuit_open`. Catch
+A rejected call signals an error of class `fnware_circuit_open`. Catch
 it separately from the function’s own errors to fall back to something
 else, such as a cached value, instead of failing:
 
@@ -169,7 +169,7 @@ try(guarded(), silent = TRUE) # opens the circuit
 fetch_or_default <- function() {
   tryCatch(
     guarded(),
-    garnish_circuit_open = function(cnd) "default value"
+    fnware_circuit_open = function(cnd) "default value"
   )
 }
 fetch_or_default()
@@ -184,15 +184,15 @@ tell “the service failed” apart from “we did not try”.
 
 The two decorators answer different questions, and they work well
 together.
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md)
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
 covers a brief failure.
-[`circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md)
+[`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md)
 covers a long one.
 
 Put
-[`circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md)
+[`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md)
 **outside**
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md):
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md):
 
 ``` r
 
@@ -213,22 +213,22 @@ Retries would trip it quickly, and an open circuit would then be retried
 against, which defeats the point.
 
 If you also use
-[`rate_limit()`](https://dyfanjones.github.io/garnish/reference/rate_limit.md),
+[`rate_limit()`](https://dyfanjones.github.io/fnware/reference/rate_limit.md),
 it goes inside
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md), so
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md), so
 the order from outside to inside is
-[`circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/circuit_breaker.md),
-[`retry()`](https://dyfanjones.github.io/garnish/reference/retry.md),
-[`rate_limit()`](https://dyfanjones.github.io/garnish/reference/rate_limit.md).
+[`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md),
+[`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md),
+[`rate_limit()`](https://dyfanjones.github.io/fnware/reference/rate_limit.md).
 
 ## With promises
 
-[`async_circuit_breaker()`](https://dyfanjones.github.io/garnish/reference/async_circuit_breaker.md)
+[`async_circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/async_circuit_breaker.md)
 is the version for functions that return a promise, such as
 [`httr2::req_perform_promise()`](https://httr2.r-lib.org/reference/req_perform_promise.html)
 or a `mirai` task. It takes the same arguments and keeps the same three
 states, and a call fails when its promise rejects. An open circuit
-returns a promise that is already rejected with a `garnish_circuit_open`
+returns a promise that is already rejected with a `fnware_circuit_open`
 error, without calling the function.
 
 ``` r
@@ -261,7 +261,7 @@ try_once()
 try_once() # the circuit is open: down() is not called
 ```
 
-    ## garnish_circuit_open
+    ## fnware_circuit_open
 
 Asynchronous calls overlap, which adds a few rules. A failure is counted
 when its promise rejects, so calls made before earlier ones have settled
@@ -270,13 +270,13 @@ and other calls are refused until it settles. A call that started before
 the circuit opened and finishes after it does not close the circuit. A
 trial that never settles is abandoned after `reset_after` seconds, so
 put
-[`async_timeout()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md)
+[`async_timeout()`](https://dyfanjones.github.io/fnware/reference/async_timeout.md)
 inside to bound it sooner.
 
 Stack it outside
-[`async_retry()`](https://dyfanjones.github.io/garnish/reference/async_retry.md)
+[`async_retry()`](https://dyfanjones.github.io/fnware/reference/async_retry.md)
 in the same way as above, and see the retry vignette for
-[`async_timeout()`](https://dyfanjones.github.io/garnish/reference/async_timeout.md).
+[`async_timeout()`](https://dyfanjones.github.io/fnware/reference/async_timeout.md).
 
 ## Notes
 

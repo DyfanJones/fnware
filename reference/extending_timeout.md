@@ -1,8 +1,8 @@
 # Write your own timeout method
 
-[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+[`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
 hands the work of enforcing a limit to a *method*.
-[`timeout_r()`](https://dyfanjones.github.io/garnish/reference/timeout.md),
+[`timeout_r()`](https://dyfanjones.github.io/fnware/reference/timeout.md),
 which uses [`setTimeLimit()`](https://rdrr.io/r/base/setTimeLimit.html),
 is the built-in. To add another, for example one that runs the call in a
 separate process and kills it, make an S7 class that inherits from
@@ -46,16 +46,16 @@ timeout_fn(class, call, seconds, ...)
 arguments that runs the decorated function, and `seconds`, the time left
 before the effective deadline. It must return the value of
 [`call()`](https://rdrr.io/r/base/call.html) unchanged, or signal a
-`garnish_timeout_error` when `seconds` run out.
-[`timeout()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+`fnware_timeout_error` when `seconds` run out.
+[`timeout()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
 adds the function name and limit to the message, and signals a
-`garnish_timeout_method_error` if
+`fnware_timeout_method_error` if
 [`call()`](https://rdrr.io/r/base/call.html) ran but the method returned
 something else or swallowed its error. Other errors should propagate.
 
 A method that runs [`call()`](https://rdrr.io/r/base/call.html) in
 another process cannot be checked for this, and
-[`timeout_remaining()`](https://dyfanjones.github.io/garnish/reference/timeout.md)
+[`timeout_remaining()`](https://dyfanjones.github.io/fnware/reference/timeout.md)
 does not see the parent's deadline there. Set the environment variable
 `GARNISH_TIMEOUT_DEADLINE` in the child to
 `as.numeric(Sys.time()) + seconds` to pass it on. The retry vignette

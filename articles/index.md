@@ -3,12 +3,12 @@
 ### Guides
 
 - [Retrying failing
-  calls](https://dyfanjones.github.io/garnish/articles/retry.md):
+  calls](https://dyfanjones.github.io/fnware/articles/retry.md):
 - [Failing fast with a circuit
-  breaker](https://dyfanjones.github.io/garnish/articles/circuitbreaker.md):
+  breaker](https://dyfanjones.github.io/fnware/articles/circuitbreaker.md):
 - [Caching
-  results](https://dyfanjones.github.io/garnish/articles/caching.md):
+  results](https://dyfanjones.github.io/fnware/articles/caching.md):
 - [Context
-  managers](https://dyfanjones.github.io/garnish/articles/contextmanager.md):
+  managers](https://dyfanjones.github.io/fnware/articles/contextmanager.md):
 - [Validating arguments and
-  results](https://dyfanjones.github.io/garnish/articles/validation.md):
+  results](https://dyfanjones.github.io/fnware/articles/validation.md):

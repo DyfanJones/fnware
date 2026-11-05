@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Python-Style Decorators for R • garnish</title>
+<title>Ready-Made Function Decorators • fnware</title>
 <script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Python-Style Decorators for R">
-<meta name="description" content="Popular Python decorators ported to R with the adorn framework: retrying, caching, context managers and argument validation.">
-<meta property="og:description" content="Popular Python decorators ported to R with the adorn framework: retrying, caching, context managers and argument validation.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Ready-Made Function Decorators">
+<meta name="description" content="Ready-made function decorators for R, built on the adorn framework. Covers resilience (retrying, timeouts, rate limiting, circuit breaking and fallbacks), caching, call logging, context managers and argument validation, with asynchronous versions for functions that return promises.">
+<meta property="og:description" content="Ready-made function decorators for R, built on the adorn framework. Covers resilience (retrying, timeouts, rate limiting, circuit breaking and fallbacks), caching, call logging, context managers and argument validation, with asynchronous versions for functions that return promises.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -20,7 +20,7 @@
 
     <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
-    <a class="navbar-brand me-2" href="index.html">garnish</a>
+    <a class="navbar-brand me-2" href="index.html">fnware</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
@@ -47,7 +47,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/DyfanJones/garnish/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/DyfanJones/fnware/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
@@ -65,7 +65,7 @@
 <div class="row">
   <main id="main" class="col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="garnish">garnish<a class="anchor" aria-label="anchor" href="#garnish"></a>
+<div class="page-header"><h1 id="fnware">fnware<a class="anchor" aria-label="anchor" href="#fnware"></a>
 </h1></div>
 <p>Popular Python decorators ported to R with the <a href="https://dyfanjones.github.io/adorn/" class="external-link">adorn</a> framework.</p>
 <table class="table">
@@ -153,6 +153,28 @@
 <a href="https://pypi.org/project/ratelimit/" class="external-link"><code>ratelimit</code></a> (async)</td>
 </tr>
 <tr>
+<td><code><a href="reference/fallback.html">fallback()</a></code></td>
+<td>Returns a default value, or a handler’s result, when a function fails</td>
+<td>
+<a href="https://github.com/jd/tenacity" class="external-link">tenacity</a> <code>retry_error_callback</code>
+</td>
+</tr>
+<tr>
+<td><code><a href="reference/async_fallback.html">async_fallback()</a></code></td>
+<td>Like <code><a href="reference/fallback.html">fallback()</a></code>, for functions that return a promise</td>
+<td></td>
+</tr>
+<tr>
+<td><code><a href="reference/once.html">once()</a></code></td>
+<td>Runs a function the first time and reuses the result</td>
+<td></td>
+</tr>
+<tr>
+<td><code><a href="reference/log_call.html">log_call()</a></code></td>
+<td>Logs when a call starts, finishes or fails, with its arguments. Writes with <code><a href="https://rdrr.io/r/base/message.html" class="external-link">message()</a></code> or any logging package via a <code><a href="reference/loggers.html">logger_fn()</a></code> method</td>
+<td></td>
+</tr>
+<tr>
 <td><code>contextmanager</code></td>
 <td>Writes setup and teardown once, as <code>local_</code>, <code>with_</code> and decorator forms</td>
 <td><a href="https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager" class="external-link"><code>contextlib.contextmanager</code></a></td>
@@ -164,7 +186,7 @@
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"DyfanJones/garnish"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"DyfanJones/fnware"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -174,7 +196,7 @@
 <h3 id="retry">Retry<a class="anchor" aria-label="anchor" href="#retry"></a>
 </h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dyfanjones.github.io/garnish/">garnish</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dyfanjones.github.io/fnware/">fnware</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span><span class="va">flaky</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
@@ -304,7 +326,7 @@
 <div class="section level3">
 <h3 id="validation">Validation<a class="anchor" aria-label="anchor" href="#validation"></a>
 </h3>
-<p><code><a href="reference/validate_args.html">validate_args()</a></code> takes one validator per argument and <code><a href="reference/validate_args.html">validate_return()</a></code> takes one for the result. A validator is any function (or formula) that returns <code>TRUE</code> to pass. Returning a string fails with that string as the message, which is how checkmate’s <code>check_*()</code> functions behave, so they work without garnish depending on them:</p>
+<p><code><a href="reference/validate_args.html">validate_args()</a></code> takes one validator per argument and <code><a href="reference/validate_args.html">validate_return()</a></code> takes one for the result. A validator is any function (or formula) that returns <code>TRUE</code> to pass. Returning a string fails with that string as the message, which is how checkmate’s <code>check_*()</code> functions behave, so they work without fnware depending on them:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scale_by</span> <span class="op">:=</span> <span class="fu"><a href="reference/validate_args.html">validate_args</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">is.numeric</span>, n <span class="op">=</span> <span class="op">~</span> <span class="va">.x</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">n</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">x</span> <span class="op">*</span> <span class="va">n</span></span>
@@ -317,7 +339,7 @@
 <span><span class="co">#&gt; Error: Invalid arguments.</span></span>
 <span><span class="co">#&gt; ✖ `x`: failed validation.</span></span>
 <span><span class="co">#&gt; ✖ `n`: failed validation.</span></span></code></pre></div>
-<p>All failures are reported together as a <code>garnish_validation_error</code>. Defaults are validated too.</p>
+<p>All failures are reported together as a <code>fnware_validation_error</code>. Defaults are validated too.</p>
 </div>
 </div>
 <div class="section level2">
@@ -330,8 +352,8 @@
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/DyfanJones/garnish/" class="external-link">Browse source code</a></li>
-<li><a href="https://github.com/DyfanJones/garnish/issues" class="external-link">Report a bug</a></li>
+<li><a href="https://github.com/DyfanJones/fnware/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/DyfanJones/fnware/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
@@ -348,7 +370,7 @@
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html#citation">Citing garnish</a></li>
+<li><a href="authors.html#citation">Citing fnware</a></li>
 </ul>
 </div>
 
@@ -362,9 +384,9 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/DyfanJones/garnish/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/DyfanJones/garnish/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://app.codecov.io/gh/DyfanJones/garnish" class="external-link"><img src="https://codecov.io/gh/DyfanJones/garnish/graph/badge.svg" alt="Codecov test coverage"></a></li>
-<li><a href="https://DyfanJones.r-universe.dev/garnish" class="external-link"><img src="https://DyfanJones.r-universe.dev/garnish/badges/version" alt="R-universe version"></a></li>
+<li><a href="https://github.com/DyfanJones/fnware/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/DyfanJones/fnware/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://app.codecov.io/gh/DyfanJones/fnware" class="external-link"><img src="https://codecov.io/gh/DyfanJones/fnware/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://DyfanJones.r-universe.dev/fnware" class="external-link"><img src="https://DyfanJones.r-universe.dev/fnware/badges/version" alt="R-universe version"></a></li>
 </ul>
 </div>
 

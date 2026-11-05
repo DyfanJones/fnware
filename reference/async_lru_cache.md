@@ -1,10 +1,10 @@
 # Cache the results of asynchronous functions
 
 Asynchronous versions of
-[`lru_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md),
-[`cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+[`lru_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md),
+[`cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md)
 and
-[`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md),
+[`disk_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md),
 for functions that return a
 [promise](https://rstudio.github.io/promises/reference/promise.html).
 They take the same arguments and keys, and the decorated function always
@@ -37,20 +37,20 @@ async_disk_cache(f, dir, maxsize = 1024 * 1024^2, TTL = Inf, format = c("rds", "
   Time to live in seconds. Entries older than this are treated as
   missing and recomputed on the next call. Defaults to `Inf`, so entries
   never expire. Not available for
-  [`cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md),
+  [`cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md),
   which never evicts.
 
 - dir:
 
   Directory for
-  [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+  [`disk_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md)
   to keep its files in. It is created if needed. There is no default, so
   persistence is always a choice.
 
 - format:
 
   File format for
-  [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md):
+  [`disk_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md):
   `"rds"` (the default) or `"qs2"`, which needs the qs2 package.
 
 ## Value
@@ -67,7 +67,7 @@ A decorator. The decorated function returns a promise.
 
 - Because only values are stored, `async_disk_cache()` works, and it
   shares files with
-  [`disk_cache()`](https://dyfanjones.github.io/garnish/reference/lru_cache.md)
+  [`disk_cache()`](https://dyfanjones.github.io/fnware/reference/lru_cache.md)
   for the same function.
 
 Needs the promises package and an event loop.
