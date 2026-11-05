@@ -50,7 +50,10 @@ test_that("logs a failure and signals it again", {
   expect_error(f(), "boom")
   out <- cap$get()
   expect_equal(out[[2]]$level, "ERROR")
-  expect_match(out[[2]]$msg, "^Failed f\\(\\) Elapsed=\\S+ \nError in `f\\(\\)`: boom$")
+  expect_match(
+    out[[2]]$msg,
+    "^Failed f\\(\\) Elapsed=\\S+ \nError in `f\\(\\)`:\nboom$"
+  )
 })
 
 test_that("each event has its own level", {
@@ -154,7 +157,10 @@ test_that("trace = TRUE adds the calls from f to the failure", {
   expect_match(msg, "Trace:\n", fixed = TRUE)
   expect_match(msg, "inner(1)", fixed = TRUE)
   expect_match(msg, "1. f()", fixed = TRUE)
-  expect_no_match(msg, "handleSimpleError|log_event|<environment>|f\\(\\.\\.\\.\\)")
+  expect_no_match(
+    msg,
+    "handleSimpleError|log_event|<environment>|f\\(\\.\\.\\.\\)"
+  )
 })
 
 test_that("the trace is left out by default", {
@@ -175,5 +181,9 @@ test_that("a failure names the call that failed", {
   cap <- capture_logger()
   f <- log_call(logger = cap$logger) %@% function(a) a + "x"
   expect_error(f(1))
-  expect_match(cap$get()[[2]]$msg, "Error in `a + \"x\"`: ", fixed = TRUE)
+  expect_match(
+    cap$get()[[2]]$msg,
+    "Error in `a + \"x\"`:\nnon-numeric",
+    fixed = TRUE
+  )
 })
