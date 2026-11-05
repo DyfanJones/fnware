@@ -22,7 +22,7 @@ test_that("logs the start and the finish", {
   expect_length(out, 2L)
   expect_equal(out[[1]]$level, "INFO")
   expect_equal(out[[1]]$msg, "Started f(a=1,b=2)")
-  expect_equal(out[[2]]$level, "DEBUG")
+  expect_equal(out[[2]]$level, "INFO")
   expect_match(
     out[[2]]$msg,
     "^Finished f\\(a=1,b=2\\) Elapsed=\\d{2}:\\d{2}:[0-9.]+$"
@@ -50,7 +50,7 @@ test_that("logs a failure and signals it again", {
   expect_error(f(), "boom")
   out <- cap$get()
   expect_equal(out[[2]]$level, "ERROR")
-  expect_match(out[[2]]$msg, "^Failed f\\(\\) Elapsed=.* Error=boom$")
+  expect_match(out[[2]]$msg, "^Failed f\\(\\) Elapsed=\\S+ \nError in `f\\(\\)`: boom$")
 })
 
 test_that("each event has its own level", {
@@ -76,7 +76,11 @@ test_that("a logger's level labels are used", {
   S7::method(logger_fn, logger_num) <- function(class, level, msg, ...) {
     seen <<- c(seen, level)
   }
-  f <- log_call(logger = logger_num()) %@% function() 1
+  f <- log_call(
+    logger = logger_num(),
+    level = log_levels(finish = "debug")
+  ) %@%
+    function() 1
   f()
   expect_equal(seen, c(20L, 10L))
 })
@@ -110,7 +114,7 @@ test_that("logger_message uses message()", {
   f <- log_call(logger = logger_message()) %@% function() 1
   msgs <- testthat::capture_messages(f())
   expect_match(msgs[[1]], "^\\[INFO\\] Started f\\(\\)")
-  expect_match(msgs[[2]], "^\\[DEBUG\\] Finished f\\(\\)")
+  expect_match(msgs[[2]], "^\\[INFO\\] Finished f\\(\\)")
 })
 
 test_that("a method for the logger package is enough to use it", {
@@ -139,4 +143,37 @@ test_that("checks its arguments", {
   expect_error(log_call(logger = "x")(identity), "`logger` must be a logger")
   expect_error(log_call(level = "loud")(identity), "`level` must be")
   expect_error(log_levels(start = "loud"), "must be one of")
+})
+
+test_that("trace = TRUE adds the calls from f to the failure", {
+  cap <- capture_logger()
+  inner <- function(x) stop("boom")
+  f <- log_call(logger = cap$logger, trace = TRUE) %@% function() inner(1)
+  expect_error(f(), "boom")
+  msg <- cap$get()[[2]]$msg
+  expect_match(msg, "Trace:\n", fixed = TRUE)
+  expect_match(msg, "inner(1)", fixed = TRUE)
+  expect_match(msg, "1. f()", fixed = TRUE)
+  expect_no_match(msg, "handleSimpleError|log_event|<environment>|f\\(\\.\\.\\.\\)")
+})
+
+test_that("the trace is left out by default", {
+  cap <- capture_logger()
+  f <- log_call(logger = cap$logger) %@% function() stop("boom")
+  expect_error(f(), "boom")
+  expect_no_match(cap$get()[[2]]$msg, "Trace:")
+})
+
+test_that("a failure without a call is logged as the bare message", {
+  cap <- capture_logger()
+  f <- log_call(logger = cap$logger) %@% function() stop("boom", call. = FALSE)
+  expect_error(f(), "boom")
+  expect_match(cap$get()[[2]]$msg, " \nboom$")
+})
+
+test_that("a failure names the call that failed", {
+  cap <- capture_logger()
+  f <- log_call(logger = cap$logger) %@% function(a) a + "x"
+  expect_error(f(1))
+  expect_match(cap$get()[[2]]$msg, "Error in `a + \"x\"`: ", fixed = TRUE)
 })

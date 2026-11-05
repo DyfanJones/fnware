@@ -10,6 +10,8 @@ articles:
     contents:
       - retry
       - circuitbreaker
+      - fallback
+      - logging
       - caching
       - contextmanager
       - validation

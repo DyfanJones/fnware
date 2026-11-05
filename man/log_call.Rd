@@ -4,7 +4,13 @@
 \alias{log_call}
 \title{Log the calls to a function}
 \usage{
-log_call(f, logger = logger_base(), level = log_levels(), elapsed = TRUE)
+log_call(
+  f,
+  logger = logger_base(),
+  level = log_levels(),
+  elapsed = TRUE,
+  trace = FALSE
+)
 }
 \arguments{
 \item{f}{The function to decorate. Usually supplied by \verb{\%@\%} rather than directly.}
@@ -16,6 +22,9 @@ log_call(f, logger = logger_base(), level = log_levels(), elapsed = TRUE)
 events.}
 
 \item{elapsed}{Include the time taken in the finish and error messages?}
+
+\item{trace}{Include the calls leading to an error in the error message?
+Only the calls from \code{f} down to the failure are shown.}
 }
 \value{
 A decorator.

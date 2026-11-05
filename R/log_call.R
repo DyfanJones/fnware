@@ -18,6 +18,8 @@ NULL
 #' @param level A [log_levels()] giving the level of the start, finish and error
 #'   events.
 #' @param elapsed Include the time taken in the finish and error messages?
+#' @param trace Include the calls leading to an error in the error message?
+#'   Only the calls from `f` down to the failure are shown.
 #' @return A decorator.
 #' @examples
 #' fn := log_call(logger = logger_message()) %@% function(a, b, c) a + b + c
@@ -35,31 +37,35 @@ log_call := decorator(
     f,
     logger = logger_base(),
     level = log_levels(),
-    elapsed = TRUE
+    elapsed = TRUE,
+    trace = FALSE
   ) {
     check_s7(logger, logger_base, "a logger")
     check_s7(level, log_levels, "a `log_levels()`")
     function(...) {
       fn <- decorator_context()$name
       args <- match_args(f, list(...))
+      wrapper <- sys.nframe()
       start <- proc.time()[["elapsed"]]
       log_event(logger, level@start, "Started", fn, args)
-      outcome <- tryCatch(
-        list(res = withVisible(f(...)), error = NULL),
-        error = function(err) list(res = NULL, error = err)
-      )
-      if (!is.null(outcome$error)) {
-        log_event(
-          logger,
-          level@error,
-          "Failed",
-          fn,
-          args,
-          start = if (elapsed) start,
-          error = outcome$error
+      res <- withVisible(
+        withCallingHandlers(
+          f(...),
+          error = function(err) {
+            handler <- sys.nframe()
+            log_event(
+              logger,
+              level@error,
+              "Failed",
+              fn,
+              args,
+              start = if (elapsed) start,
+              error = err,
+              trace = if (trace) trace_calls(fn, wrapper, handler)
+            )
+          }
         )
-        stop(outcome$error)
-      }
+      )
       log_event(
         logger,
         level@finish,
@@ -68,11 +74,7 @@ log_call := decorator(
         args,
         start = if (elapsed) start
       )
-      if (outcome$res$visible) {
-        outcome$res$value
-      } else {
-        invisible(outcome$res$value)
-      }
+      if (res$visible) res$value else invisible(res$value)
     }
   }
 )
@@ -86,7 +88,8 @@ log_event <- function(
   fn,
   args,
   start = NULL,
-  error = NULL
+  error = NULL,
+  trace = NULL
 ) {
   parts <- c(stage, fn_args(fn, args))
   if (!is.null(start)) {
@@ -96,9 +99,60 @@ log_event <- function(
     )
   }
   if (!is.null(error)) {
-    parts <- c(parts, sprintf("Error=%s", conditionMessage(error)))
+    parts <- c(parts, sprintf("\n%s", fmt_error(error, fn)))
+  }
+  if (length(trace)) {
+    parts <- c(parts, paste0("\nTrace:\n", paste(trace, collapse = "\n")))
   }
   logger_fn(logger, prop(logger, level), paste(parts, collapse = " "))
+}
+
+# The calls from `f` down to the failure, one per line. Called from the error
+# handler, `wrapper` and `handler` are the frames of the decorated function and the handler. Frames above `f`
+# belong to the caller, and the trailing handler frames are dropped.
+trace_calls <- function(fn, wrapper, handler) {
+  calls <- sys.calls()
+  end <- handler - 1L
+  if (end > 0L && identical(calls[[end]][[1L]], quote(.handleSimpleError))) {
+    end <- end - 1L
+  }
+  is_f <- vapply(calls, identical, logical(1), quote(f(...)))
+  start <- which(is_f & seq_along(calls) > wrapper)[1L]
+  if (is.na(start) || start > end) {
+    return(character())
+  }
+  # adorn calls the original through `<holder>$fn(...)`, which deparses as
+  # `<environment>$fn(...)`. Show it as `fn(...)` in place of the `f(...)` above it.
+  if (start < end && is_holder_call(calls[[start + 1L]])) {
+    start <- start + 1L
+  }
+  calls <- lapply(calls[start:end], name_holder_call, fn)
+  shown <- vapply(calls, fmt_arg, character(1), width = 80L)
+  sprintf("  %d. %s", seq_along(shown), shown)
+}
+
+# The error message, led by the call that failed as R does: "Error in `a + b`: ".
+fmt_error <- function(error, fn) {
+  msg <- conditionMessage(error)
+  call <- conditionCall(error)
+  if (is.null(call)) {
+    return(msg)
+  }
+  sprintf("Error in `%s`:\n%s", fmt_arg(name_holder_call(call, fn)), msg)
+}
+
+name_holder_call <- function(cl, fn) {
+  if (is_holder_call(cl)) {
+    cl[[1L]] <- as.name(fn)
+  }
+  cl
+}
+
+is_holder_call <- function(cl) {
+  is.call(cl) &&
+    is.call(cl[[1L]]) &&
+    identical(cl[[1L]][[1L]], quote(`$`)) &&
+    is.environment(cl[[1L]][[2L]])
 }
 
 # Name the arguments by the formals they matched, where `f` allows it.

@@ -1,0 +1,86 @@
+---
+title: "Fallbacks and running once"
+output: litedown::html_format
+vignette: >
+  %\VignetteIndexEntry{Fallbacks and running once}
+  %\VignetteEngine{litedown::vignette}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup}
+library(fnware)
+```
+
+## Returning a default
+
+`fallback()` catches a failure and returns a default instead of signalling it.
+
+```{r value}
+safe_sqrt := fallback(value = NA_real_) %@% function(x) {
+  if (x < 0) stop("negative") else sqrt(x)
+}
+safe_sqrt(4)
+safe_sqrt(-1)
+```
+
+To compute the result from the failure, pass a `handler`. It receives the
+condition:
+
+```{r handler}
+describe := fallback(handler = function(cnd) conditionMessage(cnd)) %@%
+  function() stop("boom")
+describe()
+```
+
+Only errors are caught by default. Set `class` to catch other conditions, such
+as `class = "warning"`. A caught condition ends the call, as with `tryCatch()`.
+
+## Stacking with retry and the circuit breaker
+
+Put `fallback()` outermost. The default is then used only once `retry()` has
+given up, or once `circuit_breaker()` has opened:
+
+```{r stack}
+calls <- 0
+fetch := fallback(value = "cached") %@%
+  circuit_breaker(failures = 3) %@%
+  retry(stop = stop_after_attempt(2)) %@%
+  function(url) {
+    calls <<- calls + 1
+    stop("down")
+  }
+
+fetch("x")
+calls
+```
+
+## Promises
+
+`async_fallback()` does the same for functions that return a promise. The
+promise resolves to the default if the function rejects with a matching
+condition, and other rejections carry on unchanged. It needs the promises
+package.
+
+```{r async, eval = FALSE}
+f := async_fallback(value = "default") %@% function() stop("boom")
+promises::then(f(), print)
+```
+
+## Running once
+
+`once()` runs a function on its first successful call and returns that result
+every time after, ignoring later arguments. It suits setup that should happen a
+single time.
+
+```{r once}
+setup := once %@% function() {
+  cat("setting up\n")
+  42
+}
+setup()
+setup()
+```
+
+An error stores nothing, so the next call tries again. Unlike `cache()`, which
+keeps a result per set of arguments, `once()` keeps one result whatever the
+arguments.
