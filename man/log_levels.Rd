@@ -4,7 +4,7 @@
 \alias{log_levels}
 \title{The level of each event \code{\link[=log_call]{log_call()}} logs}
 \usage{
-log_levels(start = "info", finish = "debug", error = "error")
+log_levels(start = "info", finish = "info", error = "error")
 }
 \arguments{
 \item{start, finish, error}{The level of the event: one of \code{"trace"},

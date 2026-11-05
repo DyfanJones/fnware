@@ -12,7 +12,7 @@ log_call(f, logger = logger_base(), level = log_levels(), elapsed = TRUE)
 \item{logger}{A \link[=logger_base]{logger}, such as \code{\link[=logger_message]{logger_message()}}. See
 \link{extending_log} to use a logging package.}
 
-\item{level}{A \code{\link[logger:log_levels]{log_levels()}} giving the level of the start, finish and error
+\item{level}{A \code{\link[=log_levels]{log_levels()}} giving the level of the start, finish and error
 events.}
 
 \item{elapsed}{Include the time taken in the finish and error messages?}

@@ -79,7 +79,15 @@ log_call := decorator(
 
 # Build the message for an event and hand it to the logger, with the level
 # translated to the logger's own label.
-log_event <- function(logger, level, stage, fn, args, start = NULL, error = NULL) {
+log_event <- function(
+  logger,
+  level,
+  stage,
+  fn,
+  args,
+  start = NULL,
+  error = NULL
+) {
   parts <- c(stage, fn_args(fn, args))
   if (!is.null(start)) {
     parts <- c(
@@ -96,7 +104,9 @@ log_event <- function(logger, level, stage, fn, args, start = NULL, error = NULL
 # Name the arguments by the formals they matched, where `f` allows it.
 match_args <- function(f, args) {
   tryCatch(
-    as.list(match.call(f, as.call(c(quote(f), args)), expand.dots = FALSE))[-1L],
+    as.list(match.call(f, as.call(c(quote(f), args)), expand.dots = FALSE))[
+      -1L
+    ],
     error = function(e) args
   )
 }

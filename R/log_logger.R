@@ -70,7 +70,10 @@ level_property <- function(name, default) {
     default = default,
     validator = function(value) {
       if (length(value) != 1L || !tolower(value) %in% LOG_LEVELS) {
-        sprintf("must be one of %s", paste0("'", LOG_LEVELS, "'", collapse = ", "))
+        sprintf(
+          "must be one of %s",
+          paste0("'", LOG_LEVELS, "'", collapse = ", ")
+        )
       }
     },
     setter = function(self, value) {
@@ -91,7 +94,7 @@ level_property <- function(name, default) {
 log_levels := new_class(
   properties = list(
     start = level_property("start", "info"),
-    finish = level_property("finish", "debug"),
+    finish = level_property("finish", "info"),
     error = level_property("error", "error")
   )
 )

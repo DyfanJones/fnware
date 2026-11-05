@@ -3,7 +3,10 @@ logger_capture := S7::new_class(
   properties = list(env = S7::new_property(S7::class_any))
 )
 S7::method(logger_fn, logger_capture) <- function(class, level, msg, ...) {
-  class@env$seen[[length(class@env$seen) + 1L]] <- list(level = level, msg = msg)
+  class@env$seen[[length(class@env$seen) + 1L]] <- list(
+    level = level,
+    msg = msg
+  )
 }
 capture_logger <- function() {
   env <- new.env()
@@ -20,7 +23,10 @@ test_that("logs the start and the finish", {
   expect_equal(out[[1]]$level, "INFO")
   expect_equal(out[[1]]$msg, "Started f(a=1,b=2)")
   expect_equal(out[[2]]$level, "DEBUG")
-  expect_match(out[[2]]$msg, "^Finished f\\(a=1,b=2\\) Elapsed=\\d{2}:\\d{2}:[0-9.]+$")
+  expect_match(
+    out[[2]]$msg,
+    "^Finished f\\(a=1,b=2\\) Elapsed=\\d{2}:\\d{2}:[0-9.]+$"
+  )
 })
 
 test_that("arguments are named by the formals they matched", {
@@ -52,7 +58,8 @@ test_that("each event has its own level", {
   f <- log_call(
     logger = cap$logger,
     level = log_levels(start = "trace", finish = "WARN")
-  ) %@% function() 1
+  ) %@%
+    function() 1
   f()
   expect_equal(vapply(cap$get(), `[[`, "", "level"), c("TRACE", "WARN"))
 })
@@ -111,10 +118,17 @@ test_that("a method for the logger package is enough to use it", {
   seen <- character()
   logger_logger := S7::new_class(parent = logger_base)
   S7::method(logger_fn, logger_logger) <- function(class, level, msg, ...) {
-    logger::log_level(level, logger::skip_formatter(msg), namespace = "fnware_test")
+    logger::log_level(
+      level,
+      logger::skip_formatter(msg),
+      namespace = "fnware_test"
+    )
   }
   logger::log_threshold(logger::DEBUG, namespace = "fnware_test")
-  old <- logger::log_appender(function(lines) seen <<- c(seen, lines), namespace = "fnware_test")
+  old <- logger::log_appender(
+    function(lines) seen <<- c(seen, lines),
+    namespace = "fnware_test"
+  )
   withr::defer(logger::log_appender(old, namespace = "fnware_test"))
   f <- log_call(logger = logger_logger()) %@% function(x) x
   f("{not glue}")
