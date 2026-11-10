@@ -37,28 +37,38 @@ async_log_call := decorator(
     check_s7(level, log_levels, "a `log_levels()`")
     function(...) {
       fn <- decorator_context()$name
-      args <- match_args(f, list(...))
+      args <- match_args(f, dots_present(...))
       call_text <- fn_args(fn, args)
       start <- proc.time()[["elapsed"]]
-      log_event(logger, level@start, c("Start", call_text))
+      logger_fn(
+        logger,
+        prop(logger, level@start),
+        paste(c("Start", call_text), collapse = " ")
+      )
       promises::then(
         call_as_promise(f, ...),
         onFulfilled = function(value) {
-          log_event(
+          logger_fn(
             logger,
-            level@finish,
-            c("Finished", call_text, elapse_msg(elapsed, start))
+            prop(logger, level@finish),
+            paste(
+              c("Finished", call_text, elapse_msg(elapsed, start)),
+              collapse = " "
+            )
           )
           value
         },
         onRejected = function(err) {
-          log_event(
+          logger_fn(
             logger,
-            level@error,
-            c(
-              "Error",
-              call_text,
-              sprintf("\n%s", fmt_error(as_condition(err), fn))
+            prop(logger, level@error),
+            paste(
+              c(
+                "Error",
+                call_text,
+                sprintf("\n%s", fmt_error(as_condition(err), fn))
+              ),
+              collapse = " "
             )
           )
           promises::promise_reject(err)

@@ -49,30 +49,37 @@ log_call := decorator(
     check_s7(level, log_levels, "a `log_levels()`")
     function(...) {
       fn <- decorator_context()$name
-      args <- match_args(f, list(...))
+      args <- match_args(f, dots_present(...))
       call_text <- fn_args(fn, args)
       wrapper <- sys.nframe()
       start <- proc.time()[["elapsed"]]
-      log_event(logger, level@start, c("Start", call_text))
+      logger_fn(
+        logger,
+        prop(logger, level@start),
+        paste(c("Start", call_text), collapse = " ")
+      )
       res <- withVisible(
         withCallingHandlers(
           f(...),
           error = function(err) {
             handler <- sys.nframe()
-            parts <- c("Error", call_text, sprintf("\n%s", fmt_error(err, fn)))
-            log_event(
+            parts <- c(call_text, sprintf("\n%s", fmt_error(err, fn)))
+            logger_fn(
               logger,
-              level@error,
-              parts
+              prop(logger, level@error),
+              paste(parts, collapse = " ")
             )
             trace <- trace_calls(fn, wrapper, handler)
             if (length(trace)) {
-              log_event(
+              logger_fn(
                 logger,
-                "trace",
-                c(
-                  sprintf("Trace %s", call_text),
-                  paste0("\n", paste(trace, collapse = "\n"))
+                prop(logger, "trace"),
+                paste(
+                  c(
+                    call_text,
+                    paste0("\n", paste(trace, collapse = "\n"))
+                  ),
+                  collapse = " "
                 )
               )
             }
@@ -80,10 +87,10 @@ log_call := decorator(
         )
       )
       parts <- c("Finished", call_text, elapse_msg(elapsed, start))
-      log_event(
+      logger_fn(
         logger,
-        level@finish,
-        parts
+        prop(logger, level@finish),
+        paste(parts, collapse = " ")
       )
       if (res$visible) res$value else invisible(res$value)
     }
@@ -94,16 +101,6 @@ elapse_msg <- function(elapsed, start) {
   if (elapsed) {
     sprintf("Elapsed=%s", fmt_duration(proc.time()[["elapsed"]] - start))
   }
-}
-
-# Build the message for an event and hand it to the logger, with the level
-# translated to the logger's own label.
-log_event <- function(
-  logger,
-  level,
-  parts
-) {
-  logger_fn(logger, prop(logger, level), paste(parts, collapse = " "))
 }
 
 # The calls from `f` down to the failure, one per line. Called from the error
@@ -152,6 +149,24 @@ is_holder_call <- function(cl) {
     is.call(cl[[1L]]) &&
     identical(cl[[1L]][[1L]], quote(`$`)) &&
     is.environment(cl[[1L]][[2L]])
+}
+
+# The arguments in `...` as a list, leaving out any that are missing. A wrapper
+# that mirrors the formals of `f` forwards an unsupplied argument as a promise to
+# a missing one, and forcing it with `list(...)` would fail.
+dots_present <- function(...) {
+  n <- ...length()
+  keep <- logical(n)
+  for (i in seq_len(n)) {
+    keep[i] <- !eval(substitute(missing(x), list(x = as.name(paste0("..", i)))))
+  }
+  args <- list()
+  nms <- ...names() %||% rep("", n)
+  for (i in which(keep)) {
+    args[[length(args) + 1L]] <- ...elt(i)
+    names(args)[length(args)] <- nms[i]
+  }
+  args
 }
 
 # Name the arguments by the formals they matched, where `f` allows it.

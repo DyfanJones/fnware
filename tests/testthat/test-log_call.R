@@ -37,7 +37,7 @@ test_that("logs a failure and signals it again", {
   expect_equal(out[[2]]$level, "ERROR")
   expect_match(
     out[[2]]$msg,
-    "^Error f\\(\\) \nError in `f\\(\\)`:\nboom$"
+    "^f\\(\\) \nError in `f\\(\\)`:\nboom$"
   )
 })
 
@@ -95,7 +95,11 @@ test_that("invisible results stay invisible", {
 
 test_that("the default logger prints level, time and message", {
   f <- log_call() %@% function() 1
-  expect_output(f(), "INFO \\[\\d{4}-.*Z\\]: Start f\\(\\)")
+  expect_match(
+    capture.output(f(), type = "message"),
+    "INFO \\[\\d{4}-.*Z\\]: Start f\\(\\)",
+    all = FALSE
+  )
 })
 
 test_that("logger_message uses message()", {
@@ -142,12 +146,12 @@ test_that("a failure logs the calls from f to the failure as a trace event", {
   expect_length(out, 3L)
   expect_equal(out[[3]]$level, "TRACE")
   msg <- out[[3]]$msg
-  expect_match(msg, "^Trace f\\(\\)")
+  expect_match(msg, "^f\\(\\)")
   expect_match(msg, "inner(1)", fixed = TRUE)
   expect_match(msg, "1. f()", fixed = TRUE)
   expect_no_match(
     msg,
-    "handleSimpleError|log_event|<environment>|f\\(\\.\\.\\.\\)"
+    "handleSimpleError|<environment>|f\\(\\.\\.\\.\\)"
   )
 })
 
@@ -161,7 +165,7 @@ test_that("a level event is hidden below the logger's threshold", {
     function() stop("boom")
   msgs <- testthat::capture_messages(try(f(), silent = TRUE))
   expect_length(msgs, 3L)
-  expect_match(msgs[[3]], "^TRACE \\[.*Z\\]: Trace f\\(\\)")
+  expect_match(msgs[[3]], "^TRACE \\[.*Z\\]: f\\(\\)")
 })
 
 test_that("the default logger honours the threshold", {
@@ -169,7 +173,11 @@ test_that("the default logger honours the threshold", {
   expect_silent(f())
   g <- log_call(logger = logger_base(threshold = "trace")) %@%
     function() stop("boom")
-  expect_output(try(g(), silent = TRUE), "TRACE \\[.*\\]: Trace g\\(\\)")
+  expect_match(
+    capture.output(try(g(), silent = TRUE), type = "message"),
+    "TRACE \\[.*\\]: g\\(\\)",
+    all = FALSE
+  )
 })
 
 test_that("threshold is checked", {

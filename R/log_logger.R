@@ -85,7 +85,11 @@ logger_message := new_class(parent = logger_base)
 method(logger_fn, logger_base) <- function(class, level, msg, ...) {
   if (level_enabled(class, level)) {
     now_utc <- format(Sys.time(), "%Y-%m-%dT%H:%M:%OS3Z", tz = "UTC")
-    cat(sprintf("%s [%s]: %s", level, now_utc, msg), sep = "\n")
+    cat(
+      sprintf("%s [%s]: %s", level, now_utc, msg),
+      file = stderr(),
+      sep = "\n"
+    )
   }
 }
 
