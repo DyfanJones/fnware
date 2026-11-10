@@ -30,15 +30,15 @@ level_property <- function(name, default) {
 #'
 #' * `logger_base` is the base class. The default method prints
 #'   `LEVEL [timestamp]: message` to the console.
-#' * `logger_message` writes `[LEVEL] message` with [message()], so it can be
-#'   silenced with [suppressMessages()].
-#'
-#' Both of these hide events below `threshold`. The `trace` events, such as the
-#' calls leading to an error, are below the default `"info"`, so set
-#' `threshold = "trace"` to see them. A method for another logging package is
-#' free to ignore `threshold` and use that package's own.
+#' * `logger_message` writes the same `LEVEL [timestamp]: message` with
+#'   [message()], so it can be silenced with [suppressMessages()].
 #' * `logger_fn(class, level, msg, ...)` is the generic. Add a method to support
 #'   any logging package, see [extending_log].
+#'
+#' `logger_base` and `logger_message` hide events below `threshold`. The `trace`
+#' events, such as the calls leading to an error, are below the default
+#' `"info"`, so set `threshold = "trace"` to see them. A method for another
+#' logging package is free to ignore `threshold` and use that package's own.
 #'
 #' @param class A logger. Methods are dispatched on this argument.
 #' @param level The level label of the event, taken from the property of

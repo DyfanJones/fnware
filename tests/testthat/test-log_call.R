@@ -101,8 +101,8 @@ test_that("the default logger prints level, time and message", {
 test_that("logger_message uses message()", {
   f <- log_call(logger = logger_message()) %@% function() 1
   msgs <- testthat::capture_messages(f())
-  expect_match(msgs[[1]], "^\\[INFO\\] Start f\\(\\)")
-  expect_match(msgs[[2]], "^\\[INFO\\] Finished f\\(\\)")
+  expect_match(msgs[[1]], "^INFO \\[.*Z\\]: Start f\\(\\)")
+  expect_match(msgs[[2]], "^INFO \\[.*Z\\]: Finished f\\(\\)")
 })
 
 test_that("a method for the logger package is enough to use it", {
@@ -161,7 +161,7 @@ test_that("a level event is hidden below the logger's threshold", {
     function() stop("boom")
   msgs <- testthat::capture_messages(try(f(), silent = TRUE))
   expect_length(msgs, 3L)
-  expect_match(msgs[[3]], "^\\[TRACE\\] Trace f\\(\\)")
+  expect_match(msgs[[3]], "^TRACE \\[.*Z\\]: Trace f\\(\\)")
 })
 
 test_that("the default logger honours the threshold", {

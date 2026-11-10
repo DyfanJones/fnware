@@ -61,18 +61,16 @@ inherits from \code{logger_base}, and \code{logger_fn()} decides how it is writt
 \itemize{
 \item \code{logger_base} is the base class. The default method prints
 \code{LEVEL [timestamp]: message} to the console.
-\item \code{logger_message} writes \verb{[LEVEL] message} with \code{\link[=message]{message()}}, so it can be
-silenced with \code{\link[=suppressMessages]{suppressMessages()}}.
-}
-
-Both of these hide events below \code{threshold}. The \code{trace} events, such as the
-calls leading to an error, are below the default \code{"info"}, so set
-\code{threshold = "trace"} to see them. A method for another logging package is
-free to ignore \code{threshold} and use that package's own.
-\itemize{
+\item \code{logger_message} writes the same \code{LEVEL [timestamp]: message} with
+\code{\link[=message]{message()}}, so it can be silenced with \code{\link[=suppressMessages]{suppressMessages()}}.
 \item \code{logger_fn(class, level, msg, ...)} is the generic. Add a method to support
 any logging package, see \link{extending_log}.
 }
+
+\code{logger_base} and \code{logger_message} hide events below \code{threshold}. The \code{trace}
+events, such as the calls leading to an error, are below the default
+\code{"info"}, so set \code{threshold = "trace"} to see them. A method for another
+logging package is free to ignore \code{threshold} and use that package's own.
 }
 \examples{
 logger_message()

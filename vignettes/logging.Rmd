@@ -43,6 +43,9 @@ quiet := log_call(
 try(quiet(1), silent = TRUE)
 ```
 
+The start and finish are `debug` here, below the loggers' default `threshold` of
+`"info"`, so only the failure is written.
+
 Set `elapsed = FALSE` to leave the time out of the finish message.
 
 ## Traces
@@ -62,8 +65,8 @@ try(outer(1), silent = TRUE)
 ## Loggers
 
 A logger decides where a message goes. `logger_base()`, the default, prints
-`LEVEL [timestamp]: message`. `logger_message()` writes with `message()`
-instead, so `suppressMessages()` silences it. Both take a `threshold`, one of
+`LEVEL [timestamp]: message`. `logger_message()` writes the same line with
+`message()` instead, so `suppressMessages()` silences it. Both take a `threshold`, one of
 `"trace"`, `"debug"`, `"info"`, `"warn"`, `"error"` or `"fatal"`, and leave out
 anything below it.
 
