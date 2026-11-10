@@ -4,13 +4,7 @@
 \alias{log_call}
 \title{Log the calls to a function}
 \usage{
-log_call(
-  f,
-  logger = logger_base(),
-  level = log_levels(),
-  elapsed = TRUE,
-  trace = FALSE
-)
+log_call(f, logger = logger_base(), level = log_levels(), elapsed = TRUE)
 }
 \arguments{
 \item{f}{The function to decorate. Usually supplied by \verb{\%@\%} rather than directly.}
@@ -21,10 +15,7 @@ log_call(
 \item{level}{A \code{\link[=log_levels]{log_levels()}} giving the level of the start, finish and error
 events.}
 
-\item{elapsed}{Include the time taken in the finish and error messages?}
-
-\item{trace}{Include the calls leading to an error in the error message?
-Only the calls from \code{f} down to the failure are shown.}
+\item{elapsed}{Include the time taken in the finish message?}
 }
 \value{
 A decorator.
@@ -38,6 +29,11 @@ signalled again unchanged.
 The message holds the function's name, its arguments matched to the formals
 and, once finished, the time taken. Arguments are evaluated before the start
 is logged.
+
+When a call fails, the calls from \code{f} down to the failure are logged as a
+separate \code{trace} event after the error. Whether it is shown is up to the
+logger: the built-in loggers hide it until \code{threshold = "trace"}, see
+\link{logger_base}.
 
 For a function that returns a promise, use \code{\link[=async_log_call]{async_log_call()}}. Here the finish
 would be logged when the promise is returned, not when it settles.

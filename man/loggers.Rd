@@ -13,6 +13,7 @@ logger_base(
   warn = "WARN",
   error = "ERROR",
   fatal = "FATAL",
+  threshold = "info",
   logger = NULL
 )
 
@@ -25,6 +26,7 @@ logger_message(
   warn = "WARN",
   error = "ERROR",
   fatal = "FATAL",
+  threshold = "info",
   logger = NULL
 )
 }
@@ -32,6 +34,9 @@ logger_message(
 \item{trace, debug, info, warn, error, fatal}{Labels passed to \code{logger_fn()} for
 each level. They default to \code{"TRACE"}, \code{"DEBUG"} and so on. Change them
 when the logging package names its levels differently, or uses objects.}
+
+\item{threshold}{The lowest level the built-in loggers write: one of
+\code{"trace"}, \code{"debug"}, \code{"info"}, \code{"warn"}, \code{"error"} or \code{"fatal"}.}
 
 \item{logger}{An object a logging package needs to be passed, such as a
 log4r logger. Available to methods as \code{class@logger}.}
@@ -58,6 +63,13 @@ inherits from \code{logger_base}, and \code{logger_fn()} decides how it is writt
 \code{LEVEL [timestamp]: message} to the console.
 \item \code{logger_message} writes \verb{[LEVEL] message} with \code{\link[=message]{message()}}, so it can be
 silenced with \code{\link[=suppressMessages]{suppressMessages()}}.
+}
+
+Both of these hide events below \code{threshold}. The \code{trace} events, such as the
+calls leading to an error, are below the default \code{"info"}, so set
+\code{threshold = "trace"} to see them. A method for another logging package is
+free to ignore \code{threshold} and use that package's own.
+\itemize{
 \item \code{logger_fn(class, level, msg, ...)} is the generic. Add a method to support
 any logging package, see \link{extending_log}.
 }

@@ -12,6 +12,11 @@ NULL
 #' and, once finished, the time taken. Arguments are evaluated before the start
 #' is logged.
 #'
+#' When a call fails, the calls from `f` down to the failure are logged as a
+#' separate `trace` event after the error. Whether it is shown is up to the
+#' logger: the built-in loggers hide it until `threshold = "trace"`, see
+#' [logger_base].
+#'
 #' For a function that returns a promise, use [async_log_call()]. Here the finish
 #' would be logged when the promise is returned, not when it settles.
 #'
@@ -20,9 +25,7 @@ NULL
 #'   [extending_log] to use a logging package.
 #' @param level A [log_levels()] giving the level of the start, finish and error
 #'   events.
-#' @param elapsed Include the time taken in the finish and error messages?
-#' @param trace Include the calls leading to an error in the error message?
-#'   Only the calls from `f` down to the failure are shown.
+#' @param elapsed Include the time taken in the finish message?
 #' @return A decorator.
 #' @examples
 #' fn := log_call(logger = logger_message()) %@% function(a, b, c) a + b + c
@@ -40,73 +43,66 @@ log_call := decorator(
     f,
     logger = logger_base(),
     level = log_levels(),
-    elapsed = TRUE,
-    trace = FALSE
+    elapsed = TRUE
   ) {
     check_s7(logger, logger_base, "a logger")
     check_s7(level, log_levels, "a `log_levels()`")
     function(...) {
       fn <- decorator_context()$name
       args <- match_args(f, list(...))
+      call_text <- fn_args(fn, args)
       wrapper <- sys.nframe()
       start <- proc.time()[["elapsed"]]
-      log_event(logger, level@start, "Started", fn, args)
+      log_event(logger, level@start, c("Start", call_text))
       res <- withVisible(
         withCallingHandlers(
           f(...),
           error = function(err) {
             handler <- sys.nframe()
+            parts <- c("Error", call_text, sprintf("\n%s", fmt_error(err, fn)))
             log_event(
               logger,
               level@error,
-              "Failed",
-              fn,
-              args,
-              start = if (elapsed) start,
-              error = err,
-              trace = if (trace) trace_calls(fn, wrapper, handler)
+              parts
             )
+            trace <- trace_calls(fn, wrapper, handler)
+            if (length(trace)) {
+              log_event(
+                logger,
+                "trace",
+                c(
+                  sprintf("Trace %s", call_text),
+                  paste0("\n", paste(trace, collapse = "\n"))
+                )
+              )
+            }
           }
         )
       )
+      parts <- c("Finished", call_text, elapse_msg(elapsed, start))
       log_event(
         logger,
         level@finish,
-        "Finished",
-        fn,
-        args,
-        start = if (elapsed) start
+        parts
       )
       if (res$visible) res$value else invisible(res$value)
     }
   }
 )
 
+elapse_msg <- function(elapsed, start) {
+  if (elapsed) {
+    sprintf("Elapsed=%s", fmt_duration(proc.time()[["elapsed"]] - start))
+  }
+}
+
 # Build the message for an event and hand it to the logger, with the level
 # translated to the logger's own label.
 log_event <- function(
   logger,
   level,
-  stage,
-  fn,
-  args,
-  start = NULL,
-  error = NULL,
-  trace = NULL
+  parts
 ) {
-  parts <- c(stage, fn_args(fn, args))
-  if (!is.null(start)) {
-    parts <- c(
-      parts,
-      sprintf("Elapsed=%s", fmt_duration(proc.time()[["elapsed"]] - start))
-    )
-  }
-  if (!is.null(error)) {
-    parts <- c(parts, sprintf("\n%s", fmt_error(error, fn)))
-  }
-  if (length(trace)) {
-    parts <- c(parts, paste0("\nTrace:\n", paste(trace, collapse = "\n")))
-  }
   logger_fn(logger, prop(logger, level), paste(parts, collapse = " "))
 }
 

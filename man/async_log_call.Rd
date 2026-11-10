@@ -15,7 +15,7 @@ async_log_call(f, logger = logger_base(), level = log_levels(), elapsed = TRUE)
 \item{level}{A \code{\link[=log_levels]{log_levels()}} giving the level of the start, finish and error
 events.}
 
-\item{elapsed}{Include the time taken in the finish and error messages?}
+\item{elapsed}{Include the time taken in the finish message?}
 }
 \value{
 A decorator. The decorated function returns a promise.
@@ -28,8 +28,8 @@ up to that point. A rejection is logged then passed on unchanged. Needs the
 promises package.
 }
 \details{
-There is no \code{trace} argument, as the calls that led to a rejection are no
-longer on the stack by the time it settles.
+It logs no \code{trace} event, as the calls that led to a rejection are no longer
+on the stack by the time it settles.
 }
 \examples{
 \dontrun{

@@ -6,7 +6,7 @@ test_that("logs the start and the finish", {
   out <- cap$get()
   expect_length(out, 2L)
   expect_equal(out[[1]]$level, "INFO")
-  expect_equal(out[[1]]$msg, "Started f(a=1,b=2)")
+  expect_equal(out[[1]]$msg, "Start f(a=1,b=2)")
   expect_equal(out[[2]]$level, "INFO")
   expect_match(
     out[[2]]$msg,
@@ -18,7 +18,7 @@ test_that("arguments are named by the formals they matched", {
   cap <- capture_logger()
   f <- log_call(logger = cap$logger) %@% function(a, b, c) a + b + c
   f(1, c = 3, b = 2)
-  expect_equal(cap$get()[[1]]$msg, "Started f(a=1,b=2,c=3)")
+  expect_equal(cap$get()[[1]]$msg, "Start f(a=1,b=2,c=3)")
 })
 
 test_that("long argument values are cut", {
@@ -37,7 +37,7 @@ test_that("logs a failure and signals it again", {
   expect_equal(out[[2]]$level, "ERROR")
   expect_match(
     out[[2]]$msg,
-    "^Failed f\\(\\) Elapsed=\\S+ \nError in `f\\(\\)`:\nboom$"
+    "^Error f\\(\\) \nError in `f\\(\\)`:\nboom$"
   )
 })
 
@@ -84,7 +84,7 @@ test_that("names the function even when stacked under another decorator", {
   cap <- capture_logger()
   g <- rate_limit(calls = 5) %@% log_call(logger = cap$logger) %@% function() 1
   g()
-  expect_match(cap$get()[[1]]$msg, "^Started g\\(\\)")
+  expect_match(cap$get()[[1]]$msg, "^Start g\\(\\)")
 })
 
 test_that("invisible results stay invisible", {
@@ -95,13 +95,13 @@ test_that("invisible results stay invisible", {
 
 test_that("the default logger prints level, time and message", {
   f <- log_call() %@% function() 1
-  expect_output(f(), "INFO \\[\\d{4}-.*Z\\]: Started f\\(\\)")
+  expect_output(f(), "INFO \\[\\d{4}-.*Z\\]: Start f\\(\\)")
 })
 
 test_that("logger_message uses message()", {
   f <- log_call(logger = logger_message()) %@% function() 1
   msgs <- testthat::capture_messages(f())
-  expect_match(msgs[[1]], "^\\[INFO\\] Started f\\(\\)")
+  expect_match(msgs[[1]], "^\\[INFO\\] Start f\\(\\)")
   expect_match(msgs[[2]], "^\\[INFO\\] Finished f\\(\\)")
 })
 
@@ -124,7 +124,7 @@ test_that("a method for the logger package is enough to use it", {
   withr::defer(logger::log_appender(old, namespace = "fnware_test"))
   f <- log_call(logger = logger_logger()) %@% function(x) x
   f("{not glue}")
-  expect_match(seen[[1]], "INFO.*Started f\\(x=\"\\{not glue\\}\"\\)")
+  expect_match(seen[[1]], "INFO.*Start f\\(x=\"\\{not glue\\}\"\\)")
 })
 
 test_that("checks its arguments", {
@@ -133,13 +133,16 @@ test_that("checks its arguments", {
   expect_error(log_levels(start = "loud"), "must be one of")
 })
 
-test_that("trace = TRUE adds the calls from f to the failure", {
+test_that("a failure logs the calls from f to the failure as a trace event", {
   cap <- capture_logger()
   inner <- function(x) stop("boom")
-  f <- log_call(logger = cap$logger, trace = TRUE) %@% function() inner(1)
+  f <- log_call(logger = cap$logger) %@% function() inner(1)
   expect_error(f(), "boom")
-  msg <- cap$get()[[2]]$msg
-  expect_match(msg, "Trace:\n", fixed = TRUE)
+  out <- cap$get()
+  expect_length(out, 3L)
+  expect_equal(out[[3]]$level, "TRACE")
+  msg <- out[[3]]$msg
+  expect_match(msg, "^Trace f\\(\\)")
   expect_match(msg, "inner(1)", fixed = TRUE)
   expect_match(msg, "1. f()", fixed = TRUE)
   expect_no_match(
@@ -148,11 +151,31 @@ test_that("trace = TRUE adds the calls from f to the failure", {
   )
 })
 
-test_that("the trace is left out by default", {
-  cap <- capture_logger()
-  f <- log_call(logger = cap$logger) %@% function() stop("boom")
-  expect_error(f(), "boom")
-  expect_no_match(cap$get()[[2]]$msg, "Trace:")
+test_that("a level event is hidden below the logger's threshold", {
+  f <- log_call(logger = logger_message()) %@% function() stop("boom")
+  msgs <- testthat::capture_messages(try(f(), silent = TRUE))
+  expect_length(msgs, 2L)
+  expect_no_match(msgs, "Trace")
+
+  f <- log_call(logger = logger_message(threshold = "trace")) %@%
+    function() stop("boom")
+  msgs <- testthat::capture_messages(try(f(), silent = TRUE))
+  expect_length(msgs, 3L)
+  expect_match(msgs[[3]], "^\\[TRACE\\] Trace f\\(\\)")
+})
+
+test_that("the default logger honours the threshold", {
+  f <- log_call(logger = logger_base(threshold = "error")) %@% function() 1
+  expect_silent(f())
+  g <- log_call(logger = logger_base(threshold = "trace")) %@%
+    function() stop("boom")
+  expect_output(try(g(), silent = TRUE), "TRACE \\[.*\\]: Trace g\\(\\)")
+})
+
+test_that("threshold is checked", {
+  expect_error(logger_base(threshold = "loud"), "must be one of")
+  expect_error(logger_message(threshold = c("info", "warn")), "must be one of")
+  expect_equal(logger_message(threshold = "WARN")@threshold, "warn")
 })
 
 test_that("a failure without a call is logged as the bare message", {

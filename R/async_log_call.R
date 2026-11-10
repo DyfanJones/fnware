@@ -10,8 +10,8 @@ NULL
 #' up to that point. A rejection is logged then passed on unchanged. Needs the
 #' promises package.
 #'
-#' There is no `trace` argument, as the calls that led to a rejection are no
-#' longer on the stack by the time it settles.
+#' It logs no `trace` event, as the calls that led to a rejection are no longer
+#' on the stack by the time it settles.
 #'
 #' @inheritParams log_call
 #' @return A decorator. The decorated function returns a promise.
@@ -38,18 +38,16 @@ async_log_call := decorator(
     function(...) {
       fn <- decorator_context()$name
       args <- match_args(f, list(...))
+      call_text <- fn_args(fn, args)
       start <- proc.time()[["elapsed"]]
-      log_event(logger, level@start, "Started", fn, args)
+      log_event(logger, level@start, c("Start", call_text))
       promises::then(
         call_as_promise(f, ...),
         onFulfilled = function(value) {
           log_event(
             logger,
             level@finish,
-            "Finished",
-            fn,
-            args,
-            start = if (elapsed) start
+            c("Finished", call_text, elapse_msg(elapsed, start))
           )
           value
         },
@@ -57,11 +55,11 @@ async_log_call := decorator(
           log_event(
             logger,
             level@error,
-            "Failed",
-            fn,
-            args,
-            start = if (elapsed) start,
-            error = as_condition(err)
+            c(
+              "Error",
+              call_text,
+              sprintf("\n%s", fmt_error(as_condition(err), fn))
+            )
           )
           promises::promise_reject(err)
         }
