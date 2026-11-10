@@ -108,8 +108,8 @@ would be logged when the promise is returned, not when it settles.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fn</span> <span class="op">:=</span> <span class="fu">log_call</span><span class="op">(</span>logger <span class="op">=</span> <span class="fu"><a href="loggers.html">logger_message</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span>, <span class="va">c</span><span class="op">)</span> <span class="va">a</span> <span class="op">+</span> <span class="va">b</span> <span class="op">+</span> <span class="va">c</span></span></span>
 <span class="r-in"><span><span class="fu">fn</span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-11-10T20:21:57.748Z]: Start fn(a=1,b=2,c=3)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-11-10T20:21:57.748Z]: Finished fn(a=1,b=2,c=3) Elapsed=00:00:00.001</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-11-10T20:39:40.759Z]: Start fn(a=1,b=2,c=3)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-11-10T20:39:40.760Z]: Finished fn(a=1,b=2,c=3) Elapsed=00:00:00.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Log failures as warnings</span></span></span>
@@ -118,8 +118,8 @@ would be logged when the promise is returned, not when it settles.</p>
 <span class="r-in"><span>  level <span class="op">=</span> <span class="fu"><a href="log_levels.html">log_levels</a></span><span class="op">(</span>error <span class="op">=</span> <span class="st">"warn"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"boom"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu">g</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-11-10T20:21:57.750Z]: Start g(x=1)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> WARN [2026-11-10T20:21:57.750Z]: Error g(x=1) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> INFO [2026-11-10T20:39:40.762Z]: Start g(x=1)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> WARN [2026-11-10T20:39:40.763Z]: g(x=1) </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Error in `g(x = x)`:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> boom</span>
 </code></pre></div>

@@ -17,9 +17,6 @@ add := log_call() %@% function(a, b) a + b
 add(1, b = 2)
 ```
 
-    ## INFO [2026-11-10T20:22:15.928Z]: Start add(a=1,b=2)
-    ## INFO [2026-11-10T20:22:15.928Z]: Finished add(a=1,b=2) Elapsed=00:00:00.001
-
     ## [1] 3
 
 Arguments are named by the formals they matched, so `add(b = 2, a = 1)`
@@ -31,11 +28,6 @@ then signalled again unchanged:
 boom := log_call() %@% function(x) stop("boom")
 boom(1)
 ```
-
-    ## INFO [2026-11-10T20:22:15.995Z]: Start boom(x=1)
-    ## ERROR [2026-11-10T20:22:15.995Z]: Error boom(x=1) 
-    ## Error in `boom(x = x)`:
-    ## boom
 
     ## Error:
     ## ! boom
@@ -55,7 +47,7 @@ quiet := log_call(
 try(quiet(1), silent = TRUE)
 ```
 
-    ## WARN [2026-11-10T20:22:16.128Z]: Error quiet(x=1) 
+    ## WARN [2026-11-10T20:40:01.230Z]: quiet(x=1) 
     ## Error in `quiet(x = x)`:
     ## boom
 
@@ -80,13 +72,13 @@ outer := log_call(logger = logger_message(threshold = "trace")) %@%
 try(outer(1), silent = TRUE)
 ```
 
-    ## INFO [2026-11-10T20:22:16.176Z]: Start outer(x=1)
+    ## INFO [2026-11-10T20:40:01.295Z]: Start outer(x=1)
 
-    ## ERROR [2026-11-10T20:22:16.177Z]: Error outer(x=1) 
+    ## ERROR [2026-11-10T20:40:01.295Z]: outer(x=1) 
     ## Error in `inner(x)`:
     ## boom
 
-    ## TRACE [2026-11-10T20:22:16.177Z]: Trace outer(x=1) 
+    ## TRACE [2026-11-10T20:40:01.296Z]: outer(x=1) 
     ##   1. outer(x = x)
     ##   2. inner(x)
     ##   3. stop("boom")
@@ -109,9 +101,9 @@ hello := log_call(logger = logger_message()) %@% function() "hi"
 hello()
 ```
 
-    ## INFO [2026-11-10T20:22:16.225Z]: Start hello()
+    ## INFO [2026-11-10T20:40:01.359Z]: Start hello()
 
-    ## INFO [2026-11-10T20:22:16.226Z]: Finished hello() Elapsed=00:00:00.000
+    ## INFO [2026-11-10T20:40:01.360Z]: Finished hello() Elapsed=00:00:00.000
 
     ## [1] "hi"
 
