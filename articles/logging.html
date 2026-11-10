@@ -89,8 +89,8 @@ once the call is over, the time it took.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">add</span> <span class="op">:=</span> <span class="fu"><a href="../reference/log_call.html">log_call</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span><span class="op">)</span> <span class="va">a</span> <span class="op">+</span> <span class="va">b</span></span>
 <span><span class="fu">add</span><span class="op">(</span><span class="fl">1</span>, b <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## INFO [2026-11-05T19:25:46.609Z]: Started add(a=1,b=2)</span></span>
-<span><span class="co">## INFO [2026-11-05T19:25:46.610Z]: Finished add(a=1,b=2) Elapsed=00:00:00.001</span></span></code></pre>
+<pre><code><span><span class="co">## INFO [2026-11-10T20:22:15.928Z]: Start add(a=1,b=2)</span></span>
+<span><span class="co">## INFO [2026-11-10T20:22:15.928Z]: Finished add(a=1,b=2) Elapsed=00:00:00.001</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 3</span></span></code></pre>
 <p>Arguments are named by the formals they matched, so
 <code>add(b = 2, a = 1)</code> logs the same as above. Long values are
@@ -98,8 +98,8 @@ cut. A failure is logged and then signalled again unchanged:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">boom</span> <span class="op">:=</span> <span class="fu"><a href="../reference/log_call.html">log_call</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"boom"</span><span class="op">)</span></span>
 <span><span class="fu">boom</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## INFO [2026-11-05T19:25:46.698Z]: Started boom(x=1)</span></span>
-<span><span class="co">## ERROR [2026-11-05T19:25:46.698Z]: Failed boom(x=1) Elapsed=00:00:00.000 </span></span>
+<pre><code><span><span class="co">## INFO [2026-11-10T20:22:15.995Z]: Start boom(x=1)</span></span>
+<span><span class="co">## ERROR [2026-11-10T20:22:15.995Z]: Error boom(x=1) </span></span>
 <span><span class="co">## Error in `boom(x = x)`:</span></span>
 <span><span class="co">## boom</span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
@@ -107,34 +107,62 @@ cut. A failure is logged and then signalled again unchanged:</p>
 <div class="section level2">
 <h2 id="levels">Levels<a class="anchor" aria-label="anchor" href="#levels"></a>
 </h2>
-<p>Each event has a level. By default the start is <code>info</code>,
-the finish is <code>debug</code> and a failure is <code>error</code>.
-Change them with <code><a href="../reference/log_levels.html">log_levels()</a></code>:</p>
+<p>Each event has a level. By default the start and the finish are
+<code>info</code> and a failure is <code>error</code>. Change them with
+<code><a href="../reference/log_levels.html">log_levels()</a></code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">quiet</span> <span class="op">:=</span> <span class="fu"><a href="../reference/log_call.html">log_call</a></span><span class="op">(</span></span>
 <span>  logger <span class="op">=</span> <span class="fu"><a href="../reference/loggers.html">logger_message</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  level <span class="op">=</span> <span class="fu"><a href="../reference/log_levels.html">log_levels</a></span><span class="op">(</span>start <span class="op">=</span> <span class="st">"debug"</span>, finish <span class="op">=</span> <span class="st">"debug"</span>, error <span class="op">=</span> <span class="st">"warn"</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"boom"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu">quiet</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [DEBUG] Started quiet(x=1)</span></span></code></pre>
-<pre><code><span><span class="co">## [WARN] Failed quiet(x=1) Elapsed=00:00:00.001 </span></span>
+<pre><code><span><span class="co">## WARN [2026-11-10T20:22:16.128Z]: Error quiet(x=1) </span></span>
 <span><span class="co">## Error in `quiet(x = x)`:</span></span>
 <span><span class="co">## boom</span></span></code></pre>
-<p>Set <code>elapsed = FALSE</code> to leave the time out of the
-messages.</p>
+<p>The start and finish are <code>debug</code> here, below the loggers’
+default <code>threshold</code> of <code>"info"</code>, so only the
+failure is written.</p>
+<p>Set <code>elapsed = FALSE</code> to leave the time out of the finish
+message.</p>
+</div>
+<div class="section level2">
+<h2 id="traces">Traces<a class="anchor" aria-label="anchor" href="#traces"></a>
+</h2>
+<p>When a call fails, the calls from the decorated function down to the
+failure are logged as a separate <code>trace</code> event straight after
+the error. The built-in loggers only write events at or above their
+<code>threshold</code>, which is <code>"info"</code> by default, so the
+trace stays hidden until you lower it:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">inner</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"boom"</span><span class="op">)</span></span>
+<span><span class="va">outer</span> <span class="op">:=</span> <span class="fu"><a href="../reference/log_call.html">log_call</a></span><span class="op">(</span>logger <span class="op">=</span> <span class="fu"><a href="../reference/loggers.html">logger_message</a></span><span class="op">(</span>threshold <span class="op">=</span> <span class="st">"trace"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span></span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">inner</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/outer.html" class="external-link">outer</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## INFO [2026-11-10T20:22:16.176Z]: Start outer(x=1)</span></span></code></pre>
+<pre><code><span><span class="co">## ERROR [2026-11-10T20:22:16.177Z]: Error outer(x=1) </span></span>
+<span><span class="co">## Error in `inner(x)`:</span></span>
+<span><span class="co">## boom</span></span></code></pre>
+<pre><code><span><span class="co">## TRACE [2026-11-10T20:22:16.177Z]: Trace outer(x=1) </span></span>
+<span><span class="co">##   1. outer(x = x)</span></span>
+<span><span class="co">##   2. inner(x)</span></span>
+<span><span class="co">##   3. stop("boom")</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="loggers">Loggers<a class="anchor" aria-label="anchor" href="#loggers"></a>
 </h2>
 <p>A logger decides where a message goes. <code><a href="../reference/loggers.html">logger_base()</a></code>,
 the default, prints <code>LEVEL [timestamp]: message</code>.
-<code><a href="../reference/loggers.html">logger_message()</a></code> writes with <code><a href="https://rdrr.io/r/base/message.html" class="external-link">message()</a></code>
-instead, so <code><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages()</a></code> silences it.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code><a href="../reference/loggers.html">logger_message()</a></code> writes the same line with
+<code><a href="https://rdrr.io/r/base/message.html" class="external-link">message()</a></code> instead, so <code><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages()</a></code>
+silences it. Both take a <code>threshold</code>, one of
+<code>"trace"</code>, <code>"debug"</code>, <code>"info"</code>,
+<code>"warn"</code>, <code>"error"</code> or <code>"fatal"</code>, and
+leave out anything below it.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hello</span> <span class="op">:=</span> <span class="fu"><a href="../reference/log_call.html">log_call</a></span><span class="op">(</span>logger <span class="op">=</span> <span class="fu"><a href="../reference/loggers.html">logger_message</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="st">"hi"</span></span>
 <span><span class="fu">hello</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [INFO] Started hello()</span></span></code></pre>
-<pre><code><span><span class="co">## [INFO] Finished hello() Elapsed=00:00:00.001</span></span></code></pre>
+<pre><code><span><span class="co">## INFO [2026-11-10T20:22:16.225Z]: Start hello()</span></span></code></pre>
+<pre><code><span><span class="co">## INFO [2026-11-10T20:22:16.226Z]: Finished hello() Elapsed=00:00:00.000</span></span></code></pre>
 <pre><code><span><span class="co">## [1] "hi"</span></span></code></pre>
 </div>
 <div class="section level2">
@@ -143,10 +171,11 @@ instead, so <code><a href="https://rdrr.io/r/base/message.html" class="external-
 <p>To log with another package, inherit from <code>logger_base</code>
 and add a method for <code><a href="../reference/loggers.html">logger_fn()</a></code>. The package then owns
 thresholds, layouts and appenders. The method receives the level label
-(<code>"INFO"</code>, <code>"DEBUG"</code> and so on) and the
-message.</p>
+(<code>"INFO"</code>, <code>"DEBUG"</code> and so on) and the message,
+and decides for itself whether to show it, so <code>threshold</code> is
+not used.</p>
 <p>For the logger package:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://daroczig.github.io/logger/" class="external-link">logger</a></span><span class="op">)</span></span>
 <span><span class="va">logger_logger</span> <span class="op">:=</span> <span class="fu"><a href="https://rconsortium.github.io/S7/reference/new_class.html" class="external-link">new_class</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="va">logger_base</span><span class="op">)</span></span>
 <span></span>
@@ -161,7 +190,7 @@ braces in the message as a glue template.</p>
 <p>Some packages need a logger object passed in. Give it to the logger
 through the <code>logger</code> property and read it back as
 <code>class@logger</code>. For log4r:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-lib/log4r" class="external-link">log4r</a></span><span class="op">)</span></span>
 <span><span class="va">logger_log4r</span> <span class="op">:=</span> <span class="fu"><a href="https://rconsortium.github.io/S7/reference/new_class.html" class="external-link">new_class</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="va">logger_base</span><span class="op">)</span></span>
 <span></span>
@@ -176,7 +205,7 @@ through the <code>logger</code> property and read it back as
 the <code>trace</code>, <code>debug</code>, <code>info</code>,
 <code>warn</code>, <code>error</code> and <code>fatal</code> properties.
 A label can be any object, for example a number.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">logger_num</span> <span class="op">:=</span> <span class="fu"><a href="https://rconsortium.github.io/S7/reference/new_class.html" class="external-link">new_class</a></span><span class="op">(</span></span>
 <span>  parent <span class="op">=</span> <span class="va">logger_base</span>,</span>
 <span>  properties <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -191,7 +220,7 @@ A label can be any object, for example a number.</p>
 <span></span>
 <span><span class="va">f</span> <span class="op">:=</span> <span class="fu"><a href="../reference/log_call.html">log_call</a></span><span class="op">(</span>logger <span class="op">=</span> <span class="fu">logger_num</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fl">1</span></span>
 <span><span class="fu">f</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## 20 Started f() </span></span>
+<pre><code><span><span class="co">## 20 Start f() </span></span>
 <span><span class="co">## 20 Finished f() Elapsed=00:00:00.000</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 1</span></span></code></pre>
 </div>
@@ -202,10 +231,10 @@ A label can be any object, for example a number.</p>
 returns, which for a function that returns a promise is before the work
 is done. Use <code><a href="../reference/async_log_call.html">async_log_call()</a></code> instead. It logs the start
 when the function is called, and the finish or the failure when the
-promise settles. A rejection is logged then passed on unchanged. There
-is no <code>trace</code> argument, because the calls that led to a
-rejection are gone by the time it settles.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+promise settles. A rejection is logged then passed on unchanged. It logs
+no <code>trace</code> event, because the calls that led to a rejection
+are gone by the time it settles.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">f</span> <span class="op">:=</span> <span class="fu"><a href="../reference/async_log_call.html">async_log_call</a></span><span class="op">(</span>logger <span class="op">=</span> <span class="fu"><a href="../reference/loggers.html">logger_message</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://dyfanjones.github.io/adorn/man/apply-decorator.html" class="external-link">%@%</a></span></span>
 <span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">promises</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/promises/reference/promise_resolve.html" class="external-link">promise_resolve</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="fu">promises</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/promises/reference/then.html" class="external-link">then</a></span><span class="op">(</span><span class="fu">f</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, <span class="va">print</span><span class="op">)</span></span></code></pre></div>

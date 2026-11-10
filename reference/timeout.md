@@ -106,5 +106,5 @@ flaky()
 # Pass the remaining budget on
 budget := timeout(10) %@% function() timeout_remaining()
 budget()
-#> [1] 9.999
+#> [1] 10
 ```

@@ -17,8 +17,8 @@ add := log_call() %@% function(a, b) a + b
 add(1, b = 2)
 ```
 
-    ## INFO [2026-11-05T19:25:46.609Z]: Started add(a=1,b=2)
-    ## INFO [2026-11-05T19:25:46.610Z]: Finished add(a=1,b=2) Elapsed=00:00:00.001
+    ## INFO [2026-11-10T20:22:15.928Z]: Start add(a=1,b=2)
+    ## INFO [2026-11-10T20:22:15.928Z]: Finished add(a=1,b=2) Elapsed=00:00:00.001
 
     ## [1] 3
 
@@ -32,8 +32,8 @@ boom := log_call() %@% function(x) stop("boom")
 boom(1)
 ```
 
-    ## INFO [2026-11-05T19:25:46.698Z]: Started boom(x=1)
-    ## ERROR [2026-11-05T19:25:46.698Z]: Failed boom(x=1) Elapsed=00:00:00.000 
+    ## INFO [2026-11-10T20:22:15.995Z]: Start boom(x=1)
+    ## ERROR [2026-11-10T20:22:15.995Z]: Error boom(x=1) 
     ## Error in `boom(x = x)`:
     ## boom
 
@@ -42,8 +42,8 @@ boom(1)
 
 ## Levels
 
-Each event has a level. By default the start is `info`, the finish is
-`debug` and a failure is `error`. Change them with
+Each event has a level. By default the start and the finish are `info`
+and a failure is `error`. Change them with
 [`log_levels()`](https://dyfanjones.github.io/fnware/reference/log_levels.md):
 
 ``` r
@@ -55,13 +55,41 @@ quiet := log_call(
 try(quiet(1), silent = TRUE)
 ```
 
-    ## [DEBUG] Started quiet(x=1)
-
-    ## [WARN] Failed quiet(x=1) Elapsed=00:00:00.001 
+    ## WARN [2026-11-10T20:22:16.128Z]: Error quiet(x=1) 
     ## Error in `quiet(x = x)`:
     ## boom
 
-Set `elapsed = FALSE` to leave the time out of the messages.
+The start and finish are `debug` here, below the loggers’ default
+`threshold` of `"info"`, so only the failure is written.
+
+Set `elapsed = FALSE` to leave the time out of the finish message.
+
+## Traces
+
+When a call fails, the calls from the decorated function down to the
+failure are logged as a separate `trace` event straight after the error.
+The built-in loggers only write events at or above their `threshold`,
+which is `"info"` by default, so the trace stays hidden until you lower
+it:
+
+``` r
+
+inner <- function(x) stop("boom")
+outer := log_call(logger = logger_message(threshold = "trace")) %@%
+  function(x) inner(x)
+try(outer(1), silent = TRUE)
+```
+
+    ## INFO [2026-11-10T20:22:16.176Z]: Start outer(x=1)
+
+    ## ERROR [2026-11-10T20:22:16.177Z]: Error outer(x=1) 
+    ## Error in `inner(x)`:
+    ## boom
+
+    ## TRACE [2026-11-10T20:22:16.177Z]: Trace outer(x=1) 
+    ##   1. outer(x = x)
+    ##   2. inner(x)
+    ##   3. stop("boom")
 
 ## Loggers
 
@@ -69,9 +97,11 @@ A logger decides where a message goes.
 [`logger_base()`](https://dyfanjones.github.io/fnware/reference/loggers.md),
 the default, prints `LEVEL [timestamp]: message`.
 [`logger_message()`](https://dyfanjones.github.io/fnware/reference/loggers.md)
-writes with [`message()`](https://rdrr.io/r/base/message.html) instead,
-so [`suppressMessages()`](https://rdrr.io/r/base/message.html) silences
-it.
+writes the same line with
+[`message()`](https://rdrr.io/r/base/message.html) instead, so
+[`suppressMessages()`](https://rdrr.io/r/base/message.html) silences it.
+Both take a `threshold`, one of `"trace"`, `"debug"`, `"info"`,
+`"warn"`, `"error"` or `"fatal"`, and leave out anything below it.
 
 ``` r
 
@@ -79,9 +109,9 @@ hello := log_call(logger = logger_message()) %@% function() "hi"
 hello()
 ```
 
-    ## [INFO] Started hello()
+    ## INFO [2026-11-10T20:22:16.225Z]: Start hello()
 
-    ## [INFO] Finished hello() Elapsed=00:00:00.001
+    ## INFO [2026-11-10T20:22:16.226Z]: Finished hello() Elapsed=00:00:00.000
 
     ## [1] "hi"
 
@@ -92,7 +122,8 @@ for
 [`logger_fn()`](https://dyfanjones.github.io/fnware/reference/loggers.md).
 The package then owns thresholds, layouts and appenders. The method
 receives the level label (`"INFO"`, `"DEBUG"` and so on) and the
-message.
+message, and decides for itself whether to show it, so `threshold` is
+not used.
 
 For the logger package:
 
@@ -153,7 +184,7 @@ f := log_call(logger = logger_num()) %@% function() 1
 f()
 ```
 
-    ## 20 Started f() 
+    ## 20 Start f() 
     ## 20 Finished f() Elapsed=00:00:00.000
 
     ## [1] 1
@@ -166,8 +197,8 @@ that returns a promise is before the work is done. Use
 [`async_log_call()`](https://dyfanjones.github.io/fnware/reference/async_log_call.md)
 instead. It logs the start when the function is called, and the finish
 or the failure when the promise settles. A rejection is logged then
-passed on unchanged. There is no `trace` argument, because the calls
-that led to a rejection are gone by the time it settles.
+passed on unchanged. It logs no `trace` event, because the calls that
+led to a rejection are gone by the time it settles.
 
 ``` r
 

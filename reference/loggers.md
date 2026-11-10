@@ -14,6 +14,7 @@ logger_base(
   warn = "WARN",
   error = "ERROR",
   fatal = "FATAL",
+  threshold = "info",
   logger = NULL
 )
 
@@ -26,6 +27,7 @@ logger_message(
   warn = "WARN",
   error = "ERROR",
   fatal = "FATAL",
+  threshold = "info",
   logger = NULL
 )
 ```
@@ -37,6 +39,11 @@ logger_message(
   Labels passed to `logger_fn()` for each level. They default to
   `"TRACE"`, `"DEBUG"` and so on. Change them when the logging package
   names its levels differently, or uses objects.
+
+- threshold:
+
+  The lowest level the built-in loggers write: one of `"trace"`,
+  `"debug"`, `"info"`, `"warn"`, `"error"` or `"fatal"`.
 
 - logger:
 
@@ -69,7 +76,7 @@ logger_message(
 - `logger_base` is the base class. The default method prints
   `LEVEL [timestamp]: message` to the console.
 
-- `logger_message` writes `[LEVEL] message` with
+- `logger_message` writes the same `LEVEL [timestamp]: message` with
   [`message()`](https://rdrr.io/r/base/message.html), so it can be
   silenced with
   [`suppressMessages()`](https://rdrr.io/r/base/message.html).
@@ -78,21 +85,28 @@ logger_message(
   support any logging package, see
   [extending_log](https://dyfanjones.github.io/fnware/reference/extending_log.md).
 
+`logger_base` and `logger_message` hide events below `threshold`. The
+`trace` events, such as the calls leading to an error, are below the
+default `"info"`, so set `threshold = "trace"` to see them. A method for
+another logging package is free to ignore `threshold` and use that
+package's own.
+
 ## Examples
 
 ``` r
 logger_message()
 #> <fnware::logger_message>
-#>  @ trace : chr "TRACE"
-#>  @ debug : chr "DEBUG"
-#>  @ info  : chr "INFO"
-#>  @ warn  : chr "WARN"
-#>  @ error : chr "ERROR"
-#>  @ fatal : chr "FATAL"
-#>  @ logger: NULL
+#>  @ trace    : chr "TRACE"
+#>  @ debug    : chr "DEBUG"
+#>  @ info     : chr "INFO"
+#>  @ warn     : chr "WARN"
+#>  @ error    : chr "ERROR"
+#>  @ fatal    : chr "FATAL"
+#>  @ threshold: chr "info"
+#>  @ logger   : NULL
 f := log_call(logger = logger_message()) %@% function(x) x
 f(1)
-#> [INFO] Started f(x=1)
-#> [INFO] Finished f(x=1) Elapsed=00:00:00.000
+#> INFO [2026-11-10T20:21:58.012Z]: Start f(x=1)
+#> INFO [2026-11-10T20:21:58.012Z]: Finished f(x=1) Elapsed=00:00:00.000
 #> [1] 1
 ```

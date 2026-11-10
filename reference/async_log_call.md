@@ -39,7 +39,7 @@ async_log_call(f, logger = logger_base(), level = log_levels(), elapsed = TRUE)
 
 - elapsed:
 
-  Include the time taken in the finish and error messages?
+  Include the time taken in the finish message?
 
 ## Value
 
@@ -47,8 +47,8 @@ A decorator. The decorated function returns a promise.
 
 ## Details
 
-There is no `trace` argument, as the calls that led to a rejection are
-no longer on the stack by the time it settles.
+It logs no `trace` event, as the calls that led to a rejection are no
+longer on the stack by the time it settles.
 
 ## Examples
 

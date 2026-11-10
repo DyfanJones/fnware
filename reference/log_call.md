@@ -8,13 +8,7 @@ A failure is logged then signalled again unchanged.
 ## Usage
 
 ``` r
-log_call(
-  f,
-  logger = logger_base(),
-  level = log_levels(),
-  elapsed = TRUE,
-  trace = FALSE
-)
+log_call(f, logger = logger_base(), level = log_levels(), elapsed = TRUE)
 ```
 
 ## Arguments
@@ -41,12 +35,7 @@ log_call(
 
 - elapsed:
 
-  Include the time taken in the finish and error messages?
-
-- trace:
-
-  Include the calls leading to an error in the error message? Only the
-  calls from `f` down to the failure are shown.
+  Include the time taken in the finish message?
 
 ## Value
 
@@ -58,6 +47,12 @@ The message holds the function's name, its arguments matched to the
 formals and, once finished, the time taken. Arguments are evaluated
 before the start is logged.
 
+When a call fails, the calls from `f` down to the failure are logged as
+a separate `trace` event after the error. Whether it is shown is up to
+the logger: the built-in loggers hide it until `threshold = "trace"`,
+see
+[logger_base](https://dyfanjones.github.io/fnware/reference/loggers.md).
+
 For a function that returns a promise, use
 [`async_log_call()`](https://dyfanjones.github.io/fnware/reference/async_log_call.md).
 Here the finish would be logged when the promise is returned, not when
@@ -68,8 +63,8 @@ it settles.
 ``` r
 fn := log_call(logger = logger_message()) %@% function(a, b, c) a + b + c
 fn(1, 2, 3)
-#> [INFO] Started fn(a=1,b=2,c=3)
-#> [INFO] Finished fn(a=1,b=2,c=3) Elapsed=00:00:00.001
+#> INFO [2026-11-10T20:21:57.748Z]: Start fn(a=1,b=2,c=3)
+#> INFO [2026-11-10T20:21:57.748Z]: Finished fn(a=1,b=2,c=3) Elapsed=00:00:00.001
 #> [1] 6
 
 # Log failures as warnings
@@ -78,8 +73,8 @@ g := log_call(
   level = log_levels(error = "warn")
 ) %@% function(x) stop("boom")
 try(g(1), silent = TRUE)
-#> [INFO] Started g(x=1)
-#> [WARN] Failed g(x=1) Elapsed=00:00:00.001 
+#> INFO [2026-11-10T20:21:57.750Z]: Start g(x=1)
+#> WARN [2026-11-10T20:21:57.750Z]: Error g(x=1) 
 #> Error in `g(x = x)`:
 #> boom
 ```
