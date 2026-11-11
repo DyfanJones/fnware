@@ -47,7 +47,7 @@ quiet := log_call(
 try(quiet(1), silent = TRUE)
 ```
 
-    ## WARN [2026-11-10T20:40:01.230Z]: quiet(x=1) 
+    ## WARN [2026-11-11T17:05:01.365Z]: quiet(x=1) 
     ## Error in `quiet(x = x)`:
     ## boom
 
@@ -72,13 +72,13 @@ outer := log_call(logger = logger_message(threshold = "trace")) %@%
 try(outer(1), silent = TRUE)
 ```
 
-    ## INFO [2026-11-10T20:40:01.295Z]: Start outer(x=1)
+    ## INFO [2026-11-11T17:05:01.431Z]: Start outer(x=1)
 
-    ## ERROR [2026-11-10T20:40:01.295Z]: outer(x=1) 
+    ## ERROR [2026-11-11T17:05:01.432Z]: outer(x=1) 
     ## Error in `inner(x)`:
     ## boom
 
-    ## TRACE [2026-11-10T20:40:01.296Z]: outer(x=1) 
+    ## TRACE [2026-11-11T17:05:01.432Z]: outer(x=1) 
     ##   1. outer(x = x)
     ##   2. inner(x)
     ##   3. stop("boom")
@@ -101,9 +101,9 @@ hello := log_call(logger = logger_message()) %@% function() "hi"
 hello()
 ```
 
-    ## INFO [2026-11-10T20:40:01.359Z]: Start hello()
+    ## INFO [2026-11-11T17:05:01.497Z]: Start hello()
 
-    ## INFO [2026-11-10T20:40:01.360Z]: Finished hello() Elapsed=00:00:00.000
+    ## INFO [2026-11-11T17:05:01.498Z]: Finished hello() Elapsed=00:00:00.001
 
     ## [1] "hi"
 

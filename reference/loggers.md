@@ -106,7 +106,7 @@ logger_message()
 #>  @ logger   : NULL
 f := log_call(logger = logger_message()) %@% function(x) x
 f(1)
-#> INFO [2026-11-10T20:39:41.071Z]: Start f(x=1)
-#> INFO [2026-11-10T20:39:41.071Z]: Finished f(x=1) Elapsed=00:00:00.000
+#> INFO [2026-11-11T17:04:40.596Z]: Start f(x=1)
+#> INFO [2026-11-11T17:04:40.596Z]: Finished f(x=1) Elapsed=00:00:00.000
 #> [1] 1
 ```

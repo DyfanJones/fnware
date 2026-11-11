@@ -63,8 +63,8 @@ it settles.
 ``` r
 fn := log_call(logger = logger_message()) %@% function(a, b, c) a + b + c
 fn(1, 2, 3)
-#> INFO [2026-11-10T20:39:40.759Z]: Start fn(a=1,b=2,c=3)
-#> INFO [2026-11-10T20:39:40.760Z]: Finished fn(a=1,b=2,c=3) Elapsed=00:00:00.001
+#> INFO [2026-11-11T17:04:40.261Z]: Start fn(a=1,b=2,c=3)
+#> INFO [2026-11-11T17:04:40.262Z]: Finished fn(a=1,b=2,c=3) Elapsed=00:00:00.001
 #> [1] 6
 
 # Log failures as warnings
@@ -73,8 +73,8 @@ g := log_call(
   level = log_levels(error = "warn")
 ) %@% function(x) stop("boom")
 try(g(1), silent = TRUE)
-#> INFO [2026-11-10T20:39:40.762Z]: Start g(x=1)
-#> WARN [2026-11-10T20:39:40.763Z]: g(x=1) 
+#> INFO [2026-11-11T17:04:40.264Z]: Start g(x=1)
+#> WARN [2026-11-11T17:04:40.265Z]: g(x=1) 
 #> Error in `g(x = x)`:
 #> boom
 ```

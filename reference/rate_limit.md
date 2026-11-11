@@ -51,7 +51,7 @@ vapply(1:3, f, numeric(1)) # immediate
 #> [1] 1 2 3
 system.time(f(4)) # waits for the window to clear
 #>    user  system elapsed 
-#>    0.00    0.00    0.87 
+#>   0.000   0.000   0.854 
 
 # Throttle every attempt, retries included
 fetch := retry(stop = stop_after_attempt(3)) %@%
