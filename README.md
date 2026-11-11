@@ -4,7 +4,7 @@
 [![R-universe version](https://DyfanJones.r-universe.dev/fnware/badges/version)](https://DyfanJones.r-universe.dev/fnware)
 <!-- badges: end -->
 
-# fnware
+# fnware <img src="man/figures/logo.png" align="right" height="139" alt="fnware logo" />
 
 Popular Python decorators ported to R with the
 [adorn](https://dyfanjones.github.io/adorn/) framework.

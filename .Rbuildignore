@@ -5,3 +5,4 @@
 ^[.]?air[.]toml$
 ^\.vscode$
 ^codecov\.yml$
+^data-raw$
