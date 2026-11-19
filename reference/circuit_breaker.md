@@ -7,7 +7,8 @@ three states:
 ## Usage
 
 ``` r
-circuit_breaker(f, failures = 5, reset_after = 30)
+circuit_breaker(f, failures = 5, reset_after = 30, logger = NULL,
+  level = c(open = "warn", close = "info"))
 ```
 
 ## Arguments
@@ -26,6 +27,24 @@ circuit_breaker(f, failures = 5, reset_after = 30)
 
   Seconds the circuit stays open before a trial call. A number greater
   than 0. Defaults to 30.
+
+- logger:
+
+  A [logger](https://dyfanjones.github.io/fnware/reference/loggers.md),
+  such as
+  [`logger_message()`](https://dyfanjones.github.io/fnware/reference/loggers.md),
+  that logs when the circuit opens and closes, see
+  [extending_log](https://dyfanjones.github.io/fnware/reference/extending_log.md)
+  to use a logging package. `NULL`, the default, logs nothing. Calls
+  rejected while the circuit is open are not logged.
+
+- level:
+
+  The levels of those two events: a named character vector with `open`
+  and `close`, each one of `"trace"`, `"debug"`, `"info"`, `"warn"`,
+  `"error"` or `"fatal"`. Defaults to
+  `c(open = "warn", close = "info")`. Name only one to change just that
+  event.
 
 ## Value
 
@@ -68,6 +87,14 @@ try(f()) # rejected without calling flaky()
 #> Error : Circuit is open: the function failed repeatedly and is not being called.
 n # still 2
 #> [1] 2
+
+# Log when the circuit opens
+g := circuit_breaker(failures = 1, logger = logger_message()) %@%
+  function() stop("service down")
+try(g(), silent = TRUE)
+#> WARN [2026-11-19T12:41:21.214Z]: Circuit opened for g, rejecting calls for 30 seconds
+#> Error in `g()`:
+#> service down
 
 # Reject before any retries happen
 fetch := circuit_breaker(failures = 3, reset_after = 30) %@%

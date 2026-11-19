@@ -1,7 +1,12 @@
-# Use a logging package with [`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md)
+# Use a logging package with fnware
 
-[`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md)
-writes through a logger, see
+[`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md),
+[`async_log_call()`](https://dyfanjones.github.io/fnware/reference/async_log_call.md),
+[`before_sleep_log()`](https://dyfanjones.github.io/fnware/reference/before_sleep.md),
+[`after_sleep_log()`](https://dyfanjones.github.io/fnware/reference/after_sleep.md),
+[`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md),
+[`fallback()`](https://dyfanjones.github.io/fnware/reference/fallback.md)
+and their async versions write through a logger, see
 [logger_base](https://dyfanjones.github.io/fnware/reference/loggers.md).
 To log with another package, inherit from `logger_base` and register a
 method for

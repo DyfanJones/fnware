@@ -27,6 +27,8 @@ async_log_call(f, logger = logger_base(), level = log_levels(), elapsed = TRUE)
   A [logger](https://dyfanjones.github.io/fnware/reference/loggers.md),
   such as
   [`logger_message()`](https://dyfanjones.github.io/fnware/reference/loggers.md).
+  Defaults to
+  [`logger_base()`](https://dyfanjones.github.io/fnware/reference/loggers.md).
   See
   [extending_log](https://dyfanjones.github.io/fnware/reference/extending_log.md)
   to use a logging package.

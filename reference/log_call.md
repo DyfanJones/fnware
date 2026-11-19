@@ -23,6 +23,8 @@ log_call(f, logger = logger_base(), level = log_levels(), elapsed = TRUE)
   A [logger](https://dyfanjones.github.io/fnware/reference/loggers.md),
   such as
   [`logger_message()`](https://dyfanjones.github.io/fnware/reference/loggers.md).
+  Defaults to
+  [`logger_base()`](https://dyfanjones.github.io/fnware/reference/loggers.md).
   See
   [extending_log](https://dyfanjones.github.io/fnware/reference/extending_log.md)
   to use a logging package.
@@ -63,8 +65,8 @@ it settles.
 ``` r
 fn := log_call(logger = logger_message()) %@% function(a, b, c) a + b + c
 fn(1, 2, 3)
-#> INFO [2026-11-11T17:04:40.261Z]: Start fn(a=1,b=2,c=3)
-#> INFO [2026-11-11T17:04:40.262Z]: Finished fn(a=1,b=2,c=3) Elapsed=00:00:00.001
+#> INFO [2026-11-19T12:41:25.327Z]: Start fn(a=1,b=2,c=3)
+#> INFO [2026-11-19T12:41:25.327Z]: Finished fn(a=1,b=2,c=3) Elapsed=00:00:00.000
 #> [1] 6
 
 # Log failures as warnings
@@ -73,8 +75,8 @@ g := log_call(
   level = log_levels(error = "warn")
 ) %@% function(x) stop("boom")
 try(g(1), silent = TRUE)
-#> INFO [2026-11-11T17:04:40.264Z]: Start g(x=1)
-#> WARN [2026-11-11T17:04:40.265Z]: g(x=1) 
+#> INFO [2026-11-19T12:41:25.330Z]: Start g(x=1)
+#> WARN [2026-11-19T12:41:25.330Z]: g(x=1) 
 #> Error in `g(x = x)`:
 #> boom
 ```

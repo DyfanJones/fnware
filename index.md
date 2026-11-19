@@ -23,7 +23,7 @@ Popular Python decorators ported to R with the
 | [`async_fallback()`](https://dyfanjones.github.io/fnware/reference/async_fallback.md) | Like [`fallback()`](https://dyfanjones.github.io/fnware/reference/fallback.md), for functions that return a promise |  |
 | `once` | Runs a function the first time and reuses the result |  |
 | `async_once` | Like `once`, for functions that return a promise |  |
-| [`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md) | Logs when a call starts, finishes or fails, with its arguments. Writes with [`message()`](https://rdrr.io/r/base/message.html) or any logging package via a [`logger_fn()`](https://dyfanjones.github.io/fnware/reference/loggers.md) method |  |
+| [`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md) | Logs when a call starts, finishes or fails, with its arguments. Writes through a logger: the console, [`message()`](https://rdrr.io/r/base/message.html), or any logging package via a [`logger_fn()`](https://dyfanjones.github.io/fnware/reference/loggers.md) method. The retry hooks, [`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md) and [`fallback()`](https://dyfanjones.github.io/fnware/reference/fallback.md) use the same loggers |  |
 | [`async_log_call()`](https://dyfanjones.github.io/fnware/reference/async_log_call.md) | Like [`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md), logging the finish when the promise settles |  |
 | `contextmanager` | Writes setup and teardown once, as `local_`, `with_` and decorator forms | [`contextlib.contextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager) |
 

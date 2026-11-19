@@ -180,6 +180,27 @@ fetch_or_default()
 Errors the function raises itself still reach you unchanged, so you can
 tell “the service failed” apart from “we did not try”.
 
+## Logging
+
+Give the circuit breaker a `logger`, see
+[`vignette("logging")`](https://dyfanjones.github.io/fnware/articles/logging.md),
+to log when the circuit opens (`"warn"`) and when it closes again
+(`"info"`). Rejected calls are not logged. It is silent by default.
+
+``` r
+
+down := circuit_breaker(
+  failures = 1,
+  logger = logger_message(),
+  level = c(open = "error")
+) %@% function() stop("service down")
+try(down(), silent = TRUE)
+```
+
+    ## ERROR [2026-11-19T12:41:36.660Z]: Circuit opened for down, rejecting calls for 30 seconds
+    ## Error in `down()`:
+    ## service down
+
 ## Using it with retry
 
 The two decorators answer different questions, and they work well

@@ -11,7 +11,8 @@ carry on unchanged. Needs the promises package.
 ## Usage
 
 ``` r
-async_fallback(f, value = NULL, handler = NULL, class = "error")
+async_fallback(f, value = NULL, handler = NULL, class = "error",
+  logger = NULL, level = "warn")
 ```
 
 ## Arguments
@@ -32,6 +33,20 @@ async_fallback(f, value = NULL, handler = NULL, class = "error")
 - class:
 
   Condition classes to catch. Defaults to `"error"`.
+
+- logger:
+
+  A [logger](https://dyfanjones.github.io/fnware/reference/loggers.md),
+  such as
+  [`logger_message()`](https://dyfanjones.github.io/fnware/reference/loggers.md),
+  that logs each time the fallback is used, see
+  [extending_log](https://dyfanjones.github.io/fnware/reference/extending_log.md)
+  to use a logging package. `NULL`, the default, logs nothing.
+
+- level:
+
+  The level of that event: one of `"trace"`, `"debug"`, `"info"`,
+  `"warn"`, `"error"` or `"fatal"`. Defaults to `"warn"`.
 
 ## Value
 

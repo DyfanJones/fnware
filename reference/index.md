@@ -141,11 +141,24 @@ Log calls.
   [`logger_message()`](https://dyfanjones.github.io/fnware/reference/loggers.md)
   : Loggers
 
-- [`extending_log`](https://dyfanjones.github.io/fnware/reference/extending_log.md)
+- [`before_sleep_none()`](https://dyfanjones.github.io/fnware/reference/before_sleep.md)
+  [`before_sleep_log()`](https://dyfanjones.github.io/fnware/reference/before_sleep.md)
   :
 
-  Use a logging package with
-  [`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md)
+  Run a hook before
+  [`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
+  sleeps
+
+- [`after_sleep_none()`](https://dyfanjones.github.io/fnware/reference/after_sleep.md)
+  [`after_sleep_log()`](https://dyfanjones.github.io/fnware/reference/after_sleep.md)
+  :
+
+  Run a hook after
+  [`retry()`](https://dyfanjones.github.io/fnware/reference/retry.md)
+  sleeps
+
+- [`extending_log`](https://dyfanjones.github.io/fnware/reference/extending_log.md)
+  : Use a logging package with fnware
 
 ## Running once
 

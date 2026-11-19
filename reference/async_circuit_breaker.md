@@ -12,7 +12,8 @@ the function.
 ## Usage
 
 ``` r
-async_circuit_breaker(f, failures = 5, reset_after = 30)
+async_circuit_breaker(f, failures = 5, reset_after = 30, logger = NULL,
+  level = c(open = "warn", close = "info"))
 ```
 
 ## Arguments
@@ -31,6 +32,24 @@ async_circuit_breaker(f, failures = 5, reset_after = 30)
 
   Seconds the circuit stays open before a trial call. A number greater
   than 0. Defaults to 30.
+
+- logger:
+
+  A [logger](https://dyfanjones.github.io/fnware/reference/loggers.md),
+  such as
+  [`logger_message()`](https://dyfanjones.github.io/fnware/reference/loggers.md),
+  that logs when the circuit opens and closes, see
+  [extending_log](https://dyfanjones.github.io/fnware/reference/extending_log.md)
+  to use a logging package. `NULL`, the default, logs nothing. Calls
+  rejected while the circuit is open are not logged.
+
+- level:
+
+  The levels of those two events: a named character vector with `open`
+  and `close`, each one of `"trace"`, `"debug"`, `"info"`, `"warn"`,
+  `"error"` or `"fatal"`. Defaults to
+  `c(open = "warn", close = "info")`. Name only one to change just that
+  event.
 
 ## Value
 

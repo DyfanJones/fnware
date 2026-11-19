@@ -43,6 +43,28 @@ Only errors are caught by default. Set `class` to catch other
 conditions, such as `class = "warning"`. A caught condition ends the
 call, as with [`tryCatch()`](https://rdrr.io/r/base/conditions.html).
 
+## Logging
+
+A fallback hides a failure, so you may want a record of it. Give
+[`fallback()`](https://dyfanjones.github.io/fnware/reference/fallback.md)
+a `logger`, see
+[`vignette("logging")`](https://dyfanjones.github.io/fnware/articles/logging.md),
+and it logs each time the default is used, at `level = "warn"`. It is
+silent by default.
+
+``` r
+
+safe := fallback(value = 0, logger = logger_message()) %@%
+  function() stop("boom")
+safe()
+```
+
+    ## WARN [2026-11-19T12:41:42.745Z]: Fallback used for safe
+    ## Error in `safe()`:
+    ## boom
+
+    ## [1] 0
+
 ## Stacking with retry and the circuit breaker
 
 Put

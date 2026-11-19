@@ -47,7 +47,7 @@ quiet := log_call(
 try(quiet(1), silent = TRUE)
 ```
 
-    ## WARN [2026-11-11T17:05:01.365Z]: quiet(x=1) 
+    ## WARN [2026-11-19T12:41:44.795Z]: quiet(x=1) 
     ## Error in `quiet(x = x)`:
     ## boom
 
@@ -72,13 +72,13 @@ outer := log_call(logger = logger_message(threshold = "trace")) %@%
 try(outer(1), silent = TRUE)
 ```
 
-    ## INFO [2026-11-11T17:05:01.431Z]: Start outer(x=1)
+    ## INFO [2026-11-19T12:41:44.850Z]: Start outer(x=1)
 
-    ## ERROR [2026-11-11T17:05:01.432Z]: outer(x=1) 
+    ## ERROR [2026-11-19T12:41:44.851Z]: outer(x=1) 
     ## Error in `inner(x)`:
     ## boom
 
-    ## TRACE [2026-11-11T17:05:01.432Z]: outer(x=1) 
+    ## TRACE [2026-11-19T12:41:44.851Z]: outer(x=1) 
     ##   1. outer(x = x)
     ##   2. inner(x)
     ##   3. stop("boom")
@@ -101,11 +101,69 @@ hello := log_call(logger = logger_message()) %@% function() "hi"
 hello()
 ```
 
-    ## INFO [2026-11-11T17:05:01.497Z]: Start hello()
+    ## INFO [2026-11-19T12:41:44.905Z]: Start hello()
 
-    ## INFO [2026-11-11T17:05:01.498Z]: Finished hello() Elapsed=00:00:00.001
+    ## INFO [2026-11-19T12:41:44.906Z]: Finished hello() Elapsed=00:00:00.000
 
     ## [1] "hi"
+
+## The default logger
+
+[`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md),
+[`async_log_call()`](https://dyfanjones.github.io/fnware/reference/async_log_call.md)
+and the retry hooks
+[`before_sleep_log()`](https://dyfanjones.github.io/fnware/reference/before_sleep.md)
+and
+[`after_sleep_log()`](https://dyfanjones.github.io/fnware/reference/after_sleep.md)
+all take a `logger`. When you give none they use
+[`logger_base()`](https://dyfanjones.github.io/fnware/reference/loggers.md).
+
+The hooks log one event each, so they take a single `level` such as
+`"warn"` in place of a
+[`log_levels()`](https://dyfanjones.github.io/fnware/reference/log_levels.md).
+[`before_sleep_log()`](https://dyfanjones.github.io/fnware/reference/before_sleep.md)
+defaults to `"warn"` and
+[`after_sleep_log()`](https://dyfanjones.github.io/fnware/reference/after_sleep.md)
+to `"info"`.
+
+## Circuit breakers and fallbacks
+
+[`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md)
+and
+[`fallback()`](https://dyfanjones.github.io/fnware/reference/fallback.md),
+and their async versions, are silent unless you give them a `logger`. A
+circuit breaker logs when the circuit opens (`"warn"`) and when it
+closes again (`"info"`), not each rejected call.
+[`fallback()`](https://dyfanjones.github.io/fnware/reference/fallback.md)
+logs each time it returns the default (`"warn"`). Change the levels with
+`level`:
+
+``` r
+
+flaky := circuit_breaker(
+  failures = 1,
+  logger = logger_message(),
+  level = c(open = "error")
+) %@% function() stop("service down")
+try(flaky(), silent = TRUE)
+```
+
+    ## ERROR [2026-11-19T12:41:44.965Z]: Circuit opened for flaky, rejecting calls for 30 seconds
+    ## Error in `flaky()`:
+    ## service down
+
+``` r
+
+safe := fallback(value = 0, logger = logger_message()) %@%
+  function() stop("boom")
+safe()
+```
+
+    ## WARN [2026-11-19T12:41:44.968Z]: Fallback used for safe
+    ## Error in `safe()`:
+    ## boom
+
+    ## [1] 0
 
 ## Using a logging package
 

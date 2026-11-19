@@ -260,24 +260,28 @@ without removing the decorator.
 
 ## Seeing what is happening
 
-Silent retries are hard to debug. The hooks run around each sleep:
+Silent retries are hard to debug. The hooks run around each sleep and
+write through a logger, see \[logger_base\]:
 
 ``` r
 
 logged <- retry(
   stop = stop_after_attempt(4),
   wait = wait_fixed(0.01),
-  before_sleep = before_sleep_log(function(msg) cat(msg, "\n")),
-  after_sleep = after_sleep_log(function(msg) cat(msg, "\n"))
+  before_sleep = before_sleep_log(logger_message()),
+  after_sleep = after_sleep_log(logger_message(), level = "info")
 ) %@%
   make_flaky(2)
 logged()
 ```
 
-    ## Attempt 1 failed: not yet (call 1). Retrying in 0.01 seconds. 
-    ## Slept 0.01 seconds after attempt 1. Retrying. 
-    ## Attempt 2 failed: not yet (call 2). Retrying in 0.01 seconds. 
-    ## Slept 0.01 seconds after attempt 2. Retrying.
+    ## WARN [2026-11-19T12:41:47.909Z]: Attempt 1 failed: not yet (call 1). Retrying in 0.01 seconds.
+
+    ## INFO [2026-11-19T12:41:47.920Z]: Slept 0.01 seconds after attempt 1. Retrying.
+
+    ## WARN [2026-11-19T12:41:47.921Z]: Attempt 2 failed: not yet (call 2). Retrying in 0.01 seconds.
+
+    ## INFO [2026-11-19T12:41:47.931Z]: Slept 0.01 seconds after attempt 2. Retrying.
 
     ## [1] "worked on call 3"
 

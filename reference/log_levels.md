@@ -1,8 +1,11 @@
 # The level of each event [`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md) logs
 
-The level of each event
 [`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md)
-logs
+logs three events, so it takes one level for each. The hooks
+[`before_sleep_log()`](https://dyfanjones.github.io/fnware/reference/before_sleep.md)
+and
+[`after_sleep_log()`](https://dyfanjones.github.io/fnware/reference/after_sleep.md)
+log a single event, so they take a plain `level` string instead.
 
 ## Usage
 

@@ -85,6 +85,21 @@ logger_message(
   support any logging package, see
   [extending_log](https://dyfanjones.github.io/fnware/reference/extending_log.md).
 
+Every function that logs takes a `logger`:
+[`log_call()`](https://dyfanjones.github.io/fnware/reference/log_call.md),
+[`async_log_call()`](https://dyfanjones.github.io/fnware/reference/async_log_call.md),
+[`before_sleep_log()`](https://dyfanjones.github.io/fnware/reference/before_sleep.md)
+and
+[`after_sleep_log()`](https://dyfanjones.github.io/fnware/reference/after_sleep.md).
+When none is given they use `logger_base()`.
+
+[`circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/circuit_breaker.md),
+[`async_circuit_breaker()`](https://dyfanjones.github.io/fnware/reference/async_circuit_breaker.md),
+[`fallback()`](https://dyfanjones.github.io/fnware/reference/fallback.md)
+and
+[`async_fallback()`](https://dyfanjones.github.io/fnware/reference/async_fallback.md)
+log only when given a `logger`, as they are silent otherwise.
+
 `logger_base` and `logger_message` hide events below `threshold`. The
 `trace` events, such as the calls leading to an error, are below the
 default `"info"`, so set `threshold = "trace"` to see them. A method for
@@ -106,7 +121,7 @@ logger_message()
 #>  @ logger   : NULL
 f := log_call(logger = logger_message()) %@% function(x) x
 f(1)
-#> INFO [2026-11-11T17:04:40.596Z]: Start f(x=1)
-#> INFO [2026-11-11T17:04:40.596Z]: Finished f(x=1) Elapsed=00:00:00.000
+#> INFO [2026-11-19T12:41:25.621Z]: Start f(x=1)
+#> INFO [2026-11-19T12:41:25.621Z]: Finished f(x=1) Elapsed=00:00:00.000
 #> [1] 1
 ```
