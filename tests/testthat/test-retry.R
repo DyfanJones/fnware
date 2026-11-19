@@ -70,7 +70,7 @@ test_that("logging hooks fire", {
   expect_equal(seen[[1]]$level, "WARN")
 })
 
-test_that("log hooks use the level given and default to message()", {
+test_that("log hooks use the level given", {
   cap <- capture_logger()
   g <- retry(
     stop = stop_after_attempt(2),
@@ -80,6 +80,18 @@ test_that("log hooks use the level given and default to message()", {
   expect_equal(cap$get()[[1]]$level, "DEBUG")
   expect_error(before_sleep_log(level = "loud"), "must be one of")
   expect_error(after_sleep_log(logger = function(x) x))
+  g <- retry(
+    stop = stop_after_attempt(2),
+    before_sleep = before_sleep_log(logger_message())
+  )(flaky(1)$f)
+  expect_message(g(), "Attempt 1 failed")
+})
+
+test_that("hooks default to the fnware.logger option and level per hook", {
+  expect_equal(before_sleep_log()@level, "warn")
+  expect_equal(after_sleep_log()@level, "info")
+  expect_s3_class(before_sleep_log()@logger, "fnware::logger_base")
+  withr::local_options(fnware.logger = logger_message())
   g <- retry(
     stop = stop_after_attempt(2),
     before_sleep = before_sleep_log()

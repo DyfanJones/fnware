@@ -1,4 +1,4 @@
-#' @importFrom adorn := decorator
+#' @importFrom adorn := decorator decorator_context
 #' @importFrom rlang try_fetch
 NULL
 
@@ -15,6 +15,11 @@ NULL
 #' @param value Value to return on failure. Ignored if `handler` is given.
 #' @param handler Optional function taking the condition and returning the result.
 #' @param class Condition classes to catch. Defaults to `"error"`.
+#' @param logger A [logger][logger_base], such as [logger_message()], that logs
+#'   each time the fallback is used, see [extending_log] to use a logging
+#'   package. `NULL`, the default, logs nothing.
+#' @param level The level of that event: one of `"trace"`, `"debug"`, `"info"`,
+#'   `"warn"`, `"error"` or `"fatal"`. Defaults to `"warn"`.
 #' @return A decorator.
 #' @examples
 #' f := fallback(value = NA_real_) %@% function(x) {
@@ -27,6 +32,11 @@ NULL
 #'   function() stop("boom")
 #' g()
 #'
+#' # Log each time the default is used
+#' h := fallback(value = 0, logger = logger_message()) %@%
+#'   function() stop("boom")
+#' h()
+#'
 #' # Use the default only after retries and the circuit breaker give up
 #' fetch := fallback(value = NULL) %@%
 #'   circuit_breaker(failures = 3) %@%
@@ -34,13 +44,27 @@ NULL
 #'   function(url) stop("down")
 #' fetch("x")
 #' @rdname fallback
-#' @usage fallback(f, value = NULL, handler = NULL, class = "error")
+#' @usage fallback(f, value = NULL, handler = NULL, class = "error",
+#'   logger = NULL, level = "warn")
 #' @export
 fallback := decorator(
-  function(f, value = NULL, handler = NULL, class = "error") {
+  function(
+    f,
+    value = NULL,
+    handler = NULL,
+    class = "error",
+    logger = NULL,
+    level = "warn"
+  ) {
     check_function(handler, null = TRUE)
     check_classes(class)
-    on_cnd <- function(cnd) if (is.null(handler)) value else handler(cnd)
+    check_logger(logger)
+    check_level(level)
+    fn <- decorator_context()$name
+    on_cnd <- function(cnd) {
+      log_fallback(logger, level, fn, cnd)
+      if (is.null(handler)) value else handler(cnd)
+    }
     handlers <- rep(list(on_cnd), length(class))
     names(handlers) <- class
     function(...) {
@@ -48,3 +72,12 @@ fallback := decorator(
     }
   }
 )
+
+# Shared by `fallback()` and `async_fallback()`.
+log_fallback <- function(logger, level, fn, cnd) {
+  log_event(
+    logger,
+    level,
+    sprintf("Fallback used for %s\n%s", fn, fmt_error(cnd, fn))
+  )
+}

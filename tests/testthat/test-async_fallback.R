@@ -31,3 +31,15 @@ test_that("conditions outside `class` stay rejected", {
   f <- async_fallback(value = "x", class = "custom") %@% function() stop("boom")
   expect_error(settle_value(f()), "boom")
 })
+
+test_that("logs when the fallback is used", {
+  skip_if_not_installed("promises")
+  cap <- capture_logger()
+  f := async_fallback(value = "default", logger = cap$logger) %@%
+    function() stop("boom")
+  expect_equal(settle_value(f()), "default")
+  seen <- cap$get()
+  expect_length(seen, 1L)
+  expect_equal(seen[[1]]$level, "WARN")
+  expect_match(seen[[1]]$msg, "Fallback used for f.*boom")
+})

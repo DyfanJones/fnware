@@ -69,6 +69,8 @@ reference:
       - async_log_call
       - log_levels
       - logger_base
+      - before_sleep_log
+      - after_sleep_log
       - extending_log
 
   - title: Running once

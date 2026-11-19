@@ -63,3 +63,26 @@ test_that("works around circuit_breaker", {
   expect_equal(f(), "open")
   expect_equal(f(), "open")
 })
+
+test_that("logs when the fallback is used, and nothing by default", {
+  cap <- capture_logger()
+  f := fallback(value = 0, logger = cap$logger) %@%
+    function(x) if (x < 0) stop("negative") else x
+  expect_equal(f(1), 1)
+  expect_length(cap$get(), 0L)
+  expect_equal(f(-1), 0)
+  seen <- cap$get()
+  expect_length(seen, 1L)
+  expect_equal(seen[[1]]$level, "WARN")
+  expect_match(seen[[1]]$msg, "Fallback used for f.*negative")
+
+  h <- fallback(value = 0, logger = cap$logger, level = "info") %@%
+    function() stop("x")
+  h()
+  expect_equal(cap$get()[[2]]$level, "INFO")
+
+  quiet <- fallback(value = 0) %@% function() stop("x")
+  expect_no_message(quiet())
+  expect_error(fallback(logger = 1) %@% function() 1, "must be a logger")
+  expect_error(fallback(level = "loud") %@% function() 1, "must be one of")
+})

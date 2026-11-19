@@ -83,3 +83,41 @@ test_that("bad arguments are rejected when applied", {
   expect_error(circuit_breaker(reset_after = 0)(f), "`reset_after`")
   expect_error(circuit_breaker(reset_after = c(1, 2))(f), "`reset_after`")
 })
+
+test_that("logs when the circuit opens and closes, and nothing by default", {
+  cap <- capture_logger()
+  ok <- FALSE
+  g <- function() if (!ok) stop("down") else "up"
+  f := circuit_breaker(failures = 1, reset_after = 0.1, logger = cap$logger) %@%
+    g
+  try(f(), silent = TRUE)
+  try(f(), silent = TRUE) # rejected, not logged
+  seen <- cap$get()
+  expect_length(seen, 1L)
+  expect_equal(seen[[1]]$level, "WARN")
+  expect_match(seen[[1]]$msg, "Circuit opened for f.*down")
+  Sys.sleep(0.15)
+  ok <- TRUE
+  f()
+  seen <- cap$get()
+  expect_length(seen, 2L)
+  expect_equal(seen[[2]]$level, "INFO")
+  expect_match(seen[[2]]$msg, "Circuit closed for f")
+  f()
+  expect_length(cap$get(), 2L) # already closed
+
+  quiet <- circuit_breaker(failures = 1) %@% function() stop("down")
+  expect_no_message(try(quiet(), silent = TRUE))
+})
+
+test_that("circuit_breaker validates logger and level", {
+  cap <- capture_logger()
+  f <- function() 1
+  expect_error(circuit_breaker(logger = "x") %@% f, "logger. must be a logger")
+  expect_error(circuit_breaker(level = "warn") %@% f, "named character")
+  expect_error(circuit_breaker(level = c(open = "loud")) %@% f, "one of")
+  g <- circuit_breaker(failures = 1, logger = cap$logger, level = c(open = "error")) %@%
+    function() stop("down")
+  try(g(), silent = TRUE)
+  expect_equal(cap$get()[[1]]$level, "ERROR")
+})

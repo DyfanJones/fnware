@@ -23,12 +23,12 @@ NULL
 #' while (!later::loop_empty()) later::run_now(0.05)
 #' }
 #' @rdname async_log_call
-#' @usage async_log_call(f, logger = logger_base(), level = log_levels(), elapsed = TRUE)
+#' @usage async_log_call(f, logger = getOption("fnware.logger", logger_base()), level = log_levels(), elapsed = TRUE)
 #' @export
 async_log_call := decorator(
   function(
     f,
-    logger = logger_base(),
+    logger = getOption("fnware.logger", logger_base()),
     level = log_levels(),
     elapsed = TRUE
   ) {

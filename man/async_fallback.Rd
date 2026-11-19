@@ -4,7 +4,8 @@
 \alias{async_fallback}
 \title{Return a default when an asynchronous function fails}
 \usage{
-async_fallback(f, value = NULL, handler = NULL, class = "error")
+async_fallback(f, value = NULL, handler = NULL, class = "error",
+  logger = NULL, level = "warn")
 }
 \arguments{
 \item{f}{The function to decorate. Usually supplied by \verb{\%@\%} rather than directly.}
@@ -14,6 +15,13 @@ async_fallback(f, value = NULL, handler = NULL, class = "error")
 \item{handler}{Optional function taking the condition and returning the result.}
 
 \item{class}{Condition classes to catch. Defaults to \code{"error"}.}
+
+\item{logger}{A \link[=logger_base]{logger}, such as \code{\link[=logger_message]{logger_message()}}, that logs
+each time the fallback is used, see \link{extending_log} to use a logging
+package. \code{NULL}, the default, logs nothing.}
+
+\item{level}{The level of that event: one of \code{"trace"}, \code{"debug"}, \code{"info"},
+\code{"warn"}, \code{"error"} or \code{"fatal"}. Defaults to \code{"warn"}.}
 }
 \value{
 A decorator. The decorated function returns a promise.

@@ -29,7 +29,7 @@ Popular Python decorators ported to R with the
 | `async_fallback()` | Like `fallback()`, for functions that return a promise | |
 | `once` | Runs a function the first time and reuses the result | |
 | `async_once` | Like `once`, for functions that return a promise | |
-| `log_call()` | Logs when a call starts, finishes or fails, with its arguments. Writes with `message()` or any logging package via a `logger_fn()` method | |
+| `log_call()` | Logs when a call starts, finishes or fails, with its arguments. Writes through a logger: the console, `message()`, or any logging package via a `logger_fn()` method. The retry hooks, `circuit_breaker()` and `fallback()` use the same loggers | |
 | `async_log_call()` | Like `log_call()`, logging the finish when the promise settles | |
 | `contextmanager` | Writes setup and teardown once, as `local_`, `with_` and decorator forms | [`contextlib.contextmanager`](https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager) |
 

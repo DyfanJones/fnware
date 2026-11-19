@@ -7,14 +7,19 @@
 \usage{
 before_sleep_none()
 
-before_sleep_log(logger = logger_message(), level = "warn")
+before_sleep_log(
+  logger = getOption("fnware.logger", logger_base()),
+  level = "warn"
+)
 }
 \arguments{
-\item{logger}{A \link[=logger_base]{logger}, such as \code{\link[=logger_message]{logger_message()}}. See
-\link{extending_log} to use a logging package.}
+\item{logger}{A \link[=logger_base]{logger}, such as \code{\link[=logger_message]{logger_message()}}. Defaults
+to the \code{fnware.logger} option, or \code{logger_base()}. See \link{extending_log} to use
+a logging package.}
 
 \item{level}{The level the message is logged at: one of \code{"trace"},
-\code{"debug"}, \code{"info"}, \code{"warn"}, \code{"error"} or \code{"fatal"}.}
+\code{"debug"}, \code{"info"}, \code{"warn"}, \code{"error"} or \code{"fatal"}. A hook logs a single
+event, so this is one string, unlike the \code{\link[=log_levels]{log_levels()}} of \code{\link[=log_call]{log_call()}}.}
 }
 \value{
 A hook to pass to \code{\link[=retry]{retry()}}.

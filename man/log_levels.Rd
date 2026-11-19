@@ -14,7 +14,9 @@ log_levels(start = "info", finish = "info", error = "error")
 An object to pass to the \code{level} argument of \code{\link[=log_call]{log_call()}}.
 }
 \description{
-The level of each event \code{\link[=log_call]{log_call()}} logs
+\code{\link[=log_call]{log_call()}} logs three events, so it takes one level for each. The hooks
+\code{\link[=before_sleep_log]{before_sleep_log()}} and \code{\link[=after_sleep_log]{after_sleep_log()}} log a single event, so they take
+a plain \code{level} string instead.
 }
 \examples{
 log_levels(finish = "trace", error = "warn")

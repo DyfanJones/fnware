@@ -2,10 +2,12 @@
 % Please edit documentation in R/log_extend.R
 \name{extending_log}
 \alias{extending_log}
-\title{Use a logging package with \code{\link[=log_call]{log_call()}}}
+\title{Use a logging package with fnware}
 \description{
-\code{\link[=log_call]{log_call()}} writes through a logger, see \link{logger_base}. To log with another
-package, inherit from \code{logger_base} and register a method for \code{logger_fn()}.
+\code{\link[=log_call]{log_call()}}, \code{\link[=async_log_call]{async_log_call()}}, \code{\link[=before_sleep_log]{before_sleep_log()}}, \code{\link[=after_sleep_log]{after_sleep_log()}},
+\code{\link[=circuit_breaker]{circuit_breaker()}}, \code{\link[=fallback]{fallback()}} and their async versions write through a
+logger, see \link{logger_base}. To log with
+another package, inherit from \code{logger_base} and register a method for \code{logger_fn()}.
 The package then owns the thresholds, layouts and appenders.
 }
 \details{
@@ -14,6 +16,9 @@ The package then owns the thresholds, layouts and appenders.
 \code{info}, \code{warn}, \code{error} and \code{fatal} properties if the package names levels
 differently. A package that needs a logger object can have it passed in
 through the \code{logger} property, available as \code{class@logger}.
+
+To use the package everywhere without passing \code{logger} each time, set
+\verb{options(fnware.logger = <your logger>)}, see \link{logger_base}.
 
 The message may contain braces, so with the logger package wrap it in
 \code{skip_formatter()} to stop it being treated as a glue template.

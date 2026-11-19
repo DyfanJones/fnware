@@ -193,3 +193,23 @@ test_that("arguments are validated", {
   expect_error(async_circuit_breaker(reset_after = 0)(f), "`reset_after`")
   expect_error(async_circuit_breaker(reset_after = c(1, 2))(f), "`reset_after`")
 })
+
+test_that("logs when the circuit opens and closes", {
+  cap <- capture_logger()
+  ok <- FALSE
+  f := async_circuit_breaker(
+    failures = 1,
+    reset_after = 0.1,
+    logger = cap$logger
+  ) %@%
+    function() if (ok) delayed("up", 0.01) else delayed_error("down", 0.01)
+  settle_promise(f())
+  seen <- cap$get()
+  expect_length(seen, 1L)
+  expect_equal(seen[[1]]$level, "WARN")
+  expect_match(seen[[1]]$msg, "Circuit opened for f.*down")
+  Sys.sleep(0.15)
+  ok <- TRUE
+  settle_promise(f())
+  expect_match(cap$get()[[2]]$msg, "Circuit closed for f")
+})

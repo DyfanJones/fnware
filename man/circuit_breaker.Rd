@@ -4,7 +4,8 @@
 \alias{circuit_breaker}
 \title{Stop calling a function that keeps failing}
 \usage{
-circuit_breaker(f, failures = 5, reset_after = 30)
+circuit_breaker(f, failures = 5, reset_after = 30, logger = NULL,
+  level = c(open = "warn", close = "info"))
 }
 \arguments{
 \item{f}{The function to decorate. Usually supplied by \verb{\%@\%} rather than directly.}
@@ -14,6 +15,16 @@ number of at least 1. Defaults to 5.}
 
 \item{reset_after}{Seconds the circuit stays open before a trial call. A number
 greater than 0. Defaults to 30.}
+
+\item{logger}{A \link[=logger_base]{logger}, such as \code{\link[=logger_message]{logger_message()}}, that logs
+when the circuit opens and closes, see \link{extending_log} to use a logging
+package. \code{NULL}, the default, logs nothing. Calls rejected while the circuit
+is open are not logged.}
+
+\item{level}{The levels of those two events: a named character vector with
+\code{open} and \code{close}, each one of \code{"trace"}, \code{"debug"}, \code{"info"}, \code{"warn"},
+\code{"error"} or \code{"fatal"}. Defaults to \code{c(open = "warn", close = "info")}. Name
+only one to change just that event.}
 }
 \value{
 A decorator.
@@ -50,6 +61,11 @@ try(f())
 try(f())
 try(f()) # rejected without calling flaky()
 n # still 2
+
+# Log when the circuit opens
+g := circuit_breaker(failures = 1, logger = logger_message()) \%@\%
+  function() stop("service down")
+try(g(), silent = TRUE)
 
 # Reject before any retries happen
 fetch := circuit_breaker(failures = 3, reset_after = 30) \%@\%

@@ -75,6 +75,41 @@ hello := log_call(logger = logger_message()) %@% function() "hi"
 hello()
 ```
 
+## The default logger
+
+`log_call()`, `async_log_call()` and the retry hooks `before_sleep_log()` and
+`after_sleep_log()` all take a `logger`. When you give none they use
+the `fnware.logger` option, or `logger_base()` if it is unset. Set it once to change them all:
+
+```{r default, eval = FALSE}
+options(fnware.logger = logger_message(threshold = "debug"))
+```
+
+The hooks log one event each, so they take a single `level` such as `"warn"`
+in place of a `log_levels()`. `before_sleep_log()` defaults to `"warn"` and
+`after_sleep_log()` to `"info"`.
+
+## Circuit breakers and fallbacks
+
+`circuit_breaker()` and `fallback()`, and their async versions, are silent
+unless you give them a `logger`. The `fnware.logger` option does not apply to
+them. A circuit breaker logs when the circuit opens (`"warn"`) and when it
+closes again (`"info"`), not each rejected call. `fallback()` logs each time it
+returns the default (`"warn"`). Change the levels with `level`:
+
+```{r circuit}
+flaky := circuit_breaker(
+  failures = 1,
+  logger = logger_message(),
+  level = c(open = "error")
+) %@% function() stop("service down")
+try(flaky(), silent = TRUE)
+
+safe := fallback(value = 0, logger = logger_message()) %@%
+  function() stop("boom")
+safe()
+```
+
 ## Using a logging package
 
 To log with another package, inherit from `logger_base` and add a method for

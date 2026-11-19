@@ -23,9 +23,8 @@ level_property <- function(name, default) {
   )
 }
 
-# A property holding a logger, defaulting to `logger_message()` so that output
-# can be silenced with `suppressMessages()`.
-logger_property <- function(default = quote(logger_message())) {
+# A property holding a logger. Defaults to the `fnware.logger` option.
+logger_property <- function(default = quote(getOption("fnware.logger", logger_base()))) {
   new_property(logger_base, default = default)
 }
 
@@ -40,6 +39,16 @@ logger_property <- function(default = quote(logger_message())) {
 #'   [message()], so it can be silenced with [suppressMessages()].
 #' * `logger_fn(class, level, msg, ...)` is the generic. Add a method to support
 #'   any logging package, see [extending_log].
+#'
+#' Every function that logs takes a `logger`: [log_call()], [async_log_call()],
+#' [before_sleep_log()] and [after_sleep_log()]. When none is given they use
+#' the logger in `getOption("fnware.logger")`, or `logger_base()` if that is
+#' unset. Set it once to change them all, e.g.
+#' `options(fnware.logger = logger_message(threshold = "debug"))`.
+#'
+#' [circuit_breaker()], [async_circuit_breaker()], [fallback()] and
+#' [async_fallback()] log only when given a `logger`, as they are silent
+#' otherwise and the option does not apply to them.
 #'
 #' `logger_base` and `logger_message` hide events below `threshold`. The `trace`
 #' events, such as the calls leading to an error, are below the default
@@ -63,6 +72,11 @@ logger_property <- function(default = quote(logger_message())) {
 #' logger_message()
 #' f := log_call(logger = logger_message()) %@% function(x) x
 #' f(1)
+#'
+#' # Change the logger used when none is given
+#' old <- options(fnware.logger = logger_message(threshold = "debug"))
+#' f(1)
+#' options(old)
 #' @rdname loggers
 #' @export
 logger_base := new_class(
@@ -108,6 +122,10 @@ method(logger_fn, logger_message) <- function(class, level, msg, ...) {
 
 #' The level of each event [log_call()] logs
 #'
+#' [log_call()] logs three events, so it takes one level for each. The hooks
+#' [before_sleep_log()] and [after_sleep_log()] log a single event, so they take
+#' a plain `level` string instead.
+#'
 #' @param start,finish,error The level of the event: one of `"trace"`,
 #'   `"debug"`, `"info"`, `"warn"`, `"error"` or `"fatal"`.
 #' @return An object to pass to the `level` argument of [log_call()].
@@ -121,6 +139,43 @@ log_levels := new_class(
     error = level_property("error", "error")
   )
 )
+
+# `logger` for the decorators that log only on request: `NULL` logs nothing.
+check_logger <- function(logger, arg = caller_arg(logger), call = caller_env()) {
+  if (!is.null(logger)) {
+    check_s7(logger, logger_base, "a logger or `NULL`", arg = arg, call = call)
+  }
+  invisible(logger)
+}
+
+# `level` must be `n` level names, e.g. "warn".
+check_level <- function(level, n = 1L, arg = caller_arg(level), call = caller_env()) {
+  if (
+    !is.character(level) ||
+      length(level) != n ||
+      anyNA(level) ||
+      !all(tolower(level) %in% LOG_LEVELS)
+  ) {
+    abort(
+      sprintf(
+        "`%s` must be %s of %s.",
+        arg,
+        if (n == 1L) "one" else "named levels, each one",
+        paste0("'", LOG_LEVELS, "'", collapse = ", ")
+      ),
+      call = call
+    )
+  }
+  invisible(level)
+}
+
+# Write `msg` at the level named `level`, if there is a logger.
+log_event <- function(logger, level, msg) {
+  if (!is.null(logger)) {
+    logger_fn(logger, prop(logger, tolower(level)), msg)
+  }
+  invisible()
+}
 
 # Is `level`, a label as passed to `logger_fn()`, at or above the logger's
 # threshold? A label that is not a level name cannot be ranked, so it is shown.

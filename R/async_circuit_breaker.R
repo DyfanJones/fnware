@@ -1,4 +1,4 @@
-#' @importFrom adorn := decorator
+#' @importFrom adorn := decorator decorator_context
 #' @importFrom rlang abort
 #' @include circuit_breaker_utils.R async_utils.R
 NULL
@@ -45,13 +45,23 @@ NULL
 #'   function(url) down()
 #' }
 #' @rdname async_circuit_breaker
-#' @usage async_circuit_breaker(f, failures = 5, reset_after = 30)
+#' @usage async_circuit_breaker(f, failures = 5, reset_after = 30, logger = NULL,
+#'   level = c(open = "warn", close = "info"))
 #' @export
 async_circuit_breaker := decorator(
-  function(f, failures = 5, reset_after = 30) {
+  function(
+    f,
+    failures = 5,
+    reset_after = 30,
+    logger = NULL,
+    level = c(open = "warn", close = "info")
+  ) {
     check_async("async_circuit_breaker", later = FALSE)
     check_number(failures, ge = 1, whole = TRUE)
     check_number(reset_after, gt = 0)
+    check_logger(logger)
+    levels <- circuit_levels(level)
+    fn <- decorator_context()$name
     circuit <- circuit_state(failures, reset_after)
     function(...) {
       token <- circuit$enter(exclusive = TRUE)
@@ -61,11 +71,20 @@ async_circuit_breaker := decorator(
       promises::then(
         call_as_promise(f, ...),
         onFulfilled = function(value) {
-          circuit$succeed(token)
+          changed <- circuit$succeed(token)
+          log_circuit(logger, levels, fn, changed, reset_after, NULL)
           value
         },
         onRejected = function(err) {
-          circuit$fail(token)
+          changed <- circuit$fail(token)
+          log_circuit(
+            logger,
+            levels,
+            fn,
+            changed,
+            reset_after,
+            as_condition(err)
+          )
           promises::promise_reject(err)
         }
       )

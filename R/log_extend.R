@@ -1,7 +1,9 @@
-#' Use a logging package with [log_call()]
+#' Use a logging package with fnware
 #'
-#' [log_call()] writes through a logger, see [logger_base]. To log with another
-#' package, inherit from `logger_base` and register a method for `logger_fn()`.
+#' [log_call()], [async_log_call()], [before_sleep_log()], [after_sleep_log()],
+#' [circuit_breaker()], [fallback()] and their async versions write through a
+#' logger, see [logger_base]. To log with
+#' another package, inherit from `logger_base` and register a method for `logger_fn()`.
 #' The package then owns the thresholds, layouts and appenders.
 #'
 #' `level` is the label from the logger's property for the event's level, so
@@ -9,6 +11,9 @@
 #' `info`, `warn`, `error` and `fatal` properties if the package names levels
 #' differently. A package that needs a logger object can have it passed in
 #' through the `logger` property, available as `class@logger`.
+#'
+#' To use the package everywhere without passing `logger` each time, set
+#' `options(fnware.logger = <your logger>)`, see [logger_base].
 #'
 #' The message may contain braces, so with the logger package wrap it in
 #' `skip_formatter()` to stop it being treated as a glue template.

@@ -35,6 +35,18 @@ describe()
 Only errors are caught by default. Set `class` to catch other conditions, such
 as `class = "warning"`. A caught condition ends the call, as with `tryCatch()`.
 
+## Logging
+
+A fallback hides a failure, so you may want a record of it. Give `fallback()` a
+`logger`, see `vignette("logging")`, and it logs each time the default is used,
+at `level = "warn"`. It is silent by default.
+
+```{r logging}
+safe := fallback(value = 0, logger = logger_message()) %@%
+  function() stop("boom")
+safe()
+```
+
 ## Stacking with retry and the circuit breaker
 
 Put `fallback()` outermost. The default is then used only once `retry()` has
