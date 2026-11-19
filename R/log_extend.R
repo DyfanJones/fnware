@@ -12,9 +12,6 @@
 #' differently. A package that needs a logger object can have it passed in
 #' through the `logger` property, available as `class@logger`.
 #'
-#' To use the package everywhere without passing `logger` each time, set
-#' `options(fnware.logger = <your logger>)`, see [logger_base].
-#'
 #' The message may contain braces, so with the logger package wrap it in
 #' `skip_formatter()` to stop it being treated as a glue template.
 #'

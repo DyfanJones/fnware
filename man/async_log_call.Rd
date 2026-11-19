@@ -4,14 +4,13 @@
 \alias{async_log_call}
 \title{Log the calls to an asynchronous function}
 \usage{
-async_log_call(f, logger = getOption("fnware.logger", logger_base()), level = log_levels(), elapsed = TRUE)
+async_log_call(f, logger = logger_base(), level = log_levels(), elapsed = TRUE)
 }
 \arguments{
 \item{f}{The function to decorate. Usually supplied by \verb{\%@\%} rather than directly.}
 
 \item{logger}{A \link[=logger_base]{logger}, such as \code{\link[=logger_message]{logger_message()}}. Defaults
-to the \code{fnware.logger} option, or \code{logger_base()}. See \link{extending_log} to use
-a logging package.}
+to \code{logger_base()}. See \link{extending_log} to use a logging package.}
 
 \item{level}{A \code{\link[=log_levels]{log_levels()}} giving the level of the start, finish and error
 events.}

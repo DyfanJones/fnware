@@ -17,9 +17,6 @@ The package then owns the thresholds, layouts and appenders.
 differently. A package that needs a logger object can have it passed in
 through the \code{logger} property, available as \code{class@logger}.
 
-To use the package everywhere without passing \code{logger} each time, set
-\verb{options(fnware.logger = <your logger>)}, see \link{logger_base}.
-
 The message may contain braces, so with the logger package wrap it in
 \code{skip_formatter()} to stop it being treated as a glue template.
 }

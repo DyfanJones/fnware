@@ -69,13 +69,11 @@ any logging package, see \link{extending_log}.
 
 Every function that logs takes a \code{logger}: \code{\link[=log_call]{log_call()}}, \code{\link[=async_log_call]{async_log_call()}},
 \code{\link[=before_sleep_log]{before_sleep_log()}} and \code{\link[=after_sleep_log]{after_sleep_log()}}. When none is given they use
-the logger in \code{getOption("fnware.logger")}, or \code{logger_base()} if that is
-unset. Set it once to change them all, e.g.
-\code{options(fnware.logger = logger_message(threshold = "debug"))}.
+\code{logger_base()}.
 
 \code{\link[=circuit_breaker]{circuit_breaker()}}, \code{\link[=async_circuit_breaker]{async_circuit_breaker()}}, \code{\link[=fallback]{fallback()}} and
 \code{\link[=async_fallback]{async_fallback()}} log only when given a \code{logger}, as they are silent
-otherwise and the option does not apply to them.
+otherwise.
 
 \code{logger_base} and \code{logger_message} hide events below \code{threshold}. The \code{trace}
 events, such as the calls leading to an error, are below the default
@@ -86,9 +84,4 @@ logging package is free to ignore \code{threshold} and use that package's own.
 logger_message()
 f := log_call(logger = logger_message()) \%@\% function(x) x
 f(1)
-
-# Change the logger used when none is given
-old <- options(fnware.logger = logger_message(threshold = "debug"))
-f(1)
-options(old)
 }

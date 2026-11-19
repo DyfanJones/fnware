@@ -16,8 +16,7 @@ after_sleep_fn := new_generic("class", function(class, state, ...) {
 #' * `after_sleep_log()` logs a message describing the attempt with `logger`.
 #'
 #' @param logger A [logger][logger_base], such as [logger_message()]. Defaults
-#'   to the `fnware.logger` option, or `logger_base()`. See [extending_log] to use
-#'   a logging package.
+#'   to `logger_base()`. See [extending_log] to use a logging package.
 #' @param level The level the message is logged at: one of `"trace"`,
 #'   `"debug"`, `"info"`, `"warn"`, `"error"` or `"fatal"`. A hook logs a single
 #'   event, so this is one string, unlike the [log_levels()] of [log_call()].

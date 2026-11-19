@@ -79,11 +79,7 @@ hello()
 
 `log_call()`, `async_log_call()` and the retry hooks `before_sleep_log()` and
 `after_sleep_log()` all take a `logger`. When you give none they use
-the `fnware.logger` option, or `logger_base()` if it is unset. Set it once to change them all:
-
-```{r default, eval = FALSE}
-options(fnware.logger = logger_message(threshold = "debug"))
-```
+`logger_base()`.
 
 The hooks log one event each, so they take a single `level` such as `"warn"`
 in place of a `log_levels()`. `before_sleep_log()` defaults to `"warn"` and
@@ -92,8 +88,7 @@ in place of a `log_levels()`. `before_sleep_log()` defaults to `"warn"` and
 ## Circuit breakers and fallbacks
 
 `circuit_breaker()` and `fallback()`, and their async versions, are silent
-unless you give them a `logger`. The `fnware.logger` option does not apply to
-them. A circuit breaker logs when the circuit opens (`"warn"`) and when it
+unless you give them a `logger`. A circuit breaker logs when the circuit opens (`"warn"`) and when it
 closes again (`"info"`), not each rejected call. `fallback()` logs each time it
 returns the default (`"warn"`). Change the levels with `level`:
 

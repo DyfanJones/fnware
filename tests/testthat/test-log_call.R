@@ -204,10 +204,6 @@ test_that("a failure names the call that failed", {
   )
 })
 
-test_that("the fnware.logger option sets the default logger", {
-  withr::local_options(fnware.logger = logger_message())
-  f <- log_call() %@% function(x) x
-  expect_match(testthat::capture_messages(f(1))[[1]], "Start")
-  withr::local_options(fnware.logger = "nope")
-  expect_error(log_call() %@% function(x) x, "must be a logger")
+test_that("log_call() rejects a logger that is not one", {
+  expect_error(log_call(logger = "nope") %@% function(x) x, "must be a logger")
 })

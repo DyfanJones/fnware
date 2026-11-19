@@ -23,8 +23,8 @@ level_property <- function(name, default) {
   )
 }
 
-# A property holding a logger. Defaults to the `fnware.logger` option.
-logger_property <- function(default = quote(getOption("fnware.logger", logger_base()))) {
+# A property holding a logger.
+logger_property <- function(default = quote(logger_base())) {
   new_property(logger_base, default = default)
 }
 
@@ -42,13 +42,11 @@ logger_property <- function(default = quote(getOption("fnware.logger", logger_ba
 #'
 #' Every function that logs takes a `logger`: [log_call()], [async_log_call()],
 #' [before_sleep_log()] and [after_sleep_log()]. When none is given they use
-#' the logger in `getOption("fnware.logger")`, or `logger_base()` if that is
-#' unset. Set it once to change them all, e.g.
-#' `options(fnware.logger = logger_message(threshold = "debug"))`.
+#' `logger_base()`.
 #'
 #' [circuit_breaker()], [async_circuit_breaker()], [fallback()] and
 #' [async_fallback()] log only when given a `logger`, as they are silent
-#' otherwise and the option does not apply to them.
+#' otherwise.
 #'
 #' `logger_base` and `logger_message` hide events below `threshold`. The `trace`
 #' events, such as the calls leading to an error, are below the default
@@ -72,11 +70,7 @@ logger_property <- function(default = quote(getOption("fnware.logger", logger_ba
 #' logger_message()
 #' f := log_call(logger = logger_message()) %@% function(x) x
 #' f(1)
-#'
-#' # Change the logger used when none is given
-#' old <- options(fnware.logger = logger_message(threshold = "debug"))
-#' f(1)
-#' options(old)
+
 #' @rdname loggers
 #' @export
 logger_base := new_class(

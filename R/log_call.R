@@ -22,8 +22,7 @@ NULL
 #'
 #' @param f The function to decorate. Usually supplied by `%@%` rather than directly.
 #' @param logger A [logger][logger_base], such as [logger_message()]. Defaults
-#'   to the `fnware.logger` option, or `logger_base()`. See [extending_log] to use
-#'   a logging package.
+#'   to `logger_base()`. See [extending_log] to use a logging package.
 #' @param level A [log_levels()] giving the level of the start, finish and error
 #'   events.
 #' @param elapsed Include the time taken in the finish message?
@@ -42,7 +41,7 @@ NULL
 log_call := decorator(
   function(
     f,
-    logger = getOption("fnware.logger", logger_base()),
+    logger = logger_base(),
     level = log_levels(),
     elapsed = TRUE
   ) {
