@@ -7,10 +7,14 @@
 \usage{
 before_sleep_none()
 
-before_sleep_log(logger = message)
+before_sleep_log(logger = logger_message(), level = "warn")
 }
 \arguments{
-\item{logger}{Function taking a single message string. Defaults to \code{\link[=message]{message()}}.}
+\item{logger}{A \link[=logger_base]{logger}, such as \code{\link[=logger_message]{logger_message()}}. See
+\link{extending_log} to use a logging package.}
+
+\item{level}{The level the message is logged at: one of \code{"trace"},
+\code{"debug"}, \code{"info"}, \code{"warn"}, \code{"error"} or \code{"fatal"}.}
 }
 \value{
 A hook to pass to \code{\link[=retry]{retry()}}.
@@ -18,9 +22,9 @@ A hook to pass to \code{\link[=retry]{retry()}}.
 \description{
 \itemize{
 \item \code{before_sleep_none()} does nothing.
-\item \code{before_sleep_log()} passes a message describing the attempt to \code{logger}.
+\item \code{before_sleep_log()} logs a message describing the attempt with \code{logger}.
 }
 }
 \examples{
-before_sleep_log(function(msg) cat(msg, "\n"))
+before_sleep_log(logger_message(), level = "info")
 }

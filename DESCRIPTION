@@ -13,10 +13,9 @@ URL: https://dyfanjones.github.io/fnware/, https://github.com/DyfanJones/fnware
 BugReports: https://github.com/DyfanJones/fnware/issues
 Depends:
     R (>= 4.4.0)
-Imports: adorn, S7 (>= 0.2.2.9000), rlang, cachem, stats, withr
+Imports: adorn, S7 (>= 1.0.0), rlang, cachem, stats, withr
 Remotes: 
-    DyfanJones/adorn,
-    RConsortium/S7
+    DyfanJones/adorn
 Suggests: 
     callr,
     later,

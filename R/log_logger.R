@@ -23,6 +23,12 @@ level_property <- function(name, default) {
   )
 }
 
+# A property holding a logger, defaulting to `logger_message()` so that output
+# can be silenced with `suppressMessages()`.
+logger_property <- function(default = quote(logger_message())) {
+  new_property(logger_base, default = default)
+}
+
 #' Loggers
 #'
 #' [log_call()] hands each message to a logger. A logger is an S7 object that

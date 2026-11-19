@@ -186,14 +186,15 @@ from a setting without removing the decorator.
 
 ## Seeing what is happening
 
-Silent retries are hard to debug. The hooks run around each sleep:
+Silent retries are hard to debug. The hooks run around each sleep and write through a logger, see
+[logger_base]:
 
 ```{r hooks}
 logged <- retry(
   stop = stop_after_attempt(4),
   wait = wait_fixed(0.01),
-  before_sleep = before_sleep_log(function(msg) cat(msg, "\n")),
-  after_sleep = after_sleep_log(function(msg) cat(msg, "\n"))
+  before_sleep = before_sleep_log(logger_message()),
+  after_sleep = after_sleep_log(logger_message(), level = "info")
 ) %@%
   make_flaky(2)
 logged()

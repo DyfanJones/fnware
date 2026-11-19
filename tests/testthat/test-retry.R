@@ -57,16 +57,34 @@ test_that("a function returning a condition is not treated as failure", {
 
 test_that("logging hooks fire", {
   fl <- flaky(1)
-  msgs <- character()
-  log <- function(x) msgs <<- c(msgs, x)
+  cap <- capture_logger()
   g <- retry(
     stop = stop_after_attempt(3),
-    before_sleep = before_sleep_log(log),
-    after_sleep = after_sleep_log(log)
+    before_sleep = before_sleep_log(cap$logger),
+    after_sleep = after_sleep_log(cap$logger)
   )(fl$f)
   g()
-  expect_length(msgs, 2L)
-  expect_match(msgs[[1]], "Attempt 1 failed")
+  seen <- cap$get()
+  expect_length(seen, 2L)
+  expect_match(seen[[1]]$msg, "Attempt 1 failed")
+  expect_equal(seen[[1]]$level, "WARN")
+})
+
+test_that("log hooks use the level given and default to message()", {
+  cap <- capture_logger()
+  g <- retry(
+    stop = stop_after_attempt(2),
+    before_sleep = before_sleep_log(cap$logger, level = "debug")
+  )(flaky(1)$f)
+  g()
+  expect_equal(cap$get()[[1]]$level, "DEBUG")
+  expect_error(before_sleep_log(level = "loud"), "must be one of")
+  expect_error(after_sleep_log(logger = function(x) x))
+  g <- retry(
+    stop = stop_after_attempt(2),
+    before_sleep = before_sleep_log()
+  )(flaky(1)$f)
+  expect_message(g(), "Attempt 1 failed")
 })
 
 test_that("stop_any / stop_all combine conditions", {
@@ -194,17 +212,17 @@ test_that("retry_error_callback supplies the fallback value", {
 })
 
 test_that("log hooks cope with result based retries", {
-  msgs <- character()
+  cap <- capture_logger()
   g <- retry(
     retry = retry_if_result(\(x) x < 2),
     stop = stop_after_attempt(3),
-    before_sleep = before_sleep_log(\(x) msgs <<- c(msgs, x))
+    before_sleep = before_sleep_log(cap$logger)
   )(local({
     n <- 0
     function() (n <<- n + 1)
   }))
   g()
-  expect_match(msgs, "unacceptable result")
+  expect_match(cap$get()[[1]]$msg, "unacceptable result")
 })
 
 test_that("wait_chain walks the strategies then repeats the last", {

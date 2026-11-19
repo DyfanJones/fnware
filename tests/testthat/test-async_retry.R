@@ -109,15 +109,19 @@ test_that("other work runs while an attempt waits", {
 })
 
 test_that("hooks run around each wait", {
-  log <- character()
+  cap <- capture_logger()
   f <- async_retry(
     stop = stop_after_attempt(3),
-    before_sleep = before_sleep_log(function(msg) log <<- c(log, "before")),
-    after_sleep = after_sleep_log(function(msg) log <<- c(log, "after"))
+    before_sleep = before_sleep_log(cap$logger),
+    after_sleep = after_sleep_log(cap$logger)
   ) %@%
     make_flaky(2)
   settle_promise(f())
-  expect_equal(log, c("before", "after", "before", "after"))
+  seen <- vapply(cap$get(), \(x) x$msg, character(1))
+  expect_equal(
+    sub(" .*", "", seen),
+    c("Attempt", "Slept", "Attempt", "Slept")
+  )
 })
 
 test_that("custom strategies work as they do in retry()", {
